@@ -95,6 +95,85 @@ List discoverable skills without installing:
 npx skills add https://github.com/nivoset/skills --list
 ```
 
+## Bug Bash Skills
+
+This repository includes a bug-bash skill family:
+
+- `bug-bash`: orchestrates a whole-codebase or area-specific review and returns one merged report
+- `bug-bash-security-privacy-permissions`
+- `bug-bash-data-integrity`
+- `bug-bash-financial-correctness`
+- `bug-bash-core-flow`
+- `bug-bash-error-handling`
+- `bug-bash-validation`
+- `bug-bash-race-idempotency`
+- `bug-bash-external-integrations`
+- `bug-bash-test-weakness`
+- `bug-bash-frontend-state-ux`
+- `bug-bash-observability`
+- `bug-bash-maintainability-risk`
+
+### Install The Bug Bash Skills
+
+Install the full bug-bash family:
+
+```bash
+npx skills add https://github.com/nivoset/skills --skill 'bug-bash*'
+```
+
+Install only the orchestrator:
+
+```bash
+npx skills add https://github.com/nivoset/skills --skill bug-bash
+```
+
+Install one focused review skill:
+
+```bash
+npx skills add https://github.com/nivoset/skills --skill bug-bash-test-weakness
+```
+
+### Use The Bug Bash Skills
+
+Use `bug-bash` when you want one combined report across the whole codebase or a named area.
+
+Example prompts:
+
+```text
+Run bug-bash on this repo and focus on the highest-risk user flows.
+```
+
+```text
+Use bug-bash on the billing area and prioritize payment, retry, and webhook problems.
+```
+
+Use a focused subskill when you want a domain-specific review without running the full orchestrator.
+
+Example prompts:
+
+```text
+Use bug-bash-security-privacy-permissions on the admin export routes.
+```
+
+```text
+Use bug-bash-test-weakness on the checkout tests and find false confidence.
+```
+
+```text
+Use bug-bash-frontend-state-ux on the onboarding screens.
+```
+
+### Bug Bash Behavior
+
+All bug-bash skills:
+
+- default to whole-codebase review unless the prompt names a narrower area
+- accept freeform scope such as a path, module, route, workflow, screen, data model, job, integration, or permission boundary
+- prefer read-only investigation and existing tests
+- follow the codebase's current testing standards first
+- recommend the minimum test or harness additions needed when stable verification is not possible with the current setup
+- use a shared bug-bash report format with severity and confidence, not numeric scoring
+
 ## Publishing Guidance
 
 - Keep only real, installable skills under `skills/`.
