@@ -1,0 +1,28 @@
+---
+name: my-skill
+description: >
+  Explain what this skill does and when an agent should use it.
+  Include concrete trigger conditions, domains, or user requests.
+---
+
+# My Skill
+
+## Purpose
+
+State the capability this skill adds.
+
+## When to Use
+
+- Use when the user asks for ...
+- Use when the task involves ...
+- Do not use when ...
+
+## Workflow
+
+1. Gather the minimum context needed.
+2. Apply the domain-specific instructions.
+3. Return the result in the expected format.
+
+## References
+
+Add pointers to any `references/` files if the skill needs deeper material.
