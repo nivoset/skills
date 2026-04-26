@@ -174,6 +174,70 @@ All bug-bash skills:
 - recommend the minimum test or harness additions needed when stable verification is not possible with the current setup
 - use a shared bug-bash report format with severity and confidence, not numeric scoring
 
+## Planning Skills
+
+This repository also includes a planning skill family:
+
+- `planning-orchestrator`: researches the codebase, clarifies unresolved decisions, and returns a developer-consumable ticket breakdown
+- `planning-codebase-researcher`: maps existing behavior, reuse paths, risks, dependencies, and test coverage that matter to planning
+- `planning-decomposer`: splits a scoped outcome into independently testable leaf tickets with plain-English acceptance tests
+
+### Install The Planning Skills
+
+Install the full planning family:
+
+```bash
+npx skills add https://github.com/nivoset/skills --skill 'planning-*'
+```
+
+Install only the orchestrator:
+
+```bash
+npx skills add https://github.com/nivoset/skills --skill planning-orchestrator
+```
+
+Install one focused planning skill:
+
+```bash
+npx skills add https://github.com/nivoset/skills --skill planning-decomposer
+```
+
+### Use The Planning Skills
+
+Use `planning-orchestrator` when you want one main entrypoint that researches first, asks only decision-critical questions, and returns a ticket tree with detailed leaf tickets.
+
+Example prompts:
+
+```text
+Use planning-orchestrator to break this feature into implementation tickets after inspecting the repo first.
+```
+
+```text
+Use planning-orchestrator to plan the migration and call out real dependencies between tickets.
+```
+
+Use a focused planning skill when you already know the scope and want one part of the workflow.
+
+Example prompts:
+
+```text
+Use planning-codebase-researcher to map the current invitation flow and identify reuse points before we plan changes.
+```
+
+```text
+Use planning-decomposer to split this approved feature spec into independently testable tickets.
+```
+
+### Planning Skill Behavior
+
+All planning skills:
+
+- inspect the repository before asking avoidable questions
+- prefer concise, evidence-backed code references with file paths and line numbers when available
+- keep ticket titles outcome-oriented and user- or stakeholder-legible
+- require plain-English acceptance tests for leaf tickets
+- keep long templates and checklists in skill-local `references/` files instead of bloating `SKILL.md`
+
 ## Publishing Guidance
 
 - Keep only real, installable skills under `skills/`.
