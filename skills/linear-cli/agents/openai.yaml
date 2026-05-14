@@ -1,0 +1,4 @@
+interface:
+  display_name: "Linear CLI"
+  short_description: "Use schpet linear-cli for Linear work"
+  default_prompt: "Use $linear-cli to inspect and manage Linear issues from the command line."
