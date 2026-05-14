@@ -95,84 +95,55 @@ List discoverable skills without installing:
 npx skills add https://github.com/nivoset/skills --list
 ```
 
-## Bug Bash Skills
+## Risk Review Skill
 
-This repository includes a bug-bash skill family:
+This repository includes a `risk-review` skill that orchestrates whole-codebase, area-specific, and plan-first risk reviews while keeping focused review briefs nested inside the skill directory.
 
-- `bug-bash`: orchestrates a whole-codebase or area-specific review and returns one merged report
-- `bug-bash-security-privacy-permissions`
-- `bug-bash-data-integrity`
-- `bug-bash-financial-correctness`
-- `bug-bash-core-flow`
-- `bug-bash-error-handling`
-- `bug-bash-validation`
-- `bug-bash-race-idempotency`
-- `bug-bash-external-integrations`
-- `bug-bash-test-weakness`
-- `bug-bash-frontend-state-ux`
-- `bug-bash-observability`
-- `bug-bash-maintainability-risk`
+### Install The Risk Review Skill
 
-### Install The Bug Bash Skills
-
-Install the full bug-bash family:
+Install the review orchestrator:
 
 ```bash
-npx skills add https://github.com/nivoset/skills --skill 'bug-bash*'
+npx skills add https://github.com/nivoset/skills --skill risk-review
 ```
 
-Install only the orchestrator:
+### Use The Risk Review Skill
 
-```bash
-npx skills add https://github.com/nivoset/skills --skill bug-bash
-```
-
-Install one focused review skill:
-
-```bash
-npx skills add https://github.com/nivoset/skills --skill bug-bash-test-weakness
-```
-
-### Use The Bug Bash Skills
-
-Use `bug-bash` when you want one combined report across the whole codebase or a named area.
+Use `risk-review` when you want one combined report across an implementation plan, whole codebase, or named area.
 
 Example prompts:
 
 ```text
-Run bug-bash on this repo and focus on the highest-risk user flows.
+Use risk-review on this implementation plan and call out missed risks before we build.
 ```
 
 ```text
-Use bug-bash on the billing area and prioritize payment, retry, and webhook problems.
-```
-
-Use a focused subskill when you want a domain-specific review without running the full orchestrator.
-
-Example prompts:
-
-```text
-Use bug-bash-security-privacy-permissions on the admin export routes.
+Run risk-review on this repo and focus on the highest-risk user flows.
 ```
 
 ```text
-Use bug-bash-test-weakness on the checkout tests and find false confidence.
+Use risk-review on the billing area and prioritize payment, retry, and webhook risks.
 ```
 
 ```text
-Use bug-bash-frontend-state-ux on the onboarding screens.
+Use risk-review on the checkout tests and find false confidence.
 ```
 
-### Bug Bash Behavior
+```text
+Use risk-review on the onboarding screens and check whether UI state matches backend behavior.
+```
 
-All bug-bash skills:
+### Risk Review Behavior
 
-- default to whole-codebase review unless the prompt names a narrower area
-- accept freeform scope such as a path, module, route, workflow, screen, data model, job, integration, or permission boundary
-- prefer read-only investigation and existing tests
-- follow the codebase's current testing standards first
-- recommend the minimum test or harness additions needed when stable verification is not possible with the current setup
-- use a shared bug-bash report format with severity and confidence, not numeric scoring
+The `risk-review` skill:
+
+- defaults to whole-codebase review unless the prompt names a narrower area
+- reviews a provided implementation plan before launching deeper investigation lanes
+- accepts freeform scope such as a path, module, route, workflow, screen, data model, job, integration, or permission boundary
+- prefers read-only investigation and existing tests
+- follows the codebase's current testing standards first
+- recommends the minimum test or harness additions needed when stable verification is not possible with the current setup
+- uses a shared report format with severity and confidence, not numeric scoring
 
 ## Planning Skills
 

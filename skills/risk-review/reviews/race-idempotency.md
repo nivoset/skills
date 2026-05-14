@@ -1,9 +1,4 @@
----
-name: bug-bash-race-idempotency
-description: Review a whole codebase or named area for concurrency, duplicate submission, replay, and stale-state bugs using the shared bug bash report format.
----
-
-# Bug Bash Race Idempotency
+# Race Idempotency Review
 
 ## Purpose
 
@@ -24,7 +19,7 @@ Default to the full codebase. Narrow when the prompt names a `workflow`, `route`
 - Prefer existing tests, replay fixtures, and queue or webhook harnesses.
 - Do not commit or patch code.
 - If concurrency behavior is not testable with the current setup, explain the minimum stable coverage or harness addition needed.
-- Use the shared severity, confidence, and finding schema from `bug-bash`.
+- Use the shared severity, confidence, and finding schema from `risk-review`.
 
 ## Investigation Focus
 
@@ -59,6 +54,6 @@ Attack vectors to emphasize:
 
 ## Reporting
 
-Return a standalone scoped `# Bug Bash Report`.
+Return a standalone scoped `# Risk Review Report`.
 
 Escalate findings based on business impact, especially when duplicate execution can move money, data, or destructive actions.

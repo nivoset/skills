@@ -16,7 +16,7 @@ This skill is the main planning entrypoint. It owns repository mapping, research
 - Use when the user wants to plan a feature, refactor, migration, integration, or large repair.
 - Use when the user wants the work split into developer-consumable tickets.
 - Use when the user wants codebase research before questions or estimates.
-- Do not use when the user only wants implementation, code review, or a bug bash.
+- Do not use when the user only wants implementation, code review, or a risk review.
 
 ## Scope Inputs
 

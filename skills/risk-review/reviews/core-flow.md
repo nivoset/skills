@@ -1,9 +1,4 @@
----
-name: bug-bash-core-flow
-description: Review a whole codebase or named area for broken primary user journeys, misleading success states, and incomplete end-to-end behavior using the shared bug bash report format.
----
-
-# Bug Bash Core Flow
+# Core Flow Review
 
 ## Purpose
 
@@ -24,7 +19,7 @@ Default to the full codebase. Narrow when the prompt names a `workflow`, `screen
 - Prefer read-only investigation and existing tests.
 - Do not commit or repair code.
 - If end-to-end confidence is weak because current tests are fragmented, propose the minimum stable coverage needed.
-- Use the shared severity, confidence, and finding schema from `bug-bash`.
+- Use the shared severity, confidence, and finding schema from `risk-review`.
 
 ## Investigation Focus
 
@@ -60,6 +55,6 @@ Attack vectors to emphasize:
 
 ## Reporting
 
-Return a standalone scoped `# Bug Bash Report`.
+Return a standalone scoped `# Risk Review Report`.
 
 Prioritize issues that break the user journey even when the underlying technical defect seems small.

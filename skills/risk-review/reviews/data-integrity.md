@@ -1,9 +1,4 @@
----
-name: bug-bash-data-integrity
-description: Review a whole codebase or named area for data loss, corruption, partial writes, and invalid state bugs using the shared bug bash report format.
----
-
-# Bug Bash Data Integrity
+# Data Integrity Review
 
 ## Purpose
 
@@ -24,7 +19,7 @@ Default to the full codebase. Narrow when the prompt names a `path`, `module`, `
 - Prefer read-only investigation and existing tests.
 - Do not commit or repair code.
 - Reuse current test patterns where possible. If stable write-path validation is missing, describe the minimum harness or fixture improvement needed.
-- Use the shared severity, confidence, and finding schema from `bug-bash`.
+- Use the shared severity, confidence, and finding schema from `risk-review`.
 
 ## Investigation Focus
 
@@ -64,6 +59,6 @@ Attack vectors to emphasize:
 
 ## Reporting
 
-Return a standalone scoped `# Bug Bash Report`.
+Return a standalone scoped `# Risk Review Report`.
 
 Document meaningful data loss or corruption risk even if the bug is not fully reproduced, provided the evidence supports at least `Likely`.

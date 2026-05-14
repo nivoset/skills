@@ -1,9 +1,4 @@
----
-name: bug-bash-financial-correctness
-description: Review a whole codebase or named area for billing, payments, credits, refunds, and accounting-sensitive bugs using the shared bug bash report format.
----
-
-# Bug Bash Financial Correctness
+# Financial Correctness Review
 
 ## Purpose
 
@@ -24,7 +19,7 @@ Default to the full codebase. Narrow when the prompt names a `path`, `module`, `
 - Prefer existing tests and fixtures.
 - Do not commit or patch code.
 - If stable financial verification is not possible with current tests, explain the minimum regression coverage needed.
-- Use the shared severity, confidence, and finding schema from `bug-bash`.
+- Use the shared severity, confidence, and finding schema from `risk-review`.
 
 ## Investigation Focus
 
@@ -62,6 +57,6 @@ Attack vectors to emphasize:
 
 ## Reporting
 
-Return a standalone scoped `# Bug Bash Report`.
+Return a standalone scoped `# Risk Review Report`.
 
 Treat a missing negative or idempotency test around important billing behavior as a real finding when it creates false confidence.

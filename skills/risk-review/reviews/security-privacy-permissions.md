@@ -1,9 +1,4 @@
----
-name: bug-bash-security-privacy-permissions
-description: Review a whole codebase or named area for auth, privacy, tenant isolation, and destructive permission bugs using the shared bug bash report format.
----
-
-# Bug Bash Security Privacy Permissions
+# Security Privacy Permissions Review
 
 ## Purpose
 
@@ -25,7 +20,7 @@ Default to the full codebase. Narrow when the prompt names a `path`, `module`, `
 - Prefer read-only investigation and existing tests.
 - Do not commit or apply fixes.
 - Follow existing test standards first. If stable permission verification is missing, explain the minimum test additions needed.
-- Use the shared severity, confidence, and finding schema from `bug-bash`.
+- Use the shared severity, confidence, and finding schema from `risk-review`.
 
 ## Investigation Focus
 
@@ -62,7 +57,7 @@ Attack vectors to emphasize:
 
 ## Reporting
 
-Return a standalone scoped `# Bug Bash Report`.
+Return a standalone scoped `# Risk Review Report`.
 
 Fully document `Critical`, `High`, and `Medium` findings. Summarize `Low` findings unless they are especially actionable or reveal a broader pattern.
 

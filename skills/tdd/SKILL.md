@@ -121,7 +121,7 @@ Compare completed behavior against the ticket requirements.
 
 ## Ticket Observations
 
-Any red, green, verifier, reviewer, or bug-bash agent may identify a meaningful gap while working. Add a ticket comment only when the observation is:
+Any red, green, verifier, reviewer, or risk-review agent may identify a meaningful gap while working. Add a ticket comment only when the observation is:
 
 - related to the current ticket area,
 - actionable,
@@ -133,18 +133,18 @@ Good observations include missing null handling, an exception path that can brea
 
 If creating or editing an external ticket comment is visible to other people, follow the active client or repo policy for approval before posting.
 
-## Bug-Bash Extension
+## Risk Review Extension
 
-After the normal TDD loop is stable, spin up a bug-bash agent for the ticket scope.
+After the normal TDD loop is stable, spin up a risk-review agent for the ticket scope.
 
-Bug-bash agent responsibilities:
+Risk-review agent responsibilities:
 
 - Look for defects and gaps directly related to the ticket.
 - Ignore issues outside the ticket unless they block the ticket's correctness.
 - For each meaningful finding, attempt to build the smallest behavior test that proves it.
 - Hand the proposed failing test to the red verifier.
 
-If the bug-bash test fails for the expected reason and is aligned with the ticket, run the normal red verifier, green agent, reviewer, refactor, and commit flow for that failure.
+If the risk-review test fails for the expected reason and is aligned with the ticket, run the normal red verifier, green agent, reviewer, refactor, and commit flow for that failure.
 
 If the finding is real but outside scope, leave a ticket observation instead of expanding the implementation.
 

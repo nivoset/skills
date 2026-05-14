@@ -1,9 +1,4 @@
----
-name: bug-bash-observability
-description: Review a whole codebase or named area for missing logs, traces, alerts, and auditability gaps that hide important failures using the shared bug bash report format.
----
-
-# Bug Bash Observability
+# Observability Review
 
 ## Purpose
 
@@ -24,7 +19,7 @@ Default to the full codebase. Narrow when the prompt names a `workflow`, `job`, 
 - Prefer existing tests and operational docs when present.
 - Do not commit or patch code.
 - If observability is hard to verify automatically, describe the minimum logging or audit checks needed.
-- Use the shared severity, confidence, and finding schema from `bug-bash`.
+- Use the shared severity, confidence, and finding schema from `risk-review`.
 
 ## Investigation Focus
 
@@ -57,6 +52,6 @@ Attack vectors to emphasize:
 
 ## Reporting
 
-Return a standalone scoped `# Bug Bash Report`.
+Return a standalone scoped `# Risk Review Report`.
 
 Treat missing observability around destructive actions, billing, permissions, and background jobs as high-risk even when the product still appears to function.

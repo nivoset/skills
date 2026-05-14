@@ -1,9 +1,4 @@
----
-name: bug-bash-error-handling
-description: Review a whole codebase or named area for unhandled exceptions, swallowed failures, and unclear recovery behavior using the shared bug bash report format.
----
-
-# Bug Bash Error Handling
+# Error Handling Review
 
 ## Purpose
 
@@ -24,7 +19,7 @@ Default to the full codebase. Narrow when the prompt names a `path`, `module`, `
 - Prefer existing tests, logs, and error contracts where available.
 - Do not commit or repair code.
 - If the code lacks stable error-path tests, explain the minimum additions needed.
-- Use the shared severity, confidence, and finding schema from `bug-bash`.
+- Use the shared severity, confidence, and finding schema from `risk-review`.
 
 ## Investigation Focus
 
@@ -60,6 +55,6 @@ Attack vectors to emphasize:
 
 ## Reporting
 
-Return a standalone scoped `# Bug Bash Report`.
+Return a standalone scoped `# Risk Review Report`.
 
 Call out places where the UI or API claims success while the underlying action can fail invisibly.

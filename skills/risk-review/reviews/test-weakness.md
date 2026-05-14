@@ -1,9 +1,4 @@
----
-name: bug-bash-test-weakness
-description: Review a whole codebase or named area for misleading tests, weak assertions, and false confidence using the shared bug bash report format.
----
-
-# Bug Bash Test Weakness
+# Test Weakness Review
 
 ## Purpose
 
@@ -24,7 +19,7 @@ Default to the full codebase. Narrow when the prompt names a `path`, `module`, `
 - Prefer repo-standard testing practices and compare tests against real code paths.
 - Do not commit or rewrite tests as part of the review.
 - If strong coverage is not currently possible, describe the smallest stable additions or rewrites needed.
-- Use the shared severity, confidence, and finding schema from `bug-bash`.
+- Use the shared severity, confidence, and finding schema from `risk-review`.
 
 ## Investigation Focus
 
@@ -67,6 +62,6 @@ Attack vectors to emphasize:
 
 ## Reporting
 
-Return a standalone scoped `# Bug Bash Report`.
+Return a standalone scoped `# Risk Review Report`.
 
 Treat missing or weak tests around billing, permissions, destructive actions, and core workflows as potentially `High` severity even without a reproduced production bug.

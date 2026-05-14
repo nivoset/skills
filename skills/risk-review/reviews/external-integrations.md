@@ -1,9 +1,4 @@
----
-name: bug-bash-external-integrations
-description: Review a whole codebase or named area for third-party API, webhook, timeout, and fallback bugs using the shared bug bash report format.
----
-
-# Bug Bash External Integrations
+# External Integrations Review
 
 ## Purpose
 
@@ -24,7 +19,7 @@ Default to the full codebase. Narrow when the prompt names an `integration`, `mo
 - Prefer existing mocks, fixtures, and integration-specific tests where they are trustworthy.
 - Do not commit or repair code.
 - If current tests over-mock the provider boundary, explain the minimum stable contract coverage needed.
-- Use the shared severity, confidence, and finding schema from `bug-bash`.
+- Use the shared severity, confidence, and finding schema from `risk-review`.
 
 ## Investigation Focus
 
@@ -61,6 +56,6 @@ Attack vectors to emphasize:
 
 ## Reporting
 
-Return a standalone scoped `# Bug Bash Report`.
+Return a standalone scoped `# Risk Review Report`.
 
 Treat overly fake integration tests as findings when they create false confidence around important business behavior.

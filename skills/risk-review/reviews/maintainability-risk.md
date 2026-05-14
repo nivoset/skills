@@ -1,9 +1,4 @@
----
-name: bug-bash-maintainability-risk
-description: Review a whole codebase or named area for maintainability problems that plausibly hide defects or make debugging unsafe using the shared bug bash report format.
----
-
-# Bug Bash Maintainability Risk
+# Maintainability Risk Review
 
 ## Purpose
 
@@ -25,7 +20,7 @@ Default to the full codebase. Narrow when the prompt names a `path`, `module`, `
 - Prefer existing tests, docs, and code ownership signals where available.
 - Do not commit or refactor code.
 - If the area is hard to validate safely with current tests, describe the minimum stabilization needed.
-- Use the shared severity, confidence, and finding schema from `bug-bash`.
+- Use the shared severity, confidence, and finding schema from `risk-review`.
 
 ## Investigation Focus
 
@@ -58,6 +53,6 @@ Attack vectors to emphasize:
 
 ## Reporting
 
-Return a standalone scoped `# Bug Bash Report`.
+Return a standalone scoped `# Risk Review Report`.
 
 Do not flood the report with architecture opinions. Keep only findings that materially affect defect risk or repair safety.

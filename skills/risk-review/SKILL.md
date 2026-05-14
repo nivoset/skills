@@ -1,26 +1,27 @@
 ---
-name: bug-bash
-description: Orchestrate a read-only bug bash across a whole codebase or a named area using specialized review subskills and a shared finding format.
+name: risk-review
+description: Use when reviewing an implementation plan, codebase, feature area, or pull request for likely defects, missed requirements, weak tests, security gaps, data risks, UX mismatches, or reliability issues before or after implementation.
 ---
 
-# Bug Bash
+# Risk Review
 
 ## Purpose
 
-Use this skill to run a codebase bug bash that finds, validates, prioritizes, and documents likely defects, incomplete behavior, weak tests, missing validations, unhandled failures, product mismatches, and flows where tests could pass while the product is broken.
+Use this skill to find, validate, prioritize, and document likely product and engineering risks before they become defects. It covers incomplete behavior, weak tests, missing validation, unhandled failures, product mismatches, security and privacy gaps, data integrity issues, financial correctness risks, and flows where tests could pass while the product is broken.
 
-This skill is the orchestrator. It owns repository mapping, investigation planning, subagent coordination, deduplication, prioritization, and final report assembly.
+This skill is the orchestrator. It owns plan review, repository mapping, investigation planning, subagent coordination, deduplication, prioritization, and final report assembly.
 
 ## When to Use
 
-- Use when the user asks for a bug bash, defect review, breakage review, or high-signal quality sweep.
+- Use when the user asks for a risk review, defect review, quality sweep, breakage review, or pre-implementation critique.
+- Use when the user provides a current plan and wants recommendations about best approaches, missed cases, testing gaps, or implementation risks.
 - Use when the user wants subagents to review the whole codebase or a named subsystem.
 - Use when the user wants a single merged report instead of disconnected notes.
 - Do not use when the user wants implementation or repairs instead of investigation.
 
 ## Scope Inputs
 
-Default to a whole-codebase review.
+Default to a whole-codebase review unless the user provides a plan or narrower scope.
 
 If the prompt narrows scope, accept freeform language and resolve it into one or more of these selectors:
 
@@ -33,12 +34,13 @@ If the prompt narrows scope, accept freeform language and resolve it into one or
 - `job`
 - `integration`
 - `permission boundary`
+- `implementation plan`
 
 State the resolved scope near the top of the report.
 
 ## Core Rules
 
-- Inspect the codebase before asking the operator questions.
+- Inspect the plan and codebase before asking the operator questions.
 - Prefer read-only investigation.
 - You may run existing tests, scripts, and static checks that do not change repo-tracked files.
 - Do not commit changes.
@@ -49,7 +51,7 @@ State the resolved scope near the top of the report.
 - If a trial test is created with approval, document the file, test name, purpose, and expected failure behavior. Do not commit it.
 - Follow the repo's existing testing standards and harnesses whenever they exist.
 - If stable verification is not possible with current tests or tooling, explain the minimum test or harness additions needed to make investigation reliable.
-- Stop after 25 meaningful findings. If you hit the cap, add: `Finding cap reached. Run a follow-up bug bash after these issues are triaged or repaired.`
+- Stop after 25 meaningful findings. If you hit the cap, add: `Finding cap reached. Run a follow-up risk review after these issues are triaged or repaired.`
 
 ## Severity And Confidence
 
@@ -73,7 +75,8 @@ Do not use numeric scoring.
 ## Investigation Workflow
 
 1. Map the repository before planning findings.
-2. Identify:
+2. If the user provided or referenced a plan, run the Plan Risk Pass before deeper review lanes.
+3. Identify:
    - app type and architecture
    - main user-facing flows
    - backend or API routes
@@ -86,8 +89,8 @@ Do not use numeric scoring.
    - test framework and test layout
    - high-risk modules
    - product copy, labels, or docs that imply behavior
-3. Build an investigation plan using the attack vectors below, ordered by business risk.
-4. Run focused sub-reviews in this priority order unless the repo clearly suggests a better order:
+4. Build an investigation plan using the attack vectors below, ordered by business risk.
+5. Run focused review lanes in this priority order unless the repo clearly suggests a better order:
    - security, privacy, and permissions
    - data integrity
    - financial correctness
@@ -100,7 +103,7 @@ Do not use numeric scoring.
    - frontend state and UX
    - observability
    - maintainability risk
-5. For each sub-review:
+6. For each review lane:
    - state scope
    - inspect relevant files
    - identify candidate issues
@@ -108,7 +111,23 @@ Do not use numeric scoring.
    - avoid broad questions
    - mark confidence clearly
    - avoid low-value noise
-6. Merge duplicates, prioritize by business impact, and produce one combined report.
+7. Merge duplicates, prioritize by business impact, and produce one combined report.
+
+## Plan Risk Pass
+
+When the user provides an implementation plan, current approach, ticket breakdown, or proposed architecture, review that plan before launching deeper lanes.
+
+Evaluate:
+
+- whether the approach matches existing architecture and local conventions
+- simpler or safer approaches already available in the codebase
+- likely missed edge cases, negative paths, permissions, validation, persistence, concurrency, and rollback behavior
+- test gaps that would let the planned work appear complete while still being broken
+- migration, rollout, observability, and support risks
+- ambiguous requirements that materially change implementation or acceptance tests
+- places where the plan overreaches, under-specifies behavior, or couples unrelated work
+
+Return plan recommendations early in the report. Tie each recommendation to evidence from the codebase or an explicit unresolved assumption.
 
 ## Attack Vectors
 
@@ -156,31 +175,32 @@ When asking:
 - ask only what is needed to classify or validate the finding
 - if ambiguity would require many follow-ups, create a `Needs external research` finding instead
 
-## Subskill Routing
+## Review Lane Briefs
 
-Use or simulate these focused review roles when the investigation benefits from decomposition:
+Use these nested briefs when the investigation benefits from decomposition. They are not standalone skills; load only the briefs relevant to the scope.
 
-- `bug-bash-security-privacy-permissions`
-- `bug-bash-data-integrity`
-- `bug-bash-financial-correctness`
-- `bug-bash-core-flow`
-- `bug-bash-error-handling`
-- `bug-bash-validation`
-- `bug-bash-race-idempotency`
-- `bug-bash-external-integrations`
-- `bug-bash-test-weakness`
-- `bug-bash-frontend-state-ux`
-- `bug-bash-observability`
-- `bug-bash-maintainability-risk`
+- [`reviews/security-privacy-permissions.md`](./reviews/security-privacy-permissions.md)
+- [`reviews/data-integrity.md`](./reviews/data-integrity.md)
+- [`reviews/financial-correctness.md`](./reviews/financial-correctness.md)
+- [`reviews/core-flow.md`](./reviews/core-flow.md)
+- [`reviews/error-handling.md`](./reviews/error-handling.md)
+- [`reviews/validation.md`](./reviews/validation.md)
+- [`reviews/race-idempotency.md`](./reviews/race-idempotency.md)
+- [`reviews/external-integrations.md`](./reviews/external-integrations.md)
+- [`reviews/test-weakness.md`](./reviews/test-weakness.md)
+- [`reviews/frontend-state-ux.md`](./reviews/frontend-state-ux.md)
+- [`reviews/observability.md`](./reviews/observability.md)
+- [`reviews/maintainability-risk.md`](./reviews/maintainability-risk.md)
 
 ## Report Format
 
 Return a single combined report in this structure:
 
 ```md
-# Bug Bash Report
+# Risk Review Report
 ## Executive summary
 ## Scope investigated
+## Plan recommendations
 ## Commands run
 ## Findings by priority
 ## Testing gaps
@@ -188,6 +208,8 @@ Return a single combined report in this structure:
 ## Needs external research
 ## Follow-up recommendation
 ```
+
+Omit `Plan recommendations` only when no plan was provided or inferred.
 
 Group findings by `Critical`, `High`, `Medium`, and `Low`.
 
