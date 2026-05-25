@@ -95,47 +95,47 @@ List discoverable skills without installing:
 npx skills add https://github.com/nivoset/skills --list
 ```
 
-## Risk Review Skill
+## Vette Skill
 
-This repository includes a `risk-review` skill that orchestrates whole-codebase, area-specific, and plan-first risk reviews while keeping focused review briefs nested inside the skill directory.
+This repository includes a `vette` skill that orchestrates whole-codebase, area-specific, and plan-first risk reviews while keeping focused review briefs nested inside the skill directory.
 
-### Install The Risk Review Skill
+### Install The Vette Skill
 
 Install the review orchestrator:
 
 ```bash
-npx skills add https://github.com/nivoset/skills --skill risk-review
+npx skills add https://github.com/nivoset/skills --skill vette
 ```
 
-### Use The Risk Review Skill
+### Use The Vette Skill
 
-Use `risk-review` when you want one combined report across an implementation plan, whole codebase, or named area.
+Use `vette` when you want one combined report across an implementation plan, whole codebase, or named area.
 
 Example prompts:
 
 ```text
-Use risk-review on this implementation plan and call out missed risks before we build.
+Use vette on this implementation plan and call out missed risks before we build.
 ```
 
 ```text
-Run risk-review on this repo and focus on the highest-risk user flows.
+Run vette on this repo and focus on the highest-risk user flows.
 ```
 
 ```text
-Use risk-review on the billing area and prioritize payment, retry, and webhook risks.
+Use vette on the billing area and prioritize payment, retry, and webhook risks.
 ```
 
 ```text
-Use risk-review on the checkout tests and find false confidence.
+Use vette on the checkout tests and find false confidence.
 ```
 
 ```text
-Use risk-review on the onboarding screens and check whether UI state matches backend behavior.
+Use vette on the onboarding screens and check whether UI state matches backend behavior.
 ```
 
-### Risk Review Behavior
+### Vette Behavior
 
-The `risk-review` skill:
+The `vette` skill:
 
 - defaults to whole-codebase review unless the prompt names a narrower area
 - reviews a provided implementation plan before launching deeper investigation lanes

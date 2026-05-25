@@ -19,7 +19,7 @@ Default to the full codebase. Narrow when the prompt names a `workflow`, `route`
 - Prefer existing tests, replay fixtures, and queue or webhook harnesses.
 - Do not commit or patch code.
 - If concurrency behavior is not testable with the current setup, explain the minimum stable coverage or harness addition needed.
-- Use the shared severity, confidence, and finding schema from `risk-review`.
+- Use the shared severity, confidence, and finding schema from `vette`.
 
 ## Investigation Focus
 
@@ -54,6 +54,6 @@ Attack vectors to emphasize:
 
 ## Reporting
 
-Return a standalone scoped `# Risk Review Report`.
+Return a standalone scoped `# Vette Report`.
 
 Escalate findings based on business impact, especially when duplicate execution can move money, data, or destructive actions.

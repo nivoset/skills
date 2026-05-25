@@ -19,7 +19,7 @@ Default to the full codebase. Narrow when the prompt names a `workflow`, `screen
 - Prefer read-only investigation and existing tests.
 - Do not commit or repair code.
 - If end-to-end confidence is weak because current tests are fragmented, propose the minimum stable coverage needed.
-- Use the shared severity, confidence, and finding schema from `risk-review`.
+- Use the shared severity, confidence, and finding schema from `vette`.
 
 ## Investigation Focus
 
@@ -55,6 +55,6 @@ Attack vectors to emphasize:
 
 ## Reporting
 
-Return a standalone scoped `# Risk Review Report`.
+Return a standalone scoped `# Vette Report`.
 
 Prioritize issues that break the user journey even when the underlying technical defect seems small.

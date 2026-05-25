@@ -1,9 +1,9 @@
 ---
-name: risk-review
+name: vette
 description: Use when reviewing an implementation plan, codebase, feature area, or pull request for likely defects, missed requirements, weak tests, security gaps, data risks, UX mismatches, or reliability issues before or after implementation.
 ---
 
-# Risk Review
+# Vette
 
 ## Purpose
 
@@ -197,7 +197,7 @@ Use these nested briefs when the investigation benefits from decomposition. They
 Return a single combined report in this structure:
 
 ```md
-# Risk Review Report
+# Vette Report
 ## Executive summary
 ## Scope investigated
 ## Plan recommendations

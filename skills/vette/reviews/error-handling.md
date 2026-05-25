@@ -19,7 +19,7 @@ Default to the full codebase. Narrow when the prompt names a `path`, `module`, `
 - Prefer existing tests, logs, and error contracts where available.
 - Do not commit or repair code.
 - If the code lacks stable error-path tests, explain the minimum additions needed.
-- Use the shared severity, confidence, and finding schema from `risk-review`.
+- Use the shared severity, confidence, and finding schema from `vette`.
 
 ## Investigation Focus
 
@@ -55,6 +55,6 @@ Attack vectors to emphasize:
 
 ## Reporting
 
-Return a standalone scoped `# Risk Review Report`.
+Return a standalone scoped `# Vette Report`.
 
 Call out places where the UI or API claims success while the underlying action can fail invisibly.

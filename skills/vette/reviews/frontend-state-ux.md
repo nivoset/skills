@@ -19,7 +19,7 @@ Default to the full codebase. Narrow when the prompt names a `screen`, `workflow
 - Prefer existing frontend and end-to-end tests.
 - Do not commit or patch code.
 - If stable UI verification is not possible with current tests, describe the minimum practical coverage needed.
-- Use the shared severity, confidence, and finding schema from `risk-review`.
+- Use the shared severity, confidence, and finding schema from `vette`.
 
 ## Investigation Focus
 
@@ -54,6 +54,6 @@ Attack vectors to emphasize:
 
 ## Reporting
 
-Return a standalone scoped `# Risk Review Report`.
+Return a standalone scoped `# Vette Report`.
 
 Prioritize findings where the UI claims success, completeness, or permission that the system does not actually provide.

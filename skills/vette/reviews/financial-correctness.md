@@ -19,7 +19,7 @@ Default to the full codebase. Narrow when the prompt names a `path`, `module`, `
 - Prefer existing tests and fixtures.
 - Do not commit or patch code.
 - If stable financial verification is not possible with current tests, explain the minimum regression coverage needed.
-- Use the shared severity, confidence, and finding schema from `risk-review`.
+- Use the shared severity, confidence, and finding schema from `vette`.
 
 ## Investigation Focus
 
@@ -57,6 +57,6 @@ Attack vectors to emphasize:
 
 ## Reporting
 
-Return a standalone scoped `# Risk Review Report`.
+Return a standalone scoped `# Vette Report`.
 
 Treat a missing negative or idempotency test around important billing behavior as a real finding when it creates false confidence.

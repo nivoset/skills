@@ -19,7 +19,7 @@ Default to the full codebase. Narrow when the prompt names an `integration`, `mo
 - Prefer existing mocks, fixtures, and integration-specific tests where they are trustworthy.
 - Do not commit or repair code.
 - If current tests over-mock the provider boundary, explain the minimum stable contract coverage needed.
-- Use the shared severity, confidence, and finding schema from `risk-review`.
+- Use the shared severity, confidence, and finding schema from `vette`.
 
 ## Investigation Focus
 
@@ -56,6 +56,6 @@ Attack vectors to emphasize:
 
 ## Reporting
 
-Return a standalone scoped `# Risk Review Report`.
+Return a standalone scoped `# Vette Report`.
 
 Treat overly fake integration tests as findings when they create false confidence around important business behavior.

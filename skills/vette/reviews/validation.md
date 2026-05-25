@@ -19,7 +19,7 @@ Default to the full codebase. Narrow when the prompt names a `path`, `module`, `
 - Prefer existing schema tests and contract tests.
 - Do not commit or patch code.
 - If validation coverage is weak, recommend the minimum stable tests or constraints needed.
-- Use the shared severity, confidence, and finding schema from `risk-review`.
+- Use the shared severity, confidence, and finding schema from `vette`.
 
 ## Investigation Focus
 
@@ -53,6 +53,6 @@ Attack vectors to emphasize:
 
 ## Reporting
 
-Return a standalone scoped `# Risk Review Report`.
+Return a standalone scoped `# Vette Report`.
 
 Treat validation drift as a meaningful finding even when each individual layer looks reasonable in isolation.

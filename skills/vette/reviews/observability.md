@@ -19,7 +19,7 @@ Default to the full codebase. Narrow when the prompt names a `workflow`, `job`, 
 - Prefer existing tests and operational docs when present.
 - Do not commit or patch code.
 - If observability is hard to verify automatically, describe the minimum logging or audit checks needed.
-- Use the shared severity, confidence, and finding schema from `risk-review`.
+- Use the shared severity, confidence, and finding schema from `vette`.
 
 ## Investigation Focus
 
@@ -52,6 +52,6 @@ Attack vectors to emphasize:
 
 ## Reporting
 
-Return a standalone scoped `# Risk Review Report`.
+Return a standalone scoped `# Vette Report`.
 
 Treat missing observability around destructive actions, billing, permissions, and background jobs as high-risk even when the product still appears to function.
