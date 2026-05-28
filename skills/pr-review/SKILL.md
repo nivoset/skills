@@ -7,7 +7,7 @@ description: Use when reviewing the active or named branch against a target bran
 
 ## Purpose
 
-Review the active or named branch against a target branch through bounded, evidence-first subagents. The parent agent coordinates scope, calls `vette` when risk-review lanes overlap, verifies findings locally, drafts or posts GitHub review comments when appropriate, and removes or stashes only temporary verification artifacts it created.
+Review the active or named branch against a target branch through bounded, evidence-first subagents. The parent agent coordinates scope, calls `vette` when risk-review lanes overlap, dispatches `thermo-nuclear-code-quality-review` in a separate subagent lane when that skill is available, verifies findings locally, drafts or posts GitHub review comments when appropriate, and removes or stashes only temporary verification artifacts it created.
 
 ## When to Use
 
@@ -27,6 +27,7 @@ Review the active or named branch against a target branch through bounded, evide
 - Use multiple subagents for non-trivial reviews. Give each subagent one bounded scope.
 - Prefer lane-based subagents for cross-cutting risks; use file-based subagents when files are independent or the PR is large.
 - Call `vette` as a review lane when the branch review overlaps likely defects, missed requirements, weak tests, security gaps, data risks, UX mismatches, observability gaps, or maintainability risks.
+- At intake, check whether the `thermo-nuclear-code-quality-review` skill is available in the current environment. If available, dispatch it in a separate read-only subagent lane scoped to the source-vs-target diff. If unavailable, continue the PR review and note that the skill was unavailable.
 - Keep subagents read-only by default. Subagents are writable only in an isolated worktree or when the parent serializes the write.
 - Any writable subagent gets exactly one writable path scope and returns an artifact manifest listing every file it created or changed.
 - Do not let two active agents share mutable state: databases, ports, caches, browser profiles, fixtures, or write scopes.
@@ -47,8 +48,9 @@ Review the active or named branch against a target branch through bounded, evide
 6. Fetch and check out the source branch if needed.
 7. Compute the merge base and inspect `target...source` diff, changed files, and branch-only commits.
 8. Read PR description when available, changed files, nearby tests, schemas, and contracts.
-9. Start a cleanup ledger for any temporary artifact: path, baseline status, owning agent, creation time, and intended cleanup action.
-10. Run the smallest baseline check that establishes the branch is reviewable.
+9. Check available skills for `thermo-nuclear-code-quality-review`. Load it if present; record unavailable if not present.
+10. Start a cleanup ledger for any temporary artifact: path, baseline status, owning agent, creation time, and intended cleanup action.
+11. Run the smallest baseline check that establishes the branch is reviewable.
 
 ### 2. Choose Review Slices
 
@@ -65,6 +67,7 @@ Default lanes:
 - Frontend state, UX, accessibility, and performance when applicable
 - Maintainability and architecture fit
 - `vette` risk sweep when the requested review overlaps product or engineering risk review
+- `thermo-nuclear-code-quality-review` maintainability sweep in its own subagent lane when the skill is available
 
 File-based slicing is acceptable when:
 
@@ -73,6 +76,8 @@ File-based slicing is acceptable when:
 - or verification can be isolated per file without shared fixtures.
 
 When calling `vette`, scope it to the source-vs-target diff and ask it to return only findings relevant to changed behavior. Do not let `vette` expand into a whole-repo review unless the user explicitly asked for that.
+
+When dispatching `thermo-nuclear-code-quality-review`, use a separate subagent from the other review lanes and scope it to maintainability risks introduced or worsened by the source-vs-target diff. Ask it to return only evidence-backed findings that meet the PR review comment contract; do not let it become a whole-repo style audit unless the user explicitly asked for that.
 
 ### 3. Dispatch Subagents
 
@@ -136,6 +141,7 @@ Return:
 
 - review status: request changes, comment only, approve, or needs clarification,
 - exact commands run and results,
+- whether `thermo-nuclear-code-quality-review` was available and used,
 - comments drafted or posted,
 - rejected candidate findings and why, if relevant,
 - cleanup result, including whether artifacts were removed or stashed.
