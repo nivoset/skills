@@ -27,7 +27,7 @@ Review the active or named branch against a target branch through bounded, evide
 - Use multiple subagents for non-trivial reviews. Give each subagent one bounded scope.
 - Prefer lane-based subagents for cross-cutting risks; use file-based subagents when files are independent or the PR is large.
 - Call `vette` as a review lane when the branch review overlaps likely defects, missed requirements, weak tests, security gaps, data risks, UX mismatches, observability gaps, or maintainability risks.
-- At intake, check whether the `thermo-nuclear-code-quality-review` skill is available in the current environment. If available, dispatch it in a separate read-only subagent lane scoped to the source-vs-target diff. If unavailable, continue the PR review and note that the skill was unavailable.
+- At intake, check whether the `thermo-nuclear-code-quality-review` skill is available in the current environment. If available, dispatch it in a separate read-only subagent lane scoped to the source-vs-target diff and require file/line-ready PR comments for accepted findings. If unavailable, continue the PR review and note that the skill was unavailable.
 - Keep subagents read-only by default. Subagents are writable only in an isolated worktree or when the parent serializes the write.
 - Any writable subagent gets exactly one writable path scope and returns an artifact manifest listing every file it created or changed.
 - Do not let two active agents share mutable state: databases, ports, caches, browser profiles, fixtures, or write scopes.
@@ -77,7 +77,7 @@ File-based slicing is acceptable when:
 
 When calling `vette`, scope it to the source-vs-target diff and ask it to return only findings relevant to changed behavior. Do not let `vette` expand into a whole-repo review unless the user explicitly asked for that.
 
-When dispatching `thermo-nuclear-code-quality-review`, use a separate subagent from the other review lanes and scope it to maintainability risks introduced or worsened by the source-vs-target diff. Ask it to return only evidence-backed findings that meet the PR review comment contract; do not let it become a whole-repo style audit unless the user explicitly asked for that.
+When dispatching `thermo-nuclear-code-quality-review`, use a separate subagent from the other review lanes and scope it to maintainability risks introduced or worsened by the source-vs-target diff. Ask it to return only evidence-backed findings that meet the PR review comment contract, including the exact changed file and line for each comment. Accepted thermo-nuclear findings should be converted into PR review comments on those file/line locations; do not let the lane become a whole-repo style audit unless the user explicitly asked for that.
 
 ### 3. Dispatch Subagents
 
@@ -89,6 +89,7 @@ Each subagent prompt must include:
 - Whether the agent is read-only or may create one temporary verification test.
 - Isolation constraints: no shared ports, DBs, caches, browser state, or overlapping write scope.
 - Output contract: findings only if evidence-backed; include file/line, failure mode, user impact, verification command/result, and suggested fix boundary.
+- For `thermo-nuclear-code-quality-review`, output candidate PR comments keyed to exact changed file/line locations so the parent can post them on the PR.
 - Suggested test names only when the finding needs a new or renamed test. If no test is appropriate, state the verification method instead.
 
 Subagents must not post GitHub comments. They return candidate findings to the parent.
