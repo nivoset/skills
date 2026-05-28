@@ -1,0 +1,4 @@
+interface:
+  display_name: "PR Bug Bash"
+  short_description: "Prove PR defects with failing tests"
+  default_prompt: "Use $pr-bug-bash to intensely review the current branch against dev, verify defects with failing tests, and draft PR comments."
