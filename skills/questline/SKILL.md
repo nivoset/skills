@@ -7,7 +7,7 @@ description: Use when building, grooming, or refining an Epic, Feature, parent t
 
 ## Overview
 
-Questline turns an Epic/Feature/ticket tree into a reviewed, behavior-backed, testable set of child tickets. It is a grooming skill, not an implementation skill: map the tracker tree, propose changes, ask before splitting, create only triage tickets after approval, and leave clear comments for anything blocked or ambiguous.
+Questline turns an Epic/Feature/ticket tree into a reviewed, behavior-backed, testable set of child tickets. It is a grooming skill, not an implementation skill: map the tracker tree, propose changes, ask before splitting, create only triage tickets after approval, and leave targeted comments for actionable mismatches, ambiguities, uncovered behavior, or workable-ticket readiness gaps.
 
 ## Use With
 
@@ -21,23 +21,25 @@ Questline turns an Epic/Feature/ticket tree into a reviewed, behavior-backed, te
 | Rule | Requirement |
 |------|-------------|
 | Start point | Accept an Epic, Feature, or parent ticket as the root. |
-| Tracker source | Pull status names, labels, workflow rules, blocker types, and hierarchy from the tracker itself when available; do not hardcode Linear-specific mappings. |
-| Recursive tree | Fetch all descendants, not only direct children. |
-| Creation default | New tickets are created only as triage/review-needed items unless the user explicitly says otherwise. Manual review promotes them to Todo/ready. |
+| Tracker source | Pull status names, labels, workflow rules, blocker types, hierarchy, comments, PR links, and dependencies from the tracker itself when available; do not hardcode Linear-specific mappings. Do not maintain a durable local manifest or second tracking system. |
+| Recursive tree | Fetch all descendants, not only direct children. Re-query the tracker before each grooming pass instead of trusting cached local state. |
+| Creation default | New tickets are created only as triage/review-needed items unless the user explicitly says otherwise. Manual review promotes them to Todo/ready; for current Linear TDD orchestration, Todo is the runnable leaf status. |
 | Parent behavior | Parent Gherkin describes expected user/system behavior in plain English, not DOM selectors, component internals, or API step scripts. |
 | Splitting | If child tickets need to be split or added, propose the breakdown and ask for approval before creating or validating them. |
-| Missing evidence | Do not silently change scope or promote readiness. Comment the gap and continue reviewing the next eligible parent/ticket when safe. |
-| Readiness verdict | Do not mark leaves implementation-ready based only on Questline; `objective-check` owns the final validation verdict. |
-| Implementation WIP | Stash/patch/gist capture belongs to the implementation agent, not Questline. |
+| Missing evidence | Do not silently change scope or promote readiness. For actionable mismatches, ambiguity, uncovered behavior, or workable-ticket readiness gaps, update the stable finding comment and continue reviewing the next eligible parent/ticket when safe. Do not comment on triage tickets solely because they block implementation. |
+| No runnable work | If no tracker-confirmed runnable leaf remains, do not hand off to implementation. Return a per-ticket state summary and refinement priority list. |
+| Readiness verdict | Do not select, run, sequence, or mark leaves implementation-ready based only on Questline; `objective-check` owns the final validation verdict. |
+| Implementation WIP | Patch/gist capture belongs to the implementation agent, not Questline. Do not recommend local stashes for v1 orchestration. |
 
 ## Workflow
 
 1. **Resolve tracker rules**
-   - Identify available ticket types, statuses, labels, hierarchy links, blocker/dependency links, and status semantics from the active tracker.
-   - Record which statuses mean triage/review-needed, implementation-ready, in-progress, done, canceled, and verification-ready. If uncertain, ask.
+   - Identify available ticket types, statuses, labels, hierarchy links, blocker/dependency links, comments, PR links, and status semantics from the active tracker.
+   - Record which statuses mean triage/review-needed, implementation-ready/Todo, in-progress, done, canceled, and verification-ready. If uncertain, ask.
+   - Treat the tracker as durable source of truth; local notes are temporary scratch only.
 2. **Map the quest tree**
    - Fetch the root ticket and every descendant recursively.
-   - Classify each item as parent/non-leaf, leaf, triage/review-needed, implementation-ready, blocked, done, or canceled using tracker rules.
+   - Classify each item as parent/non-leaf, leaf, triage/review-needed, implementation-ready/Todo, blocked, done, canceled, or PR-owned using tracker rules.
    - Capture cross-tree dependencies: feature-to-feature, ticket-to-ticket, and mixed feature-ticket blockers.
 3. **Shape parent objectives**
    - Ensure parent tickets have a concise Summary, Desired/Expected Outcome, Scope Boundaries, and behavior-level blueprint when they coordinate multiple children.
@@ -52,7 +54,8 @@ Questline turns an Epic/Feature/ticket tree into a reviewed, behavior-backed, te
    - New tickets default to triage/review-needed.
    - Do not auto-promote tickets to Todo/ready.
    - Leave new or updated tickets in triage/review-needed until manual review and `objective-check` both pass.
-   - Comment known gaps at the most specific ticket level.
+   - Update stable comments for actionable mismatches, ambiguity, uncovered behavior, or workable-ticket readiness gaps at the most specific ticket level, using the `objective-check` finding marker/template when possible.
+   - If triage/review-needed items block all runnable leaves, report them in the final state summary and refinement priority list instead of commenting solely because they block implementation.
 7. **Hand off to objective-check**
    - Run or request `objective-check` before any implementation/TDD orchestration.
    - Treat Questline output as a proposed/groomed structure until `objective-check` validates it.
@@ -77,5 +80,5 @@ Use [`references/split-proposal-template.md`](./references/split-proposal-templa
 | Creating Todo tickets immediately | Create triage/review-needed tickets first; manual review promotes them. |
 | Writing precise implementation Gherkin | Keep scenarios behavior-level and user/system observable. |
 | Auto-splitting tickets | Propose the split, ask, then create only after approval. |
-| Blocking the whole run on one gap | Comment the issue and continue with the next eligible branch unless the root contract is blocked. |
+| Blocking the whole run on one gap | Update the stable finding for actionable issues and continue with the next eligible branch unless the root contract is blocked. |
 | Using Linear-only status names | Discover tracker-specific mappings or ask. |

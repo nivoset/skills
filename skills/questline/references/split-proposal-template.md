@@ -8,12 +8,23 @@ Use this before creating new child tickets or splitting a mixed leaf. Ask for ap
 Root/parent ticket: <ticket-id/title>
 Reason for split: <mixed behavior / uncovered parent objective / dependency boundary / testability issue>
 
+### Current tracker state / source of truth
+
+| Ticket | Status | Parent | Blockers/dependencies | PR/branch | Notes |
+|--------|--------|--------|-----------------------|-----------|-------|
+| <ticket> | <triage/Todo/etc.> | <parent> | <blockers or none> | <link or none> | <relevant state> |
+
 ### Proposed child tickets
 
 | Proposed ticket | Parent | Type | Initial status | Covers | Depends on | Why separate/testable |
 |-----------------|--------|------|----------------|--------|------------|-----------------------|
 | <title> | <parent> | <feature/task/bug> | triage | SCN-1 / AC1 | <ticket or none> | <one red-green-refactor-sized reason> |
 | <title> | <parent> | <feature/task/bug> | triage | SCN-2 | <ticket> | <reason> |
+
+### Refinement priority
+
+1. <highest-priority split/refinement that unblocks the most objective coverage>
+2. <next priority>
 
 ### Questions before creation
 
@@ -28,6 +39,7 @@ Please approve, revise, or reject this split. New tickets will be created as tri
 ## Rules
 
 - Do not create or validate the proposed tickets until the user approves the split.
+- Base current state on the tracker, not a local manifest.
 - Keep each proposed leaf independently testable.
 - Use parent scenario IDs and child AC IDs to show coverage.
 - Include dependencies between features, tickets, or mixed feature-ticket blockers when they affect sequence.
