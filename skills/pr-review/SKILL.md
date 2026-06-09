@@ -11,7 +11,7 @@ Review the active or named branch against a target branch through bounded, evide
 
 ## When to Use
 
-- Use when the user asks for a PR review, branch review, GitHub review comments, code suggestions, test suggestions, or test-name suggestions.
+- Use when the user asks for a PR review, branch review, GitHub review comments, code suggestions, test suggestions, test-name suggestions, or naming suggestions.
 - Use when the user names a source branch, or when the active branch should be reviewed.
 - Use when the target branch is named, or when the default target should be inferred as `dev` or `develop`.
 - Use when a review is broad enough to benefit from separate focused agents.
@@ -33,7 +33,7 @@ Review the active or named branch against a target branch through bounded, evide
 - Do not let two active agents share mutable state: databases, ports, caches, browser profiles, fixtures, or write scopes.
 - Do not post externally visible GitHub comments unless the user asked you to post them or approves the final drafts.
 - Every actionable finding must have local evidence: a failing focused test, reproduced command, static proof from code/contracts, or documented reason verification is impossible.
-- Test names must describe expected user behavior, not implementation details or vague assertions.
+- Apply the `naming` skill to test names: describe expected user behavior, not implementation details or vague assertions.
 - Clean up after verification. Remove temporary tests/files, or stash only your own verification changes with an explicit message. Never stash or remove unrelated user changes.
 
 ## Workflow
@@ -116,7 +116,7 @@ Every actionable comment must include:
 - exact code location or changed hunk,
 - local verification evidence,
 - code suggestion when the smallest safe patch is clear,
-- test or test-name suggestion when coverage or naming is the issue,
+- test-name or naming suggestion when coverage or naming is the issue,
 - fix boundary: what to change and what not to change.
 
 Prefer one complete comment per root cause. Group related lines instead of comment spam.

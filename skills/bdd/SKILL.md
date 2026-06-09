@@ -11,7 +11,7 @@ Use this skill to turn user functionality into clear Gherkin behavior specificat
 
 ## Core Rule
 
-A scenario is valid only when a domain stakeholder could understand it without knowing the codebase. Follow the `test-name` principle: behavior-first wording, no vague assertions, and no implementation details.
+A scenario is valid only when a domain stakeholder could understand it without knowing the codebase. Follow the `naming` skill principle: behavior-first wording, no vague assertions, and no implementation details.
 
 Reject or rewrite scenarios that mention functions, classes, services, components, APIs, database rows, mocks, selectors, framework plumbing, internal state, or private methods unless those words are part of the user's visible domain.
 

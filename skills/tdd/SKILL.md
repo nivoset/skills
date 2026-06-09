@@ -22,7 +22,7 @@ Use this skill to run software development through a strict red, green, refactor
 - Prefer the smallest behavior slice that can be independently tested.
 - Use subagents for every non-trivial loop phase.
 - Isolate agents by write scope. Never give two active agents overlapping file ownership unless coordination is explicit.
-- Test names must describe expected user behavior, not implementation details.
+- Apply the `naming` skill to test names: describe expected user behavior, not implementation details.
 - The red agent may only edit test files.
 - The green agent may not edit test files.
 - Do not commit until the relevant verification gate passes.
