@@ -51,7 +51,7 @@ Avoid:
 - `validates input`
 - `returns correct result`
 - `knows`, `understands`, or `realizes` without a visible message, choice, or artifact
-- ambiguous possibilities such as `may have peanut butter on it` unless the precautionary rule is the behavior being specified
+- ambiguous possibilities such as `may contain an unsafe ingredient` unless the precautionary rule is the behavior being specified
 - `the API is called`
 - `the database row is created`
 - `the component renders`
@@ -62,8 +62,8 @@ Prefer:
 - `the owner sees that the invitation is pending`
 - `the invited person receives an invitation email`
 - `the member cannot access the workspace after the invitation expires`
-- `the user sees that two usable slices of bread are required`
-- `the sandwich is prepared only on equipment reserved for the non-allergic eater`
+- `the user sees which required item is missing`
+- `the meal is prepared only on equipment reserved for the person with the safety restriction`
 - `support can see why the import failed`
 
 ## Good And Bad Rewrites

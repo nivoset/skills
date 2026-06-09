@@ -29,20 +29,23 @@ Do not use Gherkin by default for internal refactors, low-level unit behavior, f
 ## Workflow
 
 1. **Decide if Gherkin fits.** If the request is implementation-only, explain why Gherkin is the wrong format and offer behavior-level acceptance criteria instead.
-2. **Extract observable behavior.** Identify actors, goals, business rules, permissions, states, and user-visible outcomes.
-3. **Draft in business language.** Use Feature, optional Rule, Scenario, Scenario Outline, Given, When, Then, And, and But consistently. See [`references/format-and-wording.md`](./references/format-and-wording.md).
-4. **Review for missed cases.** Check negative paths, authorization, boundaries, duplicates, expired states, unavailable dependencies, retries, async completion, accessibility-visible feedback, and support/audit outcomes. For risky workflows, do not finalize happy-path-only specs. Risky means safety, allergies, money, privacy, permissions, destructive actions, legal/compliance, cross-role effects, or irreversible outcomes. Include the most important failure, denial, unavailable-resource, or recovery example, or list the missing product question. See [`references/common-missed-items.md`](./references/common-missed-items.md).
-5. **Rewrite weak scenarios.** Replace vague or implementation-heavy text with concrete domain examples and observable results.
+2. **Extract observable behavior.** Identify actors, goals, business rules, permissions, states, and user-visible outcomes. For websites, product descriptions, notes, screenshots, transcripts, or structured data, first identify distinct flows and source evidence. See [`references/product-flow-extraction.md`](./references/product-flow-extraction.md).
+3. **Ask or suggest when coverage is uncertain.** If required details are missing, ask clarifying questions before final Gherkin. If the input implies likely overlooked scenarios but lacks enough evidence to write them, list suggested scenarios or product questions instead of inventing rules.
+4. **Draft in business language.** Use Feature, optional Background, optional Rule, Scenario, Scenario Outline, Given, When, Then, And, and But consistently. See [`references/format-and-wording.md`](./references/format-and-wording.md).
+5. **Review for missed cases.** Check negative paths, authorization, boundaries, duplicates, expired states, unavailable dependencies, retries, async completion, accessibility-visible feedback, and support/audit outcomes. For risky workflows, do not finalize happy-path-only specs. Risky means safety, allergies, money, privacy, permissions, destructive actions, legal/compliance, cross-role effects, or irreversible outcomes. Include the most important failure, denial, unavailable-resource, or recovery example, or list the missing product question. See [`references/common-missed-items.md`](./references/common-missed-items.md).
+6. **Rewrite weak scenarios.** Replace vague or implementation-heavy text with concrete domain examples and observable results.
 
 ## Quality Bar
 
 Before finalizing, every scenario should answer:
 
 - Who is trying to do what?
+- What source evidence supports the flow?
 - What relevant state or business rule matters before the action?
 - What one user/stakeholder action or domain event occurs?
 - What observable outcome proves the behavior?
 - What important negative, boundary, permission, or recovery case would users expect?
+- Does missing information require a clarifying question, assumption, or suggested overlooked scenario?
 
 ## Red Flags
 
@@ -58,7 +61,9 @@ Stop and rewrite when you see:
 
 ## Output Shape
 
-When writing specs, return scenarios first. Include missed gaps, edge cases, or product questions when drafting reveals important ambiguity; do not hide unresolved behavior by inventing it.
+When writing standalone specs, return scenarios first. Include missed gaps, edge cases, or product questions when drafting reveals important ambiguity; do not hide unresolved behavior by inventing it.
+
+When extracting Gherkin from provided product material, use [`references/product-flow-extraction.md`](./references/product-flow-extraction.md): list identified flows with source evidence, then Gherkin specifications, then meaningful gaps or assumptions. If the input is insufficient, return `## Clarifying Questions` before writing final Gherkin.
 
 Prefer:
 
@@ -96,5 +101,6 @@ Omit sections that do not apply.
 ## References
 
 - [`references/when-to-use-gherkin.md`](./references/when-to-use-gherkin.md)
+- [`references/product-flow-extraction.md`](./references/product-flow-extraction.md)
 - [`references/format-and-wording.md`](./references/format-and-wording.md)
 - [`references/common-missed-items.md`](./references/common-missed-items.md)
