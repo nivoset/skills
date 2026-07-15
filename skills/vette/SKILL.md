@@ -53,6 +53,18 @@ State the resolved scope near the top of the report.
 - If stable verification is not possible with current tests or tooling, explain the minimum test or harness additions needed to make investigation reliable.
 - Stop after 25 meaningful findings. If you hit the cap, add: `Finding cap reached. Run a follow-up risk review after these issues are triaged or repaired.`
 
+## Naming Clarity Notes
+
+Vette should actively flag confusing names when they could mislead a person or agent during future review, repair, or test extension. Apply this broadly, especially for test names and local variables that sit near risky behavior.
+
+These are notes by default, not findings:
+
+- Add a concise `Naming note` when a test name, variable name, helper name, or fixture name is vague, misleading, implementation-focused, or broad enough that a future maintainer could misunderstand what behavior or value it represents.
+- Include a concrete suggested replacement when the surrounding code makes the domain intent clear.
+- Keep variable, helper, and fixture naming feedback as notes unless the name plausibly hides a product defect, security issue, data issue, or unreliable test.
+- For test names, use `Recommended` only when the name is so vague or misleading about what behavior it tests that future confusion is effectively certain, such as `works`, `handles errors`, `validates input`, or a name that promises different coverage than the assertions provide.
+- When the `naming` or `test-name` skill would request a rename, vette still downgrades it to a note unless the `Recommended` test-name threshold above is met or there is a concrete defect risk.
+
 ## Severity And Confidence
 
 Severity is based on business impact, not elegance.
