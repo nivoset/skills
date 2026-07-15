@@ -29,6 +29,19 @@ Use this skill to run software development through a strict red, green, refactor
 - Do not broaden scope to issues better handled by another ticket.
 - Before final completion claims, run fresh verification and report exact commands and results.
 
+## Test at the Smallest Trustworthy Boundary
+
+For each risk, write the test at the narrowest boundary that can reliably
+expose the intended failure.
+
+Keep a dependency real when its behavior is itself part of the risk being
+tested. Use broader integration or end-to-end tests only when they validate
+something lower-level tests cannot, such as dependency wiring,
+cross-component behavior, or a complete user journey.
+
+Do not duplicate lower-level test cases at higher levels unless the
+higher-level test provides distinct, additional confidence.
+
 ## Loop
 
 ### 1. Select One Behavior
