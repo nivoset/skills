@@ -32,7 +32,7 @@ Do not use Gherkin by default for internal refactors, low-level unit behavior, f
 2. **Extract observable behavior.** Identify actors, goals, business rules, permissions, states, and user-visible outcomes. For websites, product descriptions, notes, screenshots, transcripts, or structured data, first identify distinct flows and source evidence. See [`references/product-flow-extraction.md`](./references/product-flow-extraction.md).
 3. **Ask or suggest when coverage is uncertain.** If required details are missing, ask clarifying questions before final Gherkin. If the input implies likely overlooked scenarios but lacks enough evidence to write them, list suggested scenarios or product questions instead of inventing rules.
 4. **Draft in business language.** Use Feature, optional Background, optional Rule, Scenario, Scenario Outline, Given, When, Then, And, and But consistently. See [`references/format-and-wording.md`](./references/format-and-wording.md).
-5. **Review for missed cases.** Check negative paths, authorization, boundaries, duplicates, expired states, unavailable dependencies, retries, async completion, accessibility-visible feedback, and support/audit outcomes. For risky workflows, do not finalize happy-path-only specs. Risky means safety, allergies, money, privacy, permissions, destructive actions, legal/compliance, cross-role effects, or irreversible outcomes. Include the most important failure, denial, unavailable-resource, or recovery example, or list the missing product question. See [`references/common-missed-items.md`](./references/common-missed-items.md).
+5. **Review for missed cases.** Check negative paths, authorization, boundaries, duplicates, expired states, unavailable dependencies, retries, async completion, accessibility-visible feedback, and support/audit outcomes. For common feature setups, use the checklists in [`examples/`](./examples/) to prompt coverage; rewrite checklist items into domain-specific, observable scenarios before finalizing. For risky workflows, do not finalize happy-path-only specs. Risky means safety, allergies, money, privacy, permissions, destructive actions, legal/compliance, cross-role effects, or irreversible outcomes. Include the most important failure, denial, unavailable-resource, or recovery example, or list the missing product question. See [`references/common-missed-items.md`](./references/common-missed-items.md).
 6. **Rewrite weak scenarios.** Replace vague or implementation-heavy text with concrete domain examples and observable results.
 
 ## Quality Bar
@@ -100,6 +100,7 @@ Omit sections that do not apply.
 
 ## References
 
+- [`examples/`](./examples/) — setup-specific scenario checklists, one file per setup
 - [`references/when-to-use-gherkin.md`](./references/when-to-use-gherkin.md)
 - [`references/product-flow-extraction.md`](./references/product-flow-extraction.md)
 - [`references/format-and-wording.md`](./references/format-and-wording.md)
