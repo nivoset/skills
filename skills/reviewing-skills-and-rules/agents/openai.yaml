@@ -1,0 +1,6 @@
+interface:
+  display_name: "Review Skills and Rules"
+  short_description: "Find gaps in skills and rules"
+  default_prompt: "Use $reviewing-skills-and-rules to review named instruction files for confusion, gaps, contradictions, and weak examples."
+policy:
+  allow_implicit_invocation: false
