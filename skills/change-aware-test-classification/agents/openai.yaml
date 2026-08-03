@@ -1,0 +1,4 @@
+interface:
+  display_name: "Change Aware Test Classification"
+  short_description: "Classify tests by change impact"
+  default_prompt: "Use $change-aware-test-classification to classify this change and identify the tests that should run."
