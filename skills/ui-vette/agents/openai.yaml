@@ -1,0 +1,4 @@
+interface:
+  display_name: "UI Vette"
+  short_description: "Run four-role visual QA on a rendered UI"
+  default_prompt: "Use $ui-vette to compare this implementation against the supplied visual references."
