@@ -1,0 +1,4 @@
+interface:
+  display_name: "Stacked Pull Requests"
+  short_description: "Plan, maintain, review, and merge dependent pull request stacks"
+  default_prompt: "Use the stacked pull requests workflow for this change."
