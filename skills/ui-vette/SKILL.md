@@ -23,11 +23,17 @@ Use the available browser or screenshot tooling to open the reference and implem
 1. **Resolve the target.** Record the implementation URL, route, viewport, device/theme, auth state, content/data state, and interaction state. Identify every supplied reference and select the one that best represents the requested output. Keep additional references as supporting evidence.
 2. **Capture matched evidence.** Capture the implementation at the same viewport and state as the reference. Capture relevant variants when available: desktop/tablet/mobile, light/dark, loading/empty/error, and hover/focus/active. Include the source and implementation together in each comparison input; do not judge from memory or from separate unpaired views.
 3. **Normalize.** Align crop, viewport, scale, device frame, CSS dimensions, and pixel density before judging. Prefer content-region captures over browser chrome. Record source pixels, implementation pixels, CSS viewport, and device scale factor in the report. Treat density, browser chrome, canvas padding, and device-frame mismatches as capture issues to resolve—not findings.
-4. **Dispatch four reviews.** Run one independent reviewer per responsibility region using the shared normalized evidence and the rubric in [`references/review-rubric.md`](references/review-rubric.md). When parallel subagents are available, dispatch all four together. Otherwise run four isolated local passes, one per role, and preserve the role boundaries.
+4. **Dispatch four reviews.** Run one independent reviewer per responsibility region. Give each reviewer the shared normalized evidence and exactly one role file:
+   - Product Designer: [`references/product-designer.md`](references/product-designer.md)
+   - Frontend / UI Developer: [`references/frontend-ui-developer.md`](references/frontend-ui-developer.md)
+   - QA / Test Automation Engineer: [`references/qa-test-automation.md`](references/qa-test-automation.md)
+   - Accessibility Lead / Specialist: [`references/accessibility-specialist.md`](references/accessibility-specialist.md)
+
+   When parallel subagents are available, dispatch all four together. Otherwise run four isolated local passes, one per role, and preserve the role boundaries. Do not give a reviewer another role file; the main skill supplies the shared evidence, reviewer contract, severity levels, and report contract.
 5. **Merge findings.** Deduplicate issues found by multiple roles while preserving every responsible role. Verify each accepted finding against the captured evidence. Separate objective mismatches from subjective polish suggestions and distinguish intentional product constraints from unexplained drift.
 6. **Write the report.** Save `ui-vette.md` at the reviewed project root. Return its path and a concise handoff summary.
 
-## Reviewer Contract
+## Shared Reviewer Contract
 
 Each reviewer must return only findings grounded in the shared visual evidence, plus an explicit all-clear statement for checked areas. Every finding includes:
 
@@ -88,7 +94,7 @@ For findings, use this compact format:
 - Confidence: Confirmed | High | Likely
 ```
 
-Do not report “matches,” “done,” or “ready” until the required fidelity surfaces and all four responsibility regions have been checked. If a required state or comparison cannot be captured, list it as a testing gap and mark the report `blocked`.
+Every merged report explicitly checks these shared fidelity surfaces: fonts and typography; spacing and layout rhythm; colors and visual tokens; image and asset fidelity; and copy/content. Do not report “matches,” “done,” or “ready” until these surfaces and all four responsibility regions have been checked. If a required state or comparison cannot be captured, list it as a testing gap and mark the report `blocked`.
 
 ## Safety and Scope
 
