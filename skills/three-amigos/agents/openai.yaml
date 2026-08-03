@@ -1,0 +1,4 @@
+interface:
+  display_name: "Three Amigos"
+  short_description: "Align requirements with four focused perspectives."
+  default_prompt: "Use $three-amigos to refine this feature into a shared behavior specification."
