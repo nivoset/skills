@@ -1,0 +1,4 @@
+interface:
+  display_name: "QA"
+  short_description: "Run eleven focused quality review agents"
+  default_prompt: "Use $qa to review the current diff or requested application area with all eleven quality reviewers and synthesize verified findings."
