@@ -1,6 +1,6 @@
 ---
 name: ticket-master
-description: Use when a parent ticket already has child tickets and a Codex/cmux orchestrator must sequence implementation PRs across ticket systems, branches, blockers, and worker tabs.
+description: Use when a parent ticket already has child tickets and an orchestration agent must sequence implementation PRs across ticket systems, branches, blockers, and delegated agents.
 ---
 
 # Ticket Master
@@ -9,7 +9,7 @@ description: Use when a parent ticket already has child tickets and a Codex/cmux
 
 Use this skill to coordinate existing child tickets under one parent ticket into a chained series of implementation branches and PRs.
 
-The agent using this skill is an orchestrator only. It inspects, orders, launches, monitors, and updates ticket metadata. It does not implement application changes.
+The agent using this skill is an orchestrator only. It inspects, orders, delegates, monitors, and updates ticket metadata. It does not implement application changes or perform work that belongs to a delegated agent. All implementation and other execution work is done by spawned subagents or other agents.
 
 ## Inputs
 
@@ -18,7 +18,7 @@ Require these inputs from the user or surrounding prompt:
 - Parent ticket ID
 - Integration branch, defaulting to `dev` when specified by the prompt
 - Reference app or product source of truth
-- Exact cmux/Codex full-auto launch instructions
+- Instructions for spawning or otherwise delegating work to an implementation agent
 - PR creation command or expectation
 - Ticket system CLI, MCP, API, or web workflow details
 
@@ -35,7 +35,7 @@ At the start:
 - Assign the parent ticket to the current ticket-system account.
 - Set the parent ticket status to the project's equivalent of `In Progress`.
 
-For each child ticket, immediately before launching its worker:
+For each child ticket, immediately before spawning its subagent:
 
 - Assign that child ticket to the current ticket-system account.
 - Set that child ticket status to the project's equivalent of `In Progress`.
@@ -44,7 +44,7 @@ For each child ticket, immediately before launching its worker:
 Assignee safeguards:
 
 - If a ticket is already assigned to the current account, leave it as-is.
-- If a ticket is assigned to someone else, do not overwrite it silently. Report the conflict and stop before launching that ticket.
+- If a ticket is assigned to someone else, do not overwrite it silently. Report the conflict and stop before spawning its subagent.
 - Do not reassign tickets to another user.
 
 Allowed metadata updates:
@@ -55,7 +55,7 @@ Allowed metadata updates:
 
 Do not change parent links, child order, blocker links, labels, priority, estimates, status-to-done, or ownership by another user unless the user or project workflow explicitly instructs it.
 
-After a worker opens a PR, leave the child ticket in progress unless the project's workflow explicitly requires a different status. Record evidence for every metadata mutation: field changed, old value when visible, new value, command/tool used, and resulting ticket URL or response.
+After a subagent opens a PR, leave the child ticket in progress unless the project's workflow explicitly requires a different status. Record evidence for every metadata mutation: field changed, old value when visible, new value, command/tool used, and resulting ticket URL or response.
 
 ## Hard Boundaries
 
@@ -65,14 +65,15 @@ After a worker opens a PR, leave the child ticket in progress unless the project
 - Do not implement the parent ticket.
 - Do not invent a new ticket breakdown when child tickets already exist.
 - Do not create new child tickets, merge child tickets, split child tickets, or re-plan the parent unless the user explicitly asks for planning work.
-- Do not launch more than one implementation worker at a time.
+- Do not spawn or activate more than one implementation agent at a time.
 - Do not continue a child ticket that is blocked, already finished, or missing enough detail to implement.
 
 Allowed work:
 
 - Inspect repository state, ticket state, git state, PR state, CI state, and reference app behavior.
 - Determine execution order from existing ticket order and blocker relationships.
-- Launch one Codex worker in a new cmux tab for the current child ticket.
+- Spawn or otherwise delegate exactly one implementation agent for the current child ticket.
+- Coordinate delegated agents and record their results; do not perform their implementation or operational work yourself.
 - Update ticket metadata when the workflow explicitly calls for it.
 - Leave clarifying comments on unclear tickets when the ticket system supports comments.
 
@@ -116,7 +117,7 @@ Do not confuse branch base with PR target.
 - Branch base changes after each child ticket.
 - PR target stays the integration branch for every PR.
 - Do not infer PR target from branch base, branch name, or merge-base output.
-- Before launching a worker or preparing a PR, state the source branch, branch base, PR target, and merge base when available.
+- Before spawning a subagent or preparing a PR, state the source branch, branch base, PR target, and merge base when available.
 - Later PRs are intentionally cumulative until earlier PRs are merged.
 - No PR targets the previous child branch.
 - The "previous child branch" means the previous implemented source branch in the ordered chain. A skipped blocked or unclear ticket does not become the branch base unless it already has a usable source branch that represents that child ticket's completed work.
@@ -182,21 +183,20 @@ Branch-name rules:
 4. Build the execution queue from a dependency graph, using existing child-ticket order to break ties.
 5. Classify every child ticket as ready, blocked, finished, or unclear.
 6. Assign branch names and branch bases from the final ordered list.
-7. Print an execution plan before launching any worker.
-8. For finished tickets, record the existing branch or PR evidence and skip worker launch.
+7. Print an execution plan before spawning any subagent.
+8. For finished tickets, record the existing branch or PR evidence and skip subagent spawning.
 9. For unclear tickets, leave concise questions as a ticket comment when possible, then skip until clarified.
 10. For blocked tickets, record the blocker and skip until unblocked.
 11. Pick the first ready child ticket in queue order.
 12. Apply the ticket metadata rules for that child ticket.
-13. Launch exactly one Codex worker in a new cmux tab using the exact provided cmux/Codex instructions.
-14. Submit the generated worker prompt into that tab. Creating the tab is not enough.
-15. Verify the worker has started.
-16. Monitor the worker, PR, and checks until the child ticket is complete or needs human follow-up.
-17. Continue to the next child ticket only after the current child has a branch and PR or has been skipped with a recorded reason.
+13. Spawn exactly one implementation agent using the available agent mechanism and provide the complete subagent prompt.
+14. Confirm that the delegated agent accepted the assignment and has started.
+15. Monitor the delegated agent, PR, and checks until the child ticket is complete or needs human follow-up.
+16. Continue to the next child ticket only after the current child has a branch and PR or has been skipped with a recorded reason.
 
 ## Execution Plan
 
-Before launching workers, print:
+Before spawning subagents, print:
 
 - Parent ticket ID and title
 - Current account being used
@@ -208,7 +208,7 @@ Before launching workers, print:
 - Whether each child is complete, open, blocked, unclear, or ready
 - Existing branch or PR decision for each child
 - Planned metadata updates for the parent and next child
-- Exact cmux/Codex launch command or interaction
+- Delegation mechanism and assignment details
 - Exact next child ticket to start
 
 Do not ask for confirmation unless:
@@ -217,42 +217,41 @@ Do not ask for confirmation unless:
 - The assignee conflicts with another user.
 - The blocker graph has a cycle.
 - No authenticated ticket-system account can be detected.
-- The required cmux or Codex command is unavailable.
+- The available agent mechanism cannot be used.
 - The ticket system cannot be reached.
 
-## Cmux Launch Verification
+## Delegation Verification
 
-After opening a new cmux tab:
+After spawning an agent:
 
-- Record the tab, pane, session, or surface identifier exposed by cmux.
-- Confirm the tab exists and is the intended new worker tab.
-- Confirm Codex full-auto mode is running or that the provided full-auto command was accepted.
-- Confirm the generated worker prompt was submitted, not merely pasted or prepared.
-- Confirm the worker is in the intended repository or cwd when visible.
-- Treat failed tab creation, failed prompt submission, missing Codex process, wrong cwd, or unclear worker state as not started.
+- Record the delegated agent or task identifier.
+- Confirm the assignment was submitted, not merely prepared.
+- Confirm the agent acknowledged ownership of exactly one child ticket.
+- Confirm the agent has the required repository, branch, ticket, and PR context.
+- Treat failed submission, missing acknowledgement, or unclear agent state as not started.
 
-Do not launch another implementation worker while the current worker is running or in an unknown state.
+Do not spawn another implementation agent while the current agent is running or in an unknown state.
 
-## Worker Prompt Contract
+## Subagent Prompt Contract
 
-Every worker prompt must state:
+Every subagent prompt must state:
 
-- The worker runs in Codex full-auto mode and owns exactly one child ticket.
-- The worker implements only the assigned child ticket, not the parent ticket as a whole and not sibling or future tickets.
-- The worker must verify the worktree is clean and fetch latest remote state before branching.
-- The worker must create or continue only the supplied source branch from the supplied branch base.
-- The worker must stop before code changes if the supplied branch base, source branch, PR target, ticket assignment, or ticket status does not match the prompt.
-- The worker must use TDD for feature or bugfix work when applicable.
-- The worker must keep tests, ports, caches, browser profiles, services, fixtures, and writable paths isolated unless the repo has an explicit isolation mechanism.
-- The worker branch starts from the branch base supplied by the orchestrator.
-- The worker PR targets the integration branch, usually `dev`.
-- The worker must not retarget the PR to the previous child branch.
-- The worker must create or prepare exactly one PR for the child ticket.
-- The worker must not merge, squash, close, or retarget its own PR.
-- The worker must not merge earlier PRs or manually copy earlier-ticket changes except as already present through branch ancestry.
-- The worker must compare its work against the assigned ticket's acceptance criteria and stop if the diff clearly includes unrelated sibling-ticket work.
-- The worker must include a cumulative-PR note in every PR after the first.
-- The worker must report ticket ID, branch name, branch base, PR URL, PR target branch, summary of changes, tests added or changed, validation commands and results, known risks or follow-ups, and whether the next child ticket can safely begin.
+- The delegated agent owns exactly one child ticket and performs all implementation and execution work for it.
+- The subagent implements only the assigned child ticket, not the parent ticket as a whole and not sibling or future tickets.
+- The subagent must verify the worktree is clean and fetch latest remote state before branching.
+- The subagent must create or continue only the supplied source branch from the supplied branch base.
+- The subagent must stop before code changes if the supplied branch base, source branch, PR target, ticket assignment, or ticket status does not match the prompt.
+- The subagent must use TDD for feature or bugfix work when applicable.
+- The subagent must keep tests, ports, caches, browser profiles, services, fixtures, and writable paths isolated unless the repo has an explicit isolation mechanism.
+- The subagent branch starts from the branch base supplied by the orchestrator.
+- The subagent PR targets the integration branch, usually `dev`.
+- The subagent must not retarget the PR to the previous child branch.
+- The subagent must create or prepare exactly one PR for the child ticket.
+- The subagent must not merge, squash, close, or retarget its own PR.
+- The subagent must not merge earlier PRs or manually copy earlier-ticket changes except as already present through branch ancestry.
+- The subagent must compare its work against the assigned ticket's acceptance criteria and stop if the diff clearly includes unrelated sibling-ticket work.
+- The subagent must include a cumulative-PR note in every PR after the first.
+- The subagent must report ticket ID, branch name, branch base, PR URL, PR target branch, summary of changes, tests added or changed, validation commands and results, known risks or follow-ups, and whether the next child ticket can safely begin.
 
 Include these fields in the prompt:
 
@@ -354,32 +353,32 @@ Open PR:
 - Confirm the PR state, draft/readiness state, CI status, review state, and whether comments indicate unresolved implementation work.
 - Confirm whether the next child branch should use that branch as its branch base.
 - Do not create a duplicate branch or duplicate PR.
-- If the PR is valid and still in progress, monitor it or report the current state rather than launching another worker for the same child.
+- If the PR is valid and still in progress, monitor it or report the current state rather than spawning another subagent for the same child.
 
 Existing branch without PR:
 
 - Inspect enough to determine whether to continue that branch.
-- If safe, instruct the worker to continue from that branch.
+- If safe, instruct the subagent to continue from that branch.
 - If unsafe, stop and report the ambiguity.
 
-Closed PR, failed CI, or partial worker output:
+Closed PR, failed CI, or partial subagent output:
 
-- Inspect the linked PR, CI result, branch state, and worker report.
-- Decide whether the child is complete, needs monitoring, needs a follow-up worker on the same branch, is blocked, or must stop for human input.
+- Inspect the linked PR, CI result, branch state, and subagent report.
+- Decide whether the child is complete, needs monitoring, needs a follow-up subagent on the same branch, is blocked, or must stop for human input.
 - Record the evidence behind the decision.
-- Do not launch a duplicate branch for the same child ticket.
+- Do not spawn a duplicate subagent or branch for the same child ticket.
 
 Unclear:
 
 - Leave a ticket comment with the minimum questions needed to make the ticket implementable.
-- Do not launch a worker for the ticket.
+- Do not spawn a subagent for the ticket.
 
 Blocked:
 
 - Name the blocking ticket, PR, decision, or missing dependency.
 - If the blocker is another direct child ticket, start the blocker first according to the ordered queue.
 - If the blocker is outside the direct child-ticket queue, stop and report the blocking chain.
-- Do not launch a worker until the blocker clears.
+- Do not spawn a subagent until the blocker clears.
 
 No child tickets:
 
@@ -398,11 +397,11 @@ Use the reference app as the source of truth for:
 - Expected data shape
 - Compatibility requirements
 
-Pass the exact reference app path, URL, or description into every worker prompt. Treat the reference app as read-only unless the user explicitly says otherwise. Require workers to inspect it when relevant to product behavior before implementing. If the reference app cannot be accessed or the source of truth is ambiguous, stop for clarification before launching the affected worker.
+Pass the exact reference app path, URL, or description into every subagent prompt. Treat the reference app as read-only unless the user explicitly says otherwise. Require subagents to inspect it when relevant to product behavior before implementing. If the reference app cannot be accessed or the source of truth is ambiguous, stop for clarification before spawning the affected subagent.
 
 Do not ask the user product-behavior questions unless the ticket, repository, and reference app conflict or are insufficient.
 
-## After Each Worker Finishes
+## After Each Subagent Finishes
 
 Record:
 
@@ -413,7 +412,7 @@ Record:
 - PR target
 - Tests run
 - Known risks
-- Cmux tab or session identifier
+- Delegated agent or task identifier
 - CI/review state when available
 - Whether the PR diff is cumulative, clean after predecessor merge, or needs post-squash refresh
 
@@ -421,17 +420,17 @@ Confirm:
 
 - The branch was created from the correct branch base.
 - The PR targets the integration branch.
-- The worker did not implement unrelated sibling tickets.
-- The worker did not skip required tests without explanation.
+- The subagent did not implement unrelated sibling tickets.
+- The subagent did not skip required tests without explanation.
 - The PR body includes branch base, PR target, previous child PR when applicable, and the cumulative-PR note.
 
-Before launching the next worker:
+Before spawning the next subagent:
 
 - Select the next child ticket from the ordered queue.
 - Assign it to the current account.
 - Set it to the project's equivalent of `In Progress`.
 - Set its branch base to the branch from the child ticket that just completed.
-- Start exactly one new cmux tab and submit the next worker prompt.
+- Spawn exactly one new implementation agent and submit the next subagent prompt.
 
 ## Final Status Format
 
@@ -440,9 +439,9 @@ Report in these sections:
 - Queue: parent ticket ID and title, current account, integration branch, ordered child-ticket queue, and ordering rationale.
 - Processed ticket: current or last processed child ticket, state, branch name, branch base, merge base, PR target, PR URL, and whether it is cumulative.
 - Branch/PR chain: branch chain, predecessor PR state, PR URL for each child ticket, and confirmation that every PR targets the integration branch.
-- Existing work handled: reused branches, open PRs, closed PRs, failed CI, partial worker outputs, skipped tickets, and the evidence for each decision.
+- Existing work handled: reused branches, open PRs, closed PRs, failed CI, partial subagent outputs, skipped tickets, and the evidence for each decision.
 - Ticket metadata updates: assignments, status changes, branch/PR fields, comments, commands/tools used, and resulting ticket URLs or responses.
-- Commands and cmux tabs: exact cmux/Codex launch command or interaction, tab/pane/session identifiers, and worker-start verification.
+- Delegation: agent/task identifiers, assignment details, and delegated-agent start verification.
 - Verification/CI: validation commands and results, CI/review state, PR diff state, and post-squash refresh command/result when applicable.
 - Blocked or unclear items: blocker chain, questions left as comments, and human decisions needed.
 - Next action: recommended merge order, cumulative PR behavior, cleanup after merges, and unresolved risks.
