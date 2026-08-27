@@ -7,7 +7,17 @@ description: Use for software development feature or bugfix work that should fol
 
 ## Purpose
 
-Use this skill to run software development through a strict red, green, refactor loop. Each loop proves one behavior with a failing test, makes the smallest implementation change, reviews the result, removes unnecessary code, and either opens a pull request or repeats for the next uncovered requirement.
+Use this skill to run behavior-testable software development through a red, green, refactor loop. Each loop proves one behavior with a failing test, makes the smallest implementation change, reviews the result, removes unnecessary code, and repeats for the next uncovered requirement. Opening a pull request is a final, authorization-gated action after all requirements and verification gates pass.
+
+## Operating Definitions
+
+- **Behavior slice:** one independently testable acceptance behavior, including required backend or data effects even when there is no direct UI.
+- **Relevant verification gate:** the repository-documented test, lint, typecheck, build, or integration checks required by the changed surface.
+- **Fresh verification:** a newly executed command against the final diff, with command, exit status, and result recorded.
+- **Authorized mutation:** a commit, external comment, or pull request permitted by the user or active repository workflow.
+- **Stable state:** all required behavior slices pass, review is complete, refactor findings are resolved or documented, and no blocking risk remains.
+
+If TDD is explicitly disabled for an identified emergency, record the authorization and use the minimum approved alternative verification; do not silently claim a red-green-refactor cycle occurred.
 
 ## When to Use
 
@@ -20,14 +30,20 @@ Use this skill to run software development through a strict red, green, refactor
 
 - Work from the ticket, issue, prompt, acceptance criteria, and current branch.
 - Prefer the smallest behavior slice that can be independently tested.
-- Use subagents for every non-trivial loop phase.
-- Isolate agents by write scope. Never give two active agents overlapping file ownership unless coordination is explicit.
+- For every non-trivial loop phase, use an available isolated subagent when delegation is authorized; if delegation is unavailable, perform the phase in the parent context and record the fallback.
+- Isolate agents by write scope. If two active agents could modify the same file, assign one owner unless a recorded coordination plan defines sequencing and conflict resolution.
 - Apply the `naming` skill to test names: describe expected user behavior, not implementation details.
 - The red agent may only edit test files.
 - The green agent may not edit test files.
-- Do not commit until the relevant verification gate passes.
-- Do not broaden scope to issues better handled by another ticket.
-- Before final completion claims, run fresh verification and report exact commands and results.
+- Do not commit until the relevant verification gate passes and the staged diff contains only authorized paths.
+- Do not broaden scope to issues better handled by another ticket; record related blockers or observations instead.
+- Before final completion claims, run fresh verification and report exact commands, exit statuses, and results.
+
+## Working-tree and handoff protocol
+
+Before the first mutation, record `git status --short` and the diff for the task-owned paths. Never revert, stage, commit, or overwrite paths outside the current owner’s approved scope. Every agent handoff reports: status (`passed`, `failed`, or `blocked`), changed paths, exact commands, exit statuses, findings, and next action. A pre-existing change is not an agent-owned change unless explicitly adopted.
+
+If an agent, test command, or reviewer is unavailable, retry according to the repository workflow; after the configured limit, stop as `blocked` and report the owner and recovery action rather than treating silence or skipped work as approval.
 
 ## Loop
 
@@ -59,7 +75,7 @@ Verifier checks:
 - The test is scoped to the ticket and does not encode implementation details.
 - Only allowed test-scope files changed.
 
-If valid, stage the red test with `git add` but do not commit.
+If valid, stage only the approved red-test paths with `git add` but do not commit. Confirm the staged diff excludes pre-existing and unrelated changes.
 
 If invalid:
 
@@ -93,9 +109,9 @@ Reviewer checks:
 - Edge cases introduced by the change are either handled or documented as valid follow-up observations.
 - No unrelated files changed.
 
-If the reviewer approves, commit the red and green changes together using a conventional commit message.
+If an authorized reviewer provides evidence-backed approval, and committing is authorized, commit the red and green changes together using a conventional commit message. Otherwise report the reviewed, uncommitted state.
 
-If the reviewer rejects, send the green agent back with only the specific fixes needed, then rerun tests and review.
+If the reviewer rejects, send the green agent back with only the specific fixes needed, then rerun tests and review. If repeated review attempts exceed the configured limit, stop as `blocked` and escalate.
 
 ### 6. Refactor Gate: Remove Unneeded Code
 
@@ -112,11 +128,12 @@ If no cleanup is needed, state that the refactor gate passed.
 
 ### 7. Coverage Decision
 
-Compare completed behavior against the ticket requirements.
+Compare completed behavior against the ticket requirements using a checklist that maps every acceptance criterion to its test, implementation, and verification evidence.
 
 - If requirements remain, loop back to Step 1 for the next smallest behavior.
 - If requirements are complete, run the final verification suite appropriate to the change.
-- Create a pull request from the branch using the repo's PR template.
+- If the final suite passes and pull-request creation is authorized, create a pull request from the branch using the repo's PR template.
+- If verification passes but pull-request creation is unavailable or unauthorized, report `ready-but-pr-blocked` with the recovery action.
 - Use a conventional PR title that communicates client-visible value, not just implementation mechanics.
 
 ## Ticket Observations
@@ -131,11 +148,11 @@ Any red, green, verifier, reviewer, or risk-review agent may identify a meaningf
 
 Good observations include missing null handling, an exception path that can break the flow, validation drift, a race condition, or a test gap that could hide the ticket's behavior. Avoid comments for personal preference, speculative rewrites, or unrelated future ideas.
 
-If creating or editing an external ticket comment is visible to other people, follow the active client or repo policy for approval before posting.
+If creating or editing an external ticket comment is visible to other people, follow the active client or repo policy for approval before posting. Without recorded authorization, draft the comment locally rather than posting it.
 
 ## Risk Review Extension
 
-After the normal TDD loop is stable, spin up a risk-review agent for the ticket scope.
+After the normal TDD loop is stable, run a risk review when the ticket or repository policy marks the changed surface as requiring it (for example, security, data integrity, concurrency, or externally visible API behavior). If delegation is unavailable, perform the review in the parent context or record the approved waiver.
 
 Risk-review agent responsibilities:
 
@@ -152,9 +169,13 @@ If the finding is real but outside scope, leave a ticket observation instead of 
 
 End with:
 
-- behavior slices completed,
-- commits created,
-- PR link if opened,
-- ticket observations posted or drafted,
-- exact verification commands and results,
+- terminal state: `complete`, `blocked`, or `ready-but-pr-blocked`;
+- behavior slices completed;
+- acceptance-criteria coverage mapping;
+- commits created, or explicit uncommitted status;
+- PR link if opened, or the creation blocker;
+- ticket observations posted or drafted;
+- exact verification commands, exit statuses, and results;
 - any remaining requirements or risks.
+
+Use `none` with a reason for any inapplicable item.
