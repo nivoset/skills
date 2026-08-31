@@ -1,2 +1,5 @@
 .rpiv/
 pi/
+
+# macOS
+.DS_Store
