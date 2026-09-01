@@ -1,0 +1,9 @@
+id: write-order
+name: Write Order Record
+kind: command
+status: needs-refinement
+description: Persists a subscription/order record and its line items inside a transaction.
+scenarios: ./write-order.feature
+tickets:
+  - system: mock
+    ref: NIM-233

@@ -1,0 +1,6 @@
+id: read-catalog
+name: Read Catalog Rows
+kind: query
+status: solid
+description: Reads product and plan rows for the catalog service.
+scenarios: ./read-catalog.feature

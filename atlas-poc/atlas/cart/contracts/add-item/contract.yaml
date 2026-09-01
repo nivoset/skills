@@ -1,0 +1,12 @@
+id: add-item
+name: Add Item
+kind: command
+status: needs-refinement
+description: Adds a product to the shopper's cart at its current price.
+scenarios: ./add-item.feature
+# Graph connections: item-to-item links, independent of the containment
+# hierarchy above. Each entry points at another node's path in this repo.
+links:
+  - to: catalog/get-product
+    type: depends-on
+    label: looks up current price

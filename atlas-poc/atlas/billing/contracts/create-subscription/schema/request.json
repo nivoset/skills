@@ -1,0 +1,12 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "CreateSubscriptionRequest",
+  "type": "object",
+  "required": ["customerId", "planId", "paymentMethodId"],
+  "properties": {
+    "customerId": { "type": "string" },
+    "planId": { "type": "string", "enum": ["starter_monthly", "pro_monthly", "pro_annual"] },
+    "paymentMethodId": { "type": "string" },
+    "couponCode": { "type": "string", "nullable": true }
+  }
+}

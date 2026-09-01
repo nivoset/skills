@@ -1,0 +1,13 @@
+id: cancel-subscription
+name: Cancel Subscription
+kind: command
+status: needs-refinement
+description: Ends a subscription. Refund/proration rules are still being decided.
+scenarios: ./cancel-subscription.feature
+links:
+  - to: payments-gateway/refund-card
+    type: depends-on
+    label: issues a refund (not wired up yet)
+  - to: observability/ingest-event
+    type: emits
+    label: subscription.canceled event

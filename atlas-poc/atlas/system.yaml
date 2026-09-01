@@ -1,0 +1,20 @@
+id: system
+name: Nimbus Commerce
+description: >
+  Fake product used to try out the Atlas concept: a small subscription
+  storefront. Two regions, four services, mixed maturity on purpose.
+regions:
+  - id: storefront
+    name: Storefront
+    description: Everything a shopper touches before they've paid.
+    services: [catalog, cart]
+  - id: platform
+    name: Platform
+    description: Billing and messaging that run behind the scenes.
+    services: [billing, notifications]
+  - id: infrastructure
+    name: Infrastructure
+    description: >
+      Shared data storage, event logging, and the external services the
+      storefront depends on but doesn't own.
+    services: [data-store, observability, payments-gateway]

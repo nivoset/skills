@@ -1,0 +1,13 @@
+id: list-products
+name: List Products
+kind: query
+status: solid
+description: Returns the active catalog for a given plan tier.
+scenarios: ./list-products.feature
+tickets:
+  - system: mock
+    ref: NIM-105
+links:
+  - to: data-store/read-catalog
+    type: depends-on
+    label: reads product rows

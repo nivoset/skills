@@ -1,0 +1,26 @@
+id: create-subscription
+name: Create Subscription
+kind: command
+status: solid
+description: Starts a paid subscription for a customer on a given plan.
+request:
+  $ref: ./schema/request.json
+response:
+  $ref: ./schema/response.json
+scenarios: ./create-subscription.feature
+tickets:
+  - system: mock
+    ref: NIM-491
+links:
+  - to: notifications/send-email
+    type: triggers
+    label: sends the welcome email
+  - to: payments-gateway/charge-card
+    type: depends-on
+    label: charges the first invoice
+  - to: data-store/write-order
+    type: depends-on
+    label: persists the subscription row
+  - to: observability/ingest-event
+    type: emits
+    label: subscription.created event

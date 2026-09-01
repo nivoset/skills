@@ -1,0 +1,7 @@
+id: refund-card
+name: Refund Card
+kind: external
+status: not-started
+description: >
+  Proposed — issue a full or partial refund against a prior charge. Not
+  wired up yet; cancel-subscription still has no agreed proration rule.

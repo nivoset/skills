@@ -1,0 +1,10 @@
+id: get-product
+name: Get Product
+kind: query
+status: solid
+description: Fetches a single product by id, including current price.
+scenarios: ./get-product.feature
+links:
+  - to: data-store/read-catalog
+    type: depends-on
+    label: reads a single product row

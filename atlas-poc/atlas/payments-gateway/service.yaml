@@ -1,0 +1,9 @@
+id: payments-gateway
+name: Payments Gateway (external)
+status: solid
+description: >
+  Third-party card-processing API (Stripe-like) that Nimbus Commerce
+  depends on for charges and refunds but doesn't own or control.
+owns:
+  - charge-card
+  - refund-card

@@ -1,0 +1,12 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "CreateSubscriptionResponse",
+  "type": "object",
+  "required": ["subscriptionId", "status", "currentPeriodEnd"],
+  "properties": {
+    "subscriptionId": { "type": "string" },
+    "status": { "type": "string", "enum": ["active", "trialing", "incomplete"] },
+    "currentPeriodEnd": { "type": "string", "format": "date-time" },
+    "invoiceId": { "type": "string" }
+  }
+}

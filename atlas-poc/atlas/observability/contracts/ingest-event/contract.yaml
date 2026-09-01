@@ -1,0 +1,12 @@
+id: ingest-event
+name: Ingest Domain Event
+kind: event
+status: solid
+description: >
+  Receives a structured domain event (e.g. "subscription.created") from any
+  service, stamps it with a trace id and timestamp, and writes it to the
+  event stream and structured log store.
+scenarios: ./ingest-event.feature
+tickets:
+  - system: mock
+    ref: NIM-260

@@ -1,0 +1,7 @@
+id: query-logs
+name: Query Logs
+kind: query
+status: not-started
+description: >
+  Proposed — let a service or operator search ingested events and logs by
+  trace id, service, or time range. Not designed yet.

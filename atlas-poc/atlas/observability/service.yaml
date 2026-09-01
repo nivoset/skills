@@ -1,0 +1,10 @@
+id: observability
+name: Logging & Events
+status: needs-refinement
+description: >
+  Structured logging and the domain-event stream other services emit onto —
+  the shared nervous system that lets services react to what happened
+  elsewhere without calling each other directly.
+owns:
+  - ingest-event
+  - query-logs

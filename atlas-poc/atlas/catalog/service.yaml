@@ -1,0 +1,10 @@
+id: catalog
+name: Catalog Service
+status: solid
+description: Owns product and plan data — the read-only source of truth for what's for sale.
+tickets:
+  - system: mock
+    ref: NIM-104
+owns:
+  - list-products
+  - get-product

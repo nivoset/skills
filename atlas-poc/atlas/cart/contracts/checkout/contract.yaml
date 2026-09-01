@@ -1,0 +1,12 @@
+id: checkout
+name: Checkout
+kind: command
+status: not-started
+description: Converts a cart into a paid subscription. Named, not yet defined.
+links:
+  - to: billing/create-subscription
+    type: triggers
+    label: starts a subscription
+  - to: observability/ingest-event
+    type: emits
+    label: checkout.completed event

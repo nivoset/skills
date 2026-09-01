@@ -1,0 +1,10 @@
+id: billing
+name: Billing Service
+status: needs-refinement
+description: Owns subscriptions, invoices, and payment method state.
+tickets:
+  - system: mock
+    ref: NIM-482
+owns:
+  - create-subscription
+  - cancel-subscription

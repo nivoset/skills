@@ -1,0 +1,7 @@
+id: cart
+name: Cart Service
+status: needs-refinement
+description: Holds the shopper's in-progress selection before checkout.
+owns:
+  - add-item
+  - checkout

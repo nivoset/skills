@@ -1,0 +1,10 @@
+id: charge-card
+name: Charge Card
+kind: external
+status: solid
+description: Authorizes and captures a card charge for a subscription's first invoice.
+request:
+  $ref: ./schema/request.json
+response:
+  $ref: ./schema/response.json
+scenarios: ./charge-card.feature

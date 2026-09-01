@@ -1,0 +1,7 @@
+id: notifications
+name: Notifications Service
+status: not-started
+description: Outbound customer messaging — email today, SMS proposed.
+owns:
+  - send-email
+  - send-sms

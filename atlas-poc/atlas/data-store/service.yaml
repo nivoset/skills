@@ -1,0 +1,13 @@
+id: data-store
+name: Order & Catalog Database
+status: solid
+description: >
+  Postgres-backed persistence for catalog rows and order/subscription
+  records — the actual system of record other services read and write
+  through, not just a diagram convenience.
+tickets:
+  - system: mock
+    ref: NIM-210
+owns:
+  - read-catalog
+  - write-order

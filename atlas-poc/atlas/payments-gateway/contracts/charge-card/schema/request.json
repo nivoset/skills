@@ -1,0 +1,12 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ChargeCardRequest",
+  "type": "object",
+  "required": ["paymentMethodId", "amountCents", "currency"],
+  "properties": {
+    "paymentMethodId": { "type": "string" },
+    "amountCents": { "type": "integer" },
+    "currency": { "type": "string", "enum": ["usd"] },
+    "idempotencyKey": { "type": "string" }
+  }
+}

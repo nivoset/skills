@@ -1,0 +1,6 @@
+id: send-email
+name: Send Email
+kind: event
+status: needs-refinement
+description: Sends a transactional email for a given template and recipient.
+scenarios: ./send-email.feature

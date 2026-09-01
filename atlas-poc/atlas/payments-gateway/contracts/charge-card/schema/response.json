@@ -1,0 +1,11 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ChargeCardResponse",
+  "type": "object",
+  "required": ["chargeId", "status"],
+  "properties": {
+    "chargeId": { "type": "string" },
+    "status": { "type": "string", "enum": ["succeeded", "declined", "requires_action"] },
+    "declineReason": { "type": "string", "nullable": true }
+  }
+}

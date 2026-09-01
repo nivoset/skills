@@ -1,0 +1,9 @@
+id: send-sms
+name: Send SMS
+kind: event
+status: not-started
+description: Proposed — SMS notifications for payment failures. Not designed yet.
+links:
+  - to: observability/ingest-event
+    type: consumes
+    label: would consume payment_failed events (not wired up yet)
