@@ -1,11 +1,31 @@
 ---
-name: blackboard-plan
+name: blackboard
 description: Refine an initiative, epic, or feature through a dynamic-role blackboard loop and produce capability-level and feature-level ticket drafts with dependencies and parallel work lanes.
 ---
 
-# Blackboard Plan
+# Blackboard
 
 Use this skill when the user wants to refine or plan work above implementation-ticket level.
+
+## Dispatch announcement
+
+Before starting any delegated investigation, announce the board roster in the user-facing response. Introduce every agent that will be spun up with:
+
+- **name**: the stable delegated-agent name;
+- **speciality**: the review domain and scope;
+- **why**: the concrete question or risk this agent covers;
+- **deliverable**: the evidence fields it must return.
+
+Announce the smallest role set that covers the material risks. Do not imply that an agent has started until it is actually dispatched. If no delegation is needed, say so and explain why local evidence is sufficient. Agents propose evidence and recommendations only; the board owner retains decision authority.
+
+Use this format:
+
+```text
+Blackboard roster
+- <name> — <speciality>: <why>; returns <deliverable>.
+```
+
+After the announcement, dispatch each role with the same scope, board version, assigned question, timeout, and required return schema. Record the announcement and dispatch handles in the board evidence.
 
 ## Inputs
 

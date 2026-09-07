@@ -58,6 +58,8 @@ If delegation is unavailable, times out, conflicts, or returns incomplete work, 
 - Ask the requester to choose when options represent a material product, architectural, compatibility, migration, or operational decision. After the feasibility/waiver check, auto-select only a non-material choice or one explicitly pre-decided by the requester; repository constraints, elimination, or dominance may support comparison but cannot authorize auto-selection of a material choice.
 - If a decision, new evidence, or requester answer changes the behavioral contract, invalidate the affected options, matrix, recommendation, counterargument, decision record, and downstream plan/review; return to the affected earlier phase and rerun them. Record what was invalidated and why.
 - Do not write implementation tickets or code until the decision gate is resolved.
+- Do not stop with a partial `.feature-tdd/` folder. Complete and validate the canonical artifacts before the TDD-orchestration handoff.
+- Stop after a startable TDD-orchestration handoff; do not continue into product implementation unless the requester explicitly asks for implementation.
 
 ## Quick reference
 
@@ -86,7 +88,9 @@ Before drafting implementation steps, inspect the repository's instructions, sta
 
 ### Phase 1 — Idea and codebase discovery
 
-In parallel, dispatch:
+Start this phase by invoking `blackboard` as the investigation gate. Before dispatching any roles, publish the blackboard roster: introduce each planned agent by stable name, speciality, why it is needed, and expected evidence. The blackboard must return claims, evidence, gaps, risks, dependencies, conflicts, and unresolved human questions with provenance. Planning consumes that board as evidence; it must not silently replace it with unsupported synthesis.
+
+After the blackboard roster is announced and its investigation is dispatched, in parallel dispatch:
 
 - a codebase researcher to map current behavior, relevant modules/files, existing abstractions, tests, contracts, dependencies, and blast radius;
 - an **idea challenger** whose only job is to question the premise.
@@ -120,6 +124,8 @@ Keep delegated findings separate from the rendered report. Aggregate every accep
 ### Phase 2 — Behavior and validation discovery
 
 Dispatch a behavior analyst to define the behavioral contract, generate or refine BDD/Gherkin scenarios, inspect existing tests, identify edge cases, and surface behavioral collisions. Prefer observable outcomes over implementation details. Use `feature-tdd-validator` for validating feature-file scope, tags, and stable scenario identities; do not claim validation merely because scenarios were drafted. Use `feature-tdd-orchestrator` only after the decision gate for implementation sequencing. Loop to Phase 1 if this changes the underlying problem.
+
+When the decision is settled, hand off to `feature-tdd-planning` to create or reconcile the complete `.feature-tdd/` artifact set. Do not report planning complete until every required planning artifact has repository-specific content, paths and scenario IDs resolve, tags are valid, the execution graph is acyclic, traceability is bidirectional, and the review has no unresolved blocking finding. Then invoke `feature-tdd-orchestrator` and stop at the handoff boundary only when it confirms that the ordered TDD work can be started. “Ready” means orchestration inputs are complete and startable; it does not mean implementation has begun or finished.
 
 ### Phase 3 — Three-option design gate
 
