@@ -13,6 +13,16 @@ A finding must identify a behavior or risk that matters. Strong findings show on
 
 Do not report “this is ugly,” “I would refactor it,” or “an AI probably wrote this” without a specific consequence.
 
+## Suggestion standard
+
+For each accepted finding, provide:
+
+1. The smallest safe repair that removes or contains the failure mode.
+2. The test, assertion, analyzer query, or operational check that should prove the repair.
+3. A material tradeoff or deferred follow-up, if one exists.
+
+Separate required repair from optional cleanup. A harsh review is useful when it makes the next decision easier, not when it produces an indiscriminate rewrite plan.
+
 ## AI-slop indicators
 
 Treat these as prioritization signals only:
@@ -48,3 +58,13 @@ Rank evidence from strongest to weakest:
 5. CodeLens score, hotspot, coupling, or authorship concentration alone.
 
 Items at level 5 are investigation targets, not confirmed findings.
+
+## Delegation quality bar
+
+Delegates should be judged on evidence and useful disagreement, not finding volume. A good delegate can return “no issue found” for a bounded path, identify uncertainty, and suggest the next proof. The parent should reject:
+
+- duplicate findings with different wording,
+- findings based only on a CodeLens metric,
+- suggestions that expand scope without reducing a verified risk,
+- fixes that mask the symptom without testing the underlying behavior,
+- AI-authorship claims presented as technical evidence.

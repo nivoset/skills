@@ -49,7 +49,7 @@ Review the active or named branch against a target branch through bounded, evide
 7. Compute the merge base and inspect `target...source` diff, changed files, and branch-only commits.
 8. Read PR description when available, changed files, nearby tests, schemas, and contracts.
 9. Check available skills for `thermo-nuclear-code-quality-review`. Load it if present; record unavailable if not present.
-10. Start a cleanup ledger for any temporary artifact: path, baseline status, owning agent, creation time, and intended cleanup action.
+10. Start a cleanup ledger for any temporary artifact: path, baseline status, owning agent, creation time, and intended cleanup action. Store temporary artifacts under the repository's git-ignored `.tmp/` directory (create it when needed); use another git-ignored temporary directory or a global system temp directory such as `/tmp`; never use a repository path that could appear in Git status or be accidentally committed.
 11. Run the smallest baseline check that establishes the branch is reviewable.
 
 ### 2. Choose Review Slices

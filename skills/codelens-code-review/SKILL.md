@@ -50,7 +50,39 @@ Prioritize intersections, not isolated metrics:
 
 Inspect the top targets and their callers, callees, adapters, schemas, error paths, and tests. Use `--include-tests` when test blast radius matters.
 
-### 3. Apply harsh review lanes
+### 3. Delegate bounded review lanes
+
+For a non-trivial codebase, branch, or subsystem review, use separate read-only subagents/delegates. Do not send one vague “review everything” prompt. Give each delegate a bounded lane, target paths, relevant CodeLens signals, commands to run, and the output contract below.
+
+Recommended lanes, dispatched in parallel when they do not share mutable state:
+
+- **Risk triage:** interpret CodeLens health, hotspots, coupling, and regressions; nominate the highest-value paths.
+- **Behavior and correctness:** trace core flows, state transitions, persistence, permissions, and failure paths.
+- **Maintainability and architecture:** inspect duplication, abstractions, boundary violations, naming, and change blast radius.
+- **Tests and proof:** assess test honesty, negative-path coverage, observability, and the smallest reproduction for each hypothesis.
+- **Semantic security:** use CodeQL or Semgrep for reachable data-flow and dangerous API patterns when the repository supports them.
+
+Limit delegation to the lanes justified by the CodeLens signals and repository risk. Delegates must be read-only unless an isolated temporary verification test is explicitly authorized. Never let two delegates write to the same worktree, database, port, cache, or fixture.
+
+Each delegate returns:
+
+```md
+## Scope
+[lane, paths, and CodeLens signals]
+## Findings
+- Location and priority
+- Concrete failure mode and user impact
+- Evidence and confidence
+- Suggested verification
+- Suggested fix boundary
+- Alternatives and tradeoffs
+## No-Issue Areas
+[important paths checked without a finding]
+```
+
+The parent reviewer owns synthesis. Re-read every accepted finding, remove duplicates and speculation, verify the strongest claims locally, and downgrade anything not supported by evidence. Delegation increases coverage; it does not outsource judgment.
+
+### 4. Apply harsh review lanes
 
 Run only lanes relevant to the discovered risk, but cover these when applicable:
 
@@ -78,11 +110,16 @@ Prefer a focused failing test, reproducible command, static proof from code/cont
 - Failure: what breaks, silently corrupts, leaks, races, or becomes expensive
 - Evidence: commands, analyzer output, test result, or code path
 - Impact: user, business, security, reliability, or maintenance consequence
+- Suggested fix: the smallest safe repair, with an alternative only when the tradeoff is material
+- Suggested test or proof: behavior-focused test name/assertions or the narrowest verification command
+- Tradeoffs: what the suggestion does not solve and what broader refactor should be deferred
 - Fix boundary: smallest safe change; explicitly exclude unrelated cleanup
 - Missing proof: the one check that would raise or lower confidence
 ```
 
 Use P0 only for catastrophic security, data, financial, or production-flow impact; P1 for important likely breakage; P2 for meaningful defects or test gaps; P3 for real but limited risk. End with a blunt verdict: ship, ship with required repairs, or do not ship.
+
+Every accepted finding must include a practical suggestion. Prefer the smallest repair that removes the failure mode, then name a follow-up refactor only if the evidence supports it. Do not prescribe a rewrite, new abstraction, or library migration merely because the code is unpleasant.
 
 ## Supporting rubric
 

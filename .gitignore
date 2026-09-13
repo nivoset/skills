@@ -3,3 +3,6 @@ pi/
 
 # macOS
 .DS_Store
+
+# Agent and tooling temporary files
+.tmp/

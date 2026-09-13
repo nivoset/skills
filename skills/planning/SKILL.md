@@ -42,6 +42,16 @@ The orchestrator must not behave as “Here is how I would implement the ticket.
 7. Which approach is recommended, and the strongest argument against it.
 8. The implementation plan after the decision is settled.
 
+## Dispatch announcement contract
+
+Apply the blackboard roster rule to every later dispatch wave, not only Phase 1. Before dispatching behavior analysts, option designers, adversarial reviewers, plan reviewers, or handoff validators, publish a roster line for each planned agent:
+
+```text
+<stable name> — <speciality and exact scope>: <question/risk>; returns <schema/evidence>; authority <propose/approve/write + paths>; timeout/deadline <...>; owner <...>.
+```
+
+Include the current board/contract version, dependency order, read/write paths, retry/fallback rule, and whether the role is read-only or writable. Say `planned` before dispatch and `dispatched` only after a handle exists. Record the roster and handles in the current lifecycle evidence. Delegates remain evidence gatherers and critics; they cannot make material decisions.
+
 ## Operating contract
 
 Delegated agents are evidence gatherers or critics, not decision-makers. Dispatch independent work with a bounded question and require a structured return containing claim, repository evidence (path/symbol/test/command), uncertainty, and implication. Synthesize; do not treat an unsupported assertion as evidence. Mark unresolved facts as `UNKNOWN` and state how they will be verified. Before each gate, record the behavioral contract and the deterministic contract diff in `.planning/contract-diff.md`. The diff schema is exactly: `recorded_at`, `contract_version`, `target_behavior`, `current_behavior`, `public_boundaries`, `compatibility_boundaries`, `data_and_migration_boundaries`, `operational_boundaries`, `material_reframings`, `evidence_refs`, `requester_confirmation` (status, authority, source, and timestamp), and `invalidated_outputs`. The `requester_confirmation` field is always populated: use `status: not-required` with `authority: planner` when the evidence assessment finds no material reframing; its source and timestamp must identify the assessment, and `evidence_refs` must point to evidence showing the target/current contract comparison and that `material_reframings` is empty. This explicit no-material-reframing status does not block a gate. If `material_reframings` is non-empty, use `status: pending` until the requester explicitly confirms each material reframing; pending or absent confirmation blocks the next gate. Use `status: confirmed` only with requester authority and confirmation source/timestamp. Re-check and version this diff on resume and before completion, and record the confirmation or not-required evidence in both the diff and the lifecycle ledger.
@@ -88,9 +98,9 @@ Before drafting implementation steps, inspect the repository's instructions, sta
 
 ### Phase 1 — Idea and codebase discovery
 
-Start this phase by invoking `blackboard` as the investigation gate. Before dispatching any roles, publish the blackboard roster: introduce each planned agent by stable name, speciality, why it is needed, and expected evidence. The blackboard must return claims, evidence, gaps, risks, dependencies, conflicts, and unresolved human questions with provenance. Planning consumes that board as evidence; it must not silently replace it with unsupported synthesis.
+Start this phase by invoking `blackboard` as the investigation gate. The blackboard owns investigation-role selection and dispatch. Before dispatching any roles, it must publish the roster in the user-facing response: introduce each planned agent by stable name, speciality, why it is needed, and expected evidence. Planning must not dispatch duplicate investigation roles outside that roster. If planning discovers a missing investigation domain, revise the roster and announce the added role before dispatching it. The blackboard must return claims, evidence, gaps, risks, dependencies, conflicts, and unresolved human questions with provenance. Planning consumes that board as evidence; it must not silently replace it with unsupported synthesis.
 
-After the blackboard roster is announced and its investigation is dispatched, in parallel dispatch:
+The investigation roster must include, when applicable:
 
 - a codebase researcher to map current behavior, relevant modules/files, existing abstractions, tests, contracts, dependencies, and blast radius;
 - an **idea challenger** whose only job is to question the premise.
@@ -124,8 +134,6 @@ Keep delegated findings separate from the rendered report. Aggregate every accep
 ### Phase 2 — Behavior and validation discovery
 
 Dispatch a behavior analyst to define the behavioral contract, generate or refine BDD/Gherkin scenarios, inspect existing tests, identify edge cases, and surface behavioral collisions. Prefer observable outcomes over implementation details. Use `feature-tdd-validator` for validating feature-file scope, tags, and stable scenario identities; do not claim validation merely because scenarios were drafted. Use `feature-tdd-orchestrator` only after the decision gate for implementation sequencing. Loop to Phase 1 if this changes the underlying problem.
-
-When the decision is settled, hand off to `feature-tdd-planning` to create or reconcile the complete `.feature-tdd/` artifact set. Do not report planning complete until every required planning artifact has repository-specific content, paths and scenario IDs resolve, tags are valid, the execution graph is acyclic, traceability is bidirectional, and the review has no unresolved blocking finding. Then invoke `feature-tdd-orchestrator` and stop at the handoff boundary only when it confirms that the ordered TDD work can be started. “Ready” means orchestration inputs are complete and startable; it does not mean implementation has begun or finished.
 
 ### Phase 3 — Three-option design gate
 
@@ -207,6 +215,10 @@ A waiver is a decision, not a formatting escape hatch. Before using `WAIVED`, pr
 ### Phase 4 — Implementation planning
 
 Only after the approach is resolved, turn the accepted evidence and decision into an ordered, step-by-step implementation plan. Use repository-specific paths and symbols. Break work into independently testable slices with dependencies, acceptance criteria, BDD scenario references, migration/rollout notes, rollback, and explicit non-goals. Name the repository-native lint, formatter, type-check, build, and targeted-test commands applicable to the affected code. Implementation must run the applicable lint and formatter checks before completion, plus type-check, build, and targeted tests when the repository provides them; do not claim any command passed unless it is executed. Hand off decomposition to `planning-decomposer` when available.
+
+### TDD orchestration handoff
+
+After the decision is settled and the implementation plan has passed review, hand off to `feature-tdd-planning` to create or reconcile the complete `.feature-tdd/` artifact set. Do not report planning complete until every required planning artifact has repository-specific content, paths and scenario IDs resolve, tags are valid, the execution graph is acyclic, traceability is bidirectional, and the review has no unresolved blocking finding. Then invoke `feature-tdd-orchestrator` and stop at the handoff boundary only when it confirms that the ordered TDD work can be started. “Ready” means orchestration inputs are complete and startable; it does not mean implementation has begun or finished.
 
 ### Plan review
 

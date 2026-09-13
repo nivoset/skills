@@ -53,11 +53,12 @@ Use `linear issue start <ISSUE-ID>` to create or switch to the issue branch and 
 
 ### Create or update an issue
 
-Prepare substantial markdown in a temporary file, then run:
+Prepare substantial markdown in a temporary file under the repository's git-ignored `.tmp/` directory, then run. Create `.tmp/` first when needed; a global system temp directory such as `/tmp` is also acceptable because it cannot appear in this repository's Git status.
 
 ```bash
-linear issue create --title "Short user-visible title" --description-file /tmp/linear-description.md
-linear issue update ENG-123 --description-file /tmp/linear-description.md
+mkdir -p .tmp
+linear issue create --title "Short user-visible title" --description-file .tmp/linear-description.md
+linear issue update ENG-123 --description-file .tmp/linear-description.md
 ```
 
 Prefer adding `--project`, `--milestone`, labels, and assignee fields only after confirming valid names/IDs with list or view commands.
@@ -67,9 +68,10 @@ Prefer adding `--project`, `--milestone`, labels, and assignee fields only after
 When the user asks for a draft only, write the draft markdown in the final response and do not create or post a comment file. When the user asks to post or update a multiline comment, use a body file:
 
 ```bash
+mkdir -p .tmp
 linear issue comment list ENG-123
-linear issue comment add ENG-123 --body-file /tmp/linear-comment.md
-linear issue comment update <comment-id> --body-file /tmp/linear-comment.md
+linear issue comment add ENG-123 --body-file .tmp/linear-comment.md
+linear issue comment update <comment-id> --body-file .tmp/linear-comment.md
 ```
 
 Confirm before posting or editing comments unless the user explicitly requested the post.

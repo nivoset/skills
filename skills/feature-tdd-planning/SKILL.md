@@ -57,12 +57,14 @@ Load `feature-tdd-orchestrator`, `feature-tdd-validator`, `bdd`, and `tdd` when 
 
 ## TDD orchestration handoff
 
-Before declaring `tdd-orchestration-ready`, confirm that `feature-tdd-orchestrator` can start without inventing missing inputs. The handoff must identify:
+Before declaring `tdd-orchestration-ready`, confirm that `feature-tdd-orchestrator` can start without inventing missing inputs. Record the handoff in `.feature-tdd/README.md` and the execution ledger with `handoff_id`, `source_manifest_id`, `contract_version`, `orchestrator_confirmation` (`startable` or `blocked`), confirmation evidence, owner, deadline, and re-entry condition. The handoff must identify:
 
 - the canonical `.feature-tdd/` root and validated artifact versions;
 - the first executable scenario or test slice and its selector;
 - dependency order, blockers, and the next join point;
 - the execution-ledger state and resume/checkpoint rules;
-- the evidence location for validation and feature review.
+- the evidence location for validation and feature review;
+- the clean-worktree or baseline snapshot, ticket/acceptance-criteria mapping, authorized write owner, and mutation paths required by `tdd` before Red begins;
+- the first TDD action, its selector, deterministic oracle, and exact artifact to write.
 
 If any required input is missing, stale, unresolved, or unvalidated, end `blocked` with an owner and re-entry condition. Do not claim `final-ready` or startability from a partial artifact set. Once the orchestrator confirms startability, stop planning and hand off; implementation belongs to `tdd`.
