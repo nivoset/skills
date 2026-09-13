@@ -25,7 +25,9 @@ Blackboard roster
 - <name> — <speciality>: <why>; returns <deliverable>.
 ```
 
-After the announcement, dispatch each role with the same scope, board version, assigned question, timeout, and required return schema. Record the announcement and dispatch handles in the board evidence.
+After the announcement, dispatch each role with the same scope, board version, assigned question, timeout, and required return schema. Record the announcement and dispatch handles in the board evidence at `.planning/blackboard/<board-id>/dispatch.yaml` (or the repository's documented equivalent). Each dispatch record includes `board_id`, `board_version`, stable agent name, speciality, scope, question, authority (`propose-only` unless explicitly authorized otherwise), read/write paths, handle, status, deadline, retry/fallback rule, and return schema. Use `planned` before a handle exists and `dispatched` only after it exists; never imply that an agent started before dispatch.
+
+Every contribution must return `status` (`passed`, `failed`, or `blocked`), claims/results, evidence (path/symbol/test/command and result), uncertainty, implication/next action, and changed paths. Mark late or stale contributions without replacing current board state. A `parent-ready` board permits downstream behavior discovery; `final-ready` is required before capability/feature drafting. The board owner remains the decision authority.
 
 ## Inputs
 
@@ -93,7 +95,7 @@ import blackboard_plan
 plan = await blackboard_plan(problem_text, max_roles=5)
 ```
 
-The package provides `analyze_roles`, `build_iteration_brief`, `merge_contributions`, and `readiness_check`. It keeps role authority propose-only, preserves conflicting evidence, and blocks readiness when required claims, questions, disagreement rooms, or reviews remain unresolved. Treat unavailable tooling, malformed contributions, and stale sessions as blockers until the documented retry, replacement, or human-decision path succeeds.
+The skill slug and directory are `blackboard`. The documented Python package is an external runtime dependency named `blackboard_plan`; this repository does not provide or version that package. Callers must resolve the skill by the `blackboard` slug, verify the package is installed before invocation, and treat an unavailable import as a blocker requiring deterministic fallback or human decision. The package, when available, provides `analyze_roles`, `build_iteration_brief`, `merge_contributions`, and `readiness_check`. It keeps role authority propose-only, preserves conflicting evidence, and blocks readiness when required claims, questions, disagreement rooms, or reviews remain unresolved. Treat unavailable tooling, malformed contributions, and stale sessions as blockers until the documented retry, replacement, or human-decision path succeeds.
 
 
 ## End-user advocate
