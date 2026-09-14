@@ -1,6 +1,6 @@
 # Blackboard artifact contract
 
-Use this contract when the board must survive multiple cycles, delegated waves, sessions, or handoffs. For a small conversational refinement, keep the same logical records in context without creating empty files.
+Use this contract when the board needs structured working state across multiple cycles, delegated waves, or handoffs within the active workspace. The board is temporary and may disappear when `.tmp/` is cleaned. For a small conversational refinement, keep the same logical records in context without creating empty files.
 
 ## Design intent
 
@@ -11,18 +11,22 @@ The controller is the only board writer. Specialists receive a versioned snapsho
 ## Files
 
 ```text
-.planning/blackboard/<board-id>/
-├── board.yaml
-├── roles.yaml
-├── control.yaml
-├── dispatch.yaml
-├── events/
-│   └── <applied-version>-<event-id>.yaml
-├── disagreements/
-│   └── <room-id>.yaml
-└── iterations/
-    └── <cycle-id>.md
+.tmp/planning/
+└── blackboard/
+    └── <board-id>/
+        ├── board.yaml
+        ├── roles.yaml
+        ├── control.yaml
+        ├── dispatch.yaml
+        ├── events/
+        │   └── <applied-version>-<event-id>.yaml
+        ├── disagreements/
+        │   └── <room-id>.yaml
+        └── iterations/
+            └── <cycle-id>.md
 ```
+
+`.tmp/planning/` is the generic root for temporary planning work. `blackboard/` is this skill's namespace; other planning workflows may use sibling namespaces without mixing their schemas or lifecycle state. Verify that `.tmp/` is excluded by the repository ignore rules before creating the board. If it is not ignored, do not write the board until the temporary-root policy is corrected or the user authorizes another safe temporary location.
 
 - `board.yaml` is the materialized current domain-board snapshot.
 - `roles.yaml` contains reusable and dynamically introduced knowledge-source definitions.
@@ -33,6 +37,8 @@ The controller is the only board writer. Specialists receive a versioned snapsho
 - `iterations/` contains concise human-readable deltas, not hidden reasoning transcripts.
 
 Do not create placeholder files. Create each artifact when its first real record exists.
+
+Never commit files under `.tmp/planning/`. When the user explicitly requests a durable deliverable, derive it from the accepted snapshot and write only that projection to the user-approved permanent location. Record the source board version and destination as a promotion event before the temporary state is cleaned.
 
 ## Board snapshot
 
@@ -230,7 +236,7 @@ Do not close a disagreement through majority vote, confidence averaging, or last
 
 Persist only the evidence needed to support the board. Redact secrets, credentials, personal data, and unrelated sensitive content before writing, indexing, or forwarding it to a specialist. A dispatch may not widen its role's recorded path or data permissions merely because additional context would be convenient.
 
-Deferred and historical artifacts remain available for traceability, but retention must follow the repository or organization policy. A retention action is an authorized event that records what was archived or removed, why, and what trace remains; it is not silent cleanup.
+Deferred and historical artifacts remain available for traceability only while the temporary board exists. Cleanup may remove the entire board. If work must continue beyond that cleanup boundary, obtain authorization to promote a compact handoff or final deliverable; otherwise treat loss of temporary history as expected. On resume without the board, reconstruct current state from authoritative inputs and identify any event history, disagreement state, or deferred context that could not be recovered.
 
 ## Islands and joins
 
