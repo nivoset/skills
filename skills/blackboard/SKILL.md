@@ -56,7 +56,7 @@ Blackboard roster — cycle <cycle-id>, board v<version>
 - <stable-name> — <speciality>: triggered by <artifact IDs>; investigates <question>; returns <artifact types and evidence>.
 ```
 
-Record the announcement and dispatch in `.planning/blackboard/<board-id>/dispatch.yaml`. Each dispatch includes the board version, triggering artifact IDs, bounded scope, question, authority, readable paths, prohibited mutations, handle, deadline, retry or fallback, and return contract. Use `planned` until a real handle exists and `dispatched` only afterward.
+Record the announcement and dispatch in `.tmp/planning/blackboard/<board-id>/dispatch.yaml`. Treat `.tmp/planning/` as the generic root for disposable planning state and verify `.tmp/` is gitignored before writing. Each dispatch includes the board version, triggering artifact IDs, bounded scope, question, authority, readable paths, prohibited mutations, handle, deadline, retry or fallback, and return contract. Use `planned` until a real handle exists and `dispatched` only afterward.
 
 A role definition includes:
 
@@ -142,6 +142,8 @@ Treat repeated activations with no meaningful board delta, duplicate findings, c
 Every run has a bounded cycle, time, or cost budget. Reaching the bound never implies readiness. Persist the current snapshot, active agenda, blocked islands, and a precise resume trigger. Late contributions remain events but cannot replace current state without freshness validation.
 
 On resume, verify authoritative sources, board version, open disagreements, decisions, and shared invariants before dispatching new work.
+
+Blackboard state under `.tmp/planning/` is working state, not a repository deliverable. Never commit it. If the user requests a durable plan, project only the finalized, approved result into a user-approved repository location and record that promotion in the temporary board. If the temporary board has been cleaned, reconstruct it from authoritative inputs and report the lost continuity rather than pretending the prior state still exists.
 
 ## Readiness
 
