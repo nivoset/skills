@@ -67,7 +67,7 @@ A role definition includes:
 - expected cost or deadline and a fallback;
 - `propose-only` authority unless the user explicitly grants more.
 
-Examples of triggers include a disputed factual claim, missing user behavior, an untested assumption, conflicting constraints, a newly discovered dependency, a safety boundary, or two live approaches that need comparison. These are examples, not a permanent roster.
+Examples of triggers include a disputed factual claim, missing user behavior, an untested assumption, conflicting constraints, a newly discovered dependency, a changed member of a related-case family, a shared invariant, a safety boundary, or two live approaches that need comparison. These are examples, not a permanent roster.
 
 For user-facing work, treat end-user advocacy as distinct from interface design. UI/UX examines interaction structure; the advocate examines accessibility, trust, agency, confusing failure states, and recovery across every affected domain.
 
@@ -76,7 +76,7 @@ For user-facing work, treat end-user advocacy as distinct from interface design.
 Run cycles until a stop condition is met. Do not pre-commit to a phase pipeline or a fixed number of roles.
 
 1. **Observe the delta.** Compare the current board with the prior version. Identify additions, revisions, contradictions, newly answerable questions, reopened items, and stale evidence.
-2. **Generate opportunities.** Evaluate every registered or newly useful specialist trigger against that delta. Create a knowledge-source activation record for each plausible next contribution; do not dispatch it yet.
+2. **Generate opportunities.** Evaluate every registered or newly useful specialist trigger against that delta. When the delta changes a behavior, rule, setting, variant, boundary, or shared mechanism, trigger an implication sweep unless current evidence proves that no related case exists. Create a knowledge-source activation record for each plausible next contribution; do not dispatch it yet.
 3. **Choose focus.** Select the activation most likely to reduce a material uncertainty, resolve a critical conflict, test a central hypothesis, or unblock downstream work. A small set may run in parallel only when scopes do not overlap or share an unresolved decision.
 4. **Record control.** Write the selected focus, alternatives considered, evidence-backed priority signals, resource bound, and expected board change to the control board. Scores are signals, never decision authority or truth.
 5. **Dispatch.** Announce the wave, then give each role the same current board version plus its trigger IDs, bounded question, evidence requirements, and contribution schema.
@@ -99,9 +99,28 @@ Prefer the next activation using this order, adjusted by current evidence:
 
 Do not let an easy leaf displace a more important unresolved premise merely because it is easier to finish.
 
+## Implication sweeps and balanced coverage
+
+Treat a material change as a possible member of a larger case family, not as an isolated item. Run an implication sweep to discover sibling cases, shared invariants, consumers, dependents, lifecycle states, and counterexamples that are supported by the repository, domain model, accepted behavior, or user intent. Examples include other supported languages after a locale-setting change, other roles after an authorization change, or other state transitions after changing one transition. Examples guide discovery; they are not a universal checklist.
+
+For every discovered case, record the triggering artifact, the concrete relationship, the authoritative source that establishes the family or invariant, and one disposition: `required`, `covered`, `research`, `deferred`, `not-applicable`, or `duplicate`. Use typed relationships such as `same-family-as`, `shares-invariant-with`, `depends-on`, `can-regress`, and `counterexample-to`. A plausible relationship without sufficient evidence is `research`, not an implied fact.
+
+Balanced coverage means that every known family member is considered under the same relevant review dimensions and evidence standard. It does not mean spending equal effort on every member or expanding every family into a full cross-product. Shared evidence may cover an equivalence class when the common mechanism and boundaries are demonstrated. Sample representatives only when the sampling rule, equivalence evidence, and excluded boundary cases are recorded. Any exception between comparable members must cite evidence or an authorized product decision.
+
+Control scope explicitly:
+
+- `required` cases affect accepted outcomes, correctness, safety, authorization, compatibility, a shared invariant, or the critical verification path; they remain current and blocking until covered or removed from scope by the proper authority.
+- `covered` cases cite current behavioral, repository, test, or decision evidence.
+- `research` cases name the uncertainty, bounded investigation, owner, and answerability or exit condition.
+- `deferred` cases are useful but not required for the current outcome and carry the normal owner, authority, expiry, rationale, and re-entry data.
+- `not-applicable` cases cite why the apparently related member or review dimension does not apply.
+- `duplicate` cases point to the canonical case and inherit no stronger disposition than it has.
+
+Group duplicates and rank cases by acceptance relevance before activating work. Product-impacting scope expansion requires user authority. Do not hide required work as deferred, let a parking-lot list grow without ownership, or continue implication research after its bounded exit condition. Re-run the sweep whenever a refinement changes the family definition, shared mechanism, invariant, or affected boundaries.
+
 ## Back-and-forth refinement
 
-Contributions use explicit operations: `propose`, `support`, `challenge`, `refine`, `split`, `connect`, `answer`, or `retract`. Every operation targets stable artifact IDs and creates a new event. Revision preserves the earlier version and uses typed relationships such as `supports`, `challenges`, `responds-to`, `refines`, `depends-on`, `blocks`, `answers`, `derived-from`, `supersedes`, or `duplicates`.
+Contributions use explicit operations: `propose`, `support`, `challenge`, `refine`, `split`, `connect`, `answer`, or `retract`. Every operation targets stable artifact IDs and creates a new event. Revision preserves the earlier version and uses typed relationships such as `supports`, `challenges`, `responds-to`, `refines`, `depends-on`, `blocks`, `answers`, `derived-from`, `supersedes`, `duplicates`, `same-family-as`, `shares-invariant-with`, `can-regress`, or `counterexample-to`.
 
 For a material challenge:
 
@@ -147,22 +166,23 @@ Blackboard state under `.tmp/planning/` is working state, not a repository deliv
 
 ## Readiness
 
-`parent-ready` means the central outcome, non-goals, evaluation criteria, constraints, main user behaviors, live hypotheses, and blocking questions are explicit enough to begin downstream behavior discovery. It does not mean the idea is finished.
+`parent-ready` means the central outcome, non-goals, evaluation criteria, constraints, main user behaviors, live hypotheses, blocking questions, and material related-case families are explicit enough to begin downstream behavior discovery. It does not mean the idea is finished.
 
-`final-ready` means the requested artifact has been produced; all material claims trace to current evidence or authorized decisions; no blocking conflict, unknown, stale island, or newly triggered required review remains; and a completeness cycle found no material omission. Silence and budget exhaustion are not approval.
+`final-ready` means the requested artifact has been produced; all material claims trace to current evidence or authorized decisions; every material implication sweep is balanced and closed; no blocking conflict, unknown, stale island, unresolved `required` or `research` case, or newly triggered required review remains; and a completeness cycle found no material omission. Silence and budget exhaustion are not approval.
 
 `blocked` identifies the affected artifact or island, owner, evidence, and re-entry condition. Continue other useful islands unless the blocker invalidates the parent outcome or a shared invariant.
 
 A deferral names its owner, authority, affected IDs, rationale, expiry, and re-entry condition. Required correctness, safety, or authorization work cannot be hidden by deferral; it remains blocking until resolved or explicitly removed from scope by the proper authority.
 
-Before declaring readiness, ask both:
+Before declaring readiness, ask all three:
 
 - Can any currently triggered specialist materially change the conclusion?
 - Did the latest changes create a specialist or review need that was not present in the initial roster?
+- Does any material change lack an implication sweep whose known family members and relevant dimensions are accounted for without unexplained exceptions?
 
-If either answer is yes, continue the loop.
+If any answer is yes, continue the loop.
 
-For the final completeness cycle, evaluate all current trigger rules against the full candidate artifact, not merely the last delta. Include a missing-role scan for domains exposed after the initial roster. Silence, an empty dispatch queue, or completion by the initially selected roles does not count as a clean cycle.
+For the final completeness cycle, evaluate all current trigger rules against the full candidate artifact, not merely the last delta. Include a missing-role scan for domains exposed after the initial roster and rerun implication sweeps against the final family definitions, invariants, and affected boundaries. Silence, an empty dispatch queue, or completion by the initially selected roles does not count as a clean cycle.
 
 ## Completion output
 
@@ -172,6 +192,7 @@ Return a concise projection of the board rather than a transcript:
 - current model of the idea and its observable behaviors;
 - accepted, contested, rejected, and deferred hypotheses with rationale;
 - evidence, decisions, risks, dependencies, and unresolved questions;
+- material related-case families, coverage balance, and any evidence-backed exceptions;
 - important back-and-forth revisions and why the idea changed;
 - capabilities, BDD, tickets, dependency lanes, and join points only when requested;
 - control summary: cycles run, strategy shifts, blocked islands, and why processing stopped;
