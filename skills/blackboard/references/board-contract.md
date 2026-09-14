@@ -56,6 +56,7 @@ scope:
   authority: <named decision authority>
 evaluation_criteria: []
 artifacts: []
+case_families: []
 islands: []
 relations: []
 open_questions: []
@@ -100,7 +101,130 @@ A `deferred` artifact additionally records `owner`, `authority`, `rationale`, `e
   event_id: event-019
 ```
 
-Prefer `supports`, `challenges`, `responds-to`, `refines`, `depends-on`, `blocks`, `answers`, `derived-from`, `supersedes`, `duplicates`, and `requires-review`. Preserve both nodes when creating a relation. Semantic cleanup may change the derived snapshot only after equivalence, traceability, and reversibility have been checked; the events remain immutable.
+Prefer `supports`, `challenges`, `responds-to`, `refines`, `depends-on`, `blocks`, `answers`, `derived-from`, `supersedes`, `duplicates`, `requires-review`, `same-family-as`, `shares-invariant-with`, `can-regress`, and `counterexample-to`. Preserve both nodes when creating a relation. Semantic cleanup may change the derived snapshot only after equivalence, traceability, and reversibility have been checked; the events remain immutable.
+
+## Implication sweep and case-family records
+
+Create or update a case-family record when a material delta changes a behavior, rule, setting, variant, boundary, shared mechanism, or invariant. The implication sweep identifies related cases before the controller decides which investigations to run.
+
+```yaml
+- family_id: family-locale-selection
+  name: supported locale selection
+  source_artifact_ids: [behavior-change-locale]
+  authoritative_membership_evidence: [evidence-supported-locales-config]
+  membership_status: verified
+  base_version: 8
+  members: [locale-en, locale-es, locale-fr]
+  relevant_dimensions:
+    - selection
+    - persistence
+    - fallback
+    - affected-message-keys
+  cases:
+    - case_id: case-locale-selection-shared
+      trigger_artifact_ids: [behavior-change-locale]
+      member_ids: [locale-en, locale-es, locale-fr]
+      dimension: selection
+      relationship: shares-invariant-with
+      affected_artifact_ids: [behavior-change-locale]
+      disposition: covered
+      rationale: all supported locales use the same validated selector path
+      evidence_ids: [evidence-shared-selector]
+      verification_refs: [test-locale-selector-parameterized]
+      equivalence_basis_ids: [evidence-shared-selector]
+      canonical_case_id: null
+      owner: role-locale-reviewer
+      authority: propose-only
+      bound_or_expiry: null
+      reentry_or_exit_condition: shared selector path or supported membership changes
+    - case_id: case-locale-persistence-shared
+      trigger_artifact_ids: [behavior-change-locale]
+      member_ids: [locale-en, locale-es, locale-fr]
+      dimension: persistence
+      relationship: shares-invariant-with
+      affected_artifact_ids: [behavior-change-locale]
+      disposition: research
+      rationale: persistence shares the locale preference mechanism but lacks current evidence
+      evidence_ids: [evidence-supported-locales-config]
+      verification_refs: []
+      equivalence_basis_ids: []
+      canonical_case_id: null
+      owner: role-locale-reviewer
+      authority: propose-only
+      bound_or_expiry: <deadline or attempt limit>
+      reentry_or_exit_condition: verify persisted value through the shared preference path
+    - case_id: case-locale-fallback-shared
+      trigger_artifact_ids: [behavior-change-locale]
+      member_ids: [locale-en, locale-es, locale-fr]
+      dimension: fallback
+      relationship: counterexample-to
+      affected_artifact_ids: [behavior-change-locale]
+      disposition: covered
+      rationale: invalid and missing locale values use the accepted fallback invariant
+      evidence_ids: [evidence-locale-fallback-contract]
+      verification_refs: [test-locale-fallback]
+      equivalence_basis_ids: [evidence-locale-fallback-contract]
+      canonical_case_id: null
+      owner: role-locale-reviewer
+      authority: propose-only
+      bound_or_expiry: null
+      reentry_or_exit_condition: fallback contract changes
+    - case_id: case-locale-affected-keys
+      trigger_artifact_ids: [behavior-change-locale]
+      member_ids: [locale-en, locale-es, locale-fr]
+      dimension: affected-message-keys
+      relationship: can-regress
+      affected_artifact_ids: [behavior-change-locale]
+      disposition: covered
+      rationale: every affected key exists in each supported locale catalog
+      evidence_ids: [evidence-locale-catalog-membership]
+      verification_refs: [check-affected-message-keys]
+      equivalence_basis_ids: []
+      canonical_case_id: null
+      owner: role-locale-reviewer
+      authority: propose-only
+      bound_or_expiry: null
+      reentry_or_exit_condition: supported locale or affected key set changes
+  balance:
+    expected_members: [locale-en, locale-es, locale-fr]
+    accounted_members: [locale-en, locale-es, locale-fr]
+    unexplained_members: []
+    expected_dimensions: [selection, persistence, fallback, affected-message-keys]
+    accounted_dimensions: [selection, persistence, fallback, affected-message-keys]
+    unexplained_dimensions: []
+    unexplained_exceptions: []
+  last_sweep_event_id: event-026
+```
+
+Every family records `family_id`, `name`, `source_artifact_ids`, `authoritative_membership_evidence`, `membership_status`, `base_version`, `members`, `relevant_dimensions`, `cases`, `balance`, and `last_sweep_event_id`. Allowed membership statuses are `verified` and `unverified`. `unverified` requires a bounded research case describing how the family boundary will be established and blocks `final-ready` while material.
+
+Allowed case dispositions are:
+
+- `required` — current work needed for an accepted outcome, correctness, safety, authorization, compatibility, a shared invariant, or the critical verification path;
+- `covered` — current evidence demonstrates the behavior or invariant;
+- `research` — the relationship is plausible but not yet verified, with a bounded investigation and exit condition;
+- `deferred` — related but not required now, with owner, authority, rationale, expiry, affected IDs, and re-entry condition;
+- `not-applicable` — excluded with evidence explaining why the member or dimension does not apply;
+- `duplicate` — represented by `canonical_case_id` and never treated as more complete than that canonical case.
+
+Every case records `case_id`, `trigger_artifact_ids`, `member_ids`, `dimension`, `relationship`, `affected_artifact_ids`, `disposition`, `rationale`, `evidence_ids`, `verification_refs`, `equivalence_basis_ids`, `canonical_case_id`, `owner`, `authority`, `bound_or_expiry`, and `reentry_or_exit_condition`. Fields that do not apply use `null` or an empty list rather than disappearing, so coverage can be compared consistently.
+
+Derive family membership from authoritative repository or domain evidence such as enums, schemas, configuration, catalogs, routes, public contracts, accepted decisions, feature files, tests, or call sites. Do not infer that visible examples are exhaustive. If authoritative membership cannot be established, record the family boundary as unverified and create a bounded research case.
+
+Balanced coverage requires:
+
+1. every known member appears in `accounted_members` or `unexplained_members`;
+2. every relevant member/dimension combination has a case or belongs to an evidence-backed equivalence class;
+3. comparable cases use the same disposition criteria and evidence standard;
+4. sampling records the rule, common-mechanism evidence, representatives, and excluded boundary cases;
+5. exceptions cite evidence or an authorized product decision;
+6. required cases cannot be downgraded because of budget or effort;
+7. duplicate cases resolve through their canonical case;
+8. a refinement that changes membership, dimensions, mechanism, or invariants invalidates affected coverage and triggers a new sweep.
+
+Validate balance mechanically where possible: `members` and `relevant_dimensions` contain no duplicates; every case member and dimension belongs to those declared sets; the cases cover every applicable member/dimension pair directly or through `equivalence_basis_ids`; `accounted_members` and `unexplained_members` are disjoint and together equal `members`; the corresponding dimension sets balance the same way; and `unexplained_exceptions` is empty before readiness. A `covered` case requires `verification_refs`; `not-applicable` requires exclusion evidence; `research` and `required` require an owner and finite bound; `deferred` requires the full deferral metadata; and `duplicate` requires a valid canonical case. Linguistic accuracy requires authoritative linguistic or human validation when it is part of the accepted outcome; catalog presence alone verifies completeness, not translation quality.
+
+Do not generate a blind cross-product. Collapse truly equivalent cases, prioritize acceptance-relevant gaps, and keep improvements outside the accepted outcome deferred. Product-impacting expansion remains subject to the authority rules in `SKILL.md`.
 
 ## Knowledge-source definitions
 
@@ -124,6 +248,8 @@ Each role in `roles.yaml` has a stable identity and an observable activation con
 ```
 
 Triggers must be inspectable against board state. Avoid triggers such as “when useful” without naming who judges usefulness and from which evidence. A new role may be registered during a run when a board change exposes expertise the current registry does not cover. Record the event that justified its introduction.
+
+An implication-sweep role may propose `case-family` and `case-disposition` updates. It should complete only when the family boundary is evidence-backed or explicitly unverified, all known members are accounted for, relevant dimensions have dispositions, and unexplained exceptions have become cases. A required case, unresolved research case, or missing family member creates an activation; the sweep itself does not authorize expanding product scope.
 
 ## Knowledge-source activation record
 
@@ -171,6 +297,7 @@ operation: challenge
 target_ids: [hypothesis-routing-by-risk]
 artifacts: []
 relations: []
+case_family_updates: []
 evidence:
   - id: evidence-<stable-id>
     source: <path, symbol, test, command, decision, or URL>
@@ -195,10 +322,11 @@ Before applying a contribution, the controller checks:
 
 1. the return schema and role authority;
 2. evidence existence, scope, version, and freshness;
-3. that every target ID exists or is explicitly proposed in the same contribution;
+3. that every target artifact or case-family ID exists or is explicitly proposed in the same contribution;
 4. whether target artifacts or dependencies changed after `base_version`;
 5. whether the operation creates or resolves a conflict;
-6. whether new trigger conditions should create agenda entries.
+6. whether case-family membership, relevant dimensions, equivalence evidence, or shared invariants changed;
+7. whether new trigger conditions should create agenda entries, including required or research cases exposed by an implication sweep.
 
 If the board advanced but the targets and dependencies did not change, the controller may apply the contribution and record `stale-base-validated`. If relevant state changed, mark it `rebase-required` and obtain a refreshed review. Never silently reinterpret stale output against the new board.
 
@@ -283,6 +411,7 @@ After an activation completes, record whether it produced the expected delta, a 
 - selected focus and why;
 - dispatches and contribution statuses;
 - applied event IDs;
+- implication sweeps opened, updated, or closed, including coverage balance changes;
 - newly opened, changed, or closed disagreements;
 - strategy shift or stall result;
 - remaining agenda and next resume trigger.
@@ -297,6 +426,8 @@ Before `parent-ready`, verify:
 - central behaviors and live hypotheses are represented at the right abstraction levels;
 - every material claim is evidence-linked, authorized, or explicitly unverified;
 - current blockers and human-required questions name affected IDs and re-entry conditions;
+- material changes have case-family boundaries recorded or evidence that no related family exists;
+- known family members are accounted for under consistent relevant dimensions, with unexplained exceptions represented as open cases;
 - no global block was inferred from an island-only problem;
 - the agenda contains no unresolved activation that could materially reframe the parent.
 
@@ -304,6 +435,7 @@ Before `final-ready`, additionally verify:
 
 - the requested downstream artifact exists and traces back to board artifacts;
 - all joins and required current-snapshot reviews completed;
+- every material case-family record is balanced; no case remains `required` or `research`, and every `duplicate` points to a canonical case with a nonblocking disposition;
 - no unresolved material disagreement, stale contribution, or authority decision remains;
 - rejected and superseded alternatives retain rationale and reopening conditions;
 - the final completeness delta triggered no additional required activation.
