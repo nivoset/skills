@@ -45,6 +45,19 @@ Before the first mutation, record `git status --short` and the diff for the task
 
 If an agent, test command, or reviewer is unavailable, retry according to the repository workflow; after the configured limit, stop as `blocked` and report the owner and recovery action rather than treating silence or skipped work as approval.
 
+## Test at the Smallest Trustworthy Boundary
+
+For each risk, write the test at the narrowest boundary that can reliably
+expose the intended failure.
+
+Keep a dependency real when its behavior is itself part of the risk being
+tested. Use broader integration or end-to-end tests only when they validate
+something lower-level tests cannot, such as dependency wiring,
+cross-component behavior, or a complete user journey.
+
+Do not duplicate lower-level test cases at higher levels unless the
+higher-level test provides distinct, additional confidence.
+
 ## Loop
 
 ### 1. Select One Behavior
