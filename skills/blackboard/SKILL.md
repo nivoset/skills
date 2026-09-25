@@ -53,13 +53,14 @@ Before each delegated wave, announce only the roles that will actually be dispat
 
 ```text
 Blackboard roster — cycle <cycle-id>, board v<version>
-- <stable-name> — <speciality>: triggered by <artifact IDs>; investigates <question>; returns <artifact types and evidence>.
+- <stable-name> — <speciality>: goal <definitive observable outcome>; triggered by <artifact IDs>; investigates <question>; returns <artifact types and evidence>.
 ```
 
 Record the announcement and dispatch in `.tmp/planning/blackboard/<board-id>/dispatch.yaml`. Treat `.tmp/planning/` as the generic root for disposable planning state and verify `.tmp/` is gitignored before writing. Each dispatch includes the board version, triggering artifact IDs, bounded scope, question, authority, readable paths, prohibited mutations, handle, deadline, retry or fallback, and return contract. Use `planned` until a real handle exists and `dispatched` only afterward.
 
 A role definition includes:
 
+- one definitive goal stated as the observable outcome the role must produce within its bounded scope;
 - an observable trigger condition;
 - required inputs and evidence scope;
 - the artifact types it may propose;
@@ -67,7 +68,11 @@ A role definition includes:
 - expected cost or deadline and a fallback;
 - `propose-only` authority unless the user explicitly grants more.
 
+A speciality describes what the role knows; its goal defines what must become true because it was activated. Do not use activity goals such as “review security” or “analyze the design.” State a testable outcome such as “identify every affected trust boundary and give each material risk an evidence-backed disposition.” A contribution cannot be `passed` unless its goal is satisfied or every unmet part is returned as `blocked` with a re-entry condition.
+
 Examples of triggers include a disputed factual claim, missing user behavior, an untested assumption, conflicting constraints, a newly discovered dependency, a changed member of a related-case family, a shared invariant, a safety boundary, or two live approaches that need comparison. These are examples, not a permanent roster.
+
+For suggested starter rosters and domain overlays, see the [examples index](examples/README.md). Delivery planning builds the validation plan and path to satisfy every ask; product strategy planning sets product and user stance, covers security domains, and frames tradeoffs. Domain overlays add specialists only when their board-observable triggers apply. Treat every example as a starting point; re-select roles from board state every cycle.
 
 For user-facing work, treat end-user advocacy as distinct from interface design. UI/UX examines interaction structure; the advocate examines accessibility, trust, agency, confusing failure states, and recovery across every affected domain.
 

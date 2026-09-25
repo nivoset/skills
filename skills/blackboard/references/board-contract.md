@@ -233,6 +233,7 @@ Each role in `roles.yaml` has a stable identity and an observable activation con
 ```yaml
 - role_id: behavior-boundary-reviewer
   speciality: user-visible boundaries and recovery
+  goal: every affected behavior has evidence-backed success, failure, and recovery outcomes
   trigger:
     all:
       - artifact_type: behavior
@@ -246,6 +247,8 @@ Each role in `roles.yaml` has a stable identity and an observable activation con
   default_bound: <time, cost, or attempt limit>
   fallback: local bounded review or human-required question
 ```
+
+The `goal` is mandatory and definitive: it states the observable board change the role is accountable for producing within scope. It is not a topic, activity, or aspiration. The controller validates `passed` against the goal and converts any unmet part into a blocking or follow-up artifact.
 
 Triggers must be inspectable against board state. Avoid triggers such as “when useful” without naming who judges usefulness and from which evidence. A new role may be registered during a run when a board change exposes expertise the current registry does not cover. Record the event that justified its introduction.
 
