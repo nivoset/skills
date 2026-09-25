@@ -1,0 +1,147 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "source",
+    "requirements",
+    "target",
+    "viewports",
+    "comparison",
+    "redaction",
+    "narration",
+    "outputs",
+    "timeouts",
+    "cleanup"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "1"
+    },
+    "source": {
+      "type": "object"
+    },
+    "requirements": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "pattern": "^[A-Za-z0-9._-]+$" },
+          "steps": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": { "type": "string", "pattern": "^[A-Za-z0-9._-]+$" }
+              },
+              "required": ["id"]
+            }
+          }
+        },
+        "required": ["id", "steps"]
+      }
+    },
+    "target": {
+      "type": "object"
+    },
+    "viewports": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string", "pattern": "^[A-Za-z0-9._-]+$" }
+        },
+        "required": ["name"]
+      }
+    },
+    "comparison": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "enum": ["current-behavior", "before-after"]
+        },
+        "targets": {
+          "type": "object",
+          "properties": {
+            "before": { "$ref": "#/definitions/comparisonTarget" },
+            "after": { "$ref": "#/definitions/comparisonTarget" }
+          },
+          "required": ["before", "after"]
+        },
+        "shots": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/shot" }
+        },
+        "composition": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean" },
+            "output": { "type": "string" },
+            "contactSheet": { "type": "string" },
+            "padding": { "type": "integer", "minimum": 0 },
+            "transition": { "const": "hard-cut" }
+          }
+        }
+      }
+    },
+    "redaction": {
+      "type": "object"
+    },
+    "narration": {
+      "type": "object"
+    },
+    "outputs": {
+      "type": "object"
+    },
+    "timeouts": {
+      "type": "object"
+    },
+    "cleanup": {
+      "type": "object"
+    }
+  },
+  "additionalProperties": true,
+  "definitions": {
+    "comparisonTarget": {
+      "type": "object",
+      "properties": {
+        "url": { "type": "string", "pattern": "^https?://" },
+        "healthUrl": { "type": "string", "pattern": "^https?://" },
+        "command": {
+          "type": "array",
+          "items": { "type": "string" },
+          "minItems": 1
+        }
+      },
+      "anyOf": [
+        { "required": ["url"] },
+        { "required": ["command"] }
+      ]
+    },
+    "shot": {
+      "type": "object",
+      "required": ["requirementId", "stepId", "phase", "route", "focusSelector", "framing", "durationMs", "annotation"],
+      "properties": {
+        "requirementId": { "type": "string", "pattern": "^[A-Za-z0-9._-]+$" },
+        "stepId": { "type": "string", "pattern": "^[A-Za-z0-9._-]+$" },
+        "phase": { "enum": ["before", "after"] },
+        "route": { "type": "string", "pattern": "^/" },
+        "action": { "enum": ["navigate", "click"] },
+        "focusSelector": { "type": "string", "minLength": 1 },
+        "framing": { "const": "union-16:9" },
+        "durationMs": { "type": "integer", "minimum": 1 },
+        "annotation": { "type": "string", "minLength": 1 },
+        "zoom": { "enum": ["static", "push-in"] },
+        "scroll": {
+          "type": "object",
+          "properties": {
+            "x": { "type": "integer" },
+            "y": { "type": "integer" }
+          },
+          "required": ["x", "y"]
+        }
+      }
+    }
+  }
+}

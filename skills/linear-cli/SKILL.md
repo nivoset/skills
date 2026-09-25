@@ -70,9 +70,11 @@ When the user asks for a draft only, write the draft markdown in the final respo
 ```bash
 mkdir -p .tmp
 linear issue comment list ENG-123
-linear issue comment add ENG-123 --body-file .tmp/linear-comment.md
+linear issue comment add ENG-123 --body-file .tmp/linear-comment.md --attach evidence.txt
 linear issue comment update <comment-id> --body-file .tmp/linear-comment.md
 ```
+
+Use the existing comment command with `--attach` to attach evidence files. Verify visible writes afterward with the relevant `view`, `list`, or `--json` command.
 
 Confirm before posting or editing comments unless the user explicitly requested the post.
 

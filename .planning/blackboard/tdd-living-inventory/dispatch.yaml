@@ -1,0 +1,63 @@
+board_id: tdd-living-inventory
+board_version: 1
+announcement: |
+  Blackboard roster
+  - >-
+    tdd-practice — TDD workflow: checks where a living inventory fits the
+    red/green/review loop and surfaces process conflicts; returns claims,
+    cited skill evidence, proposed edits, and risks.
+  - >-
+    skill-editor — skill maintainability: checks concise, enforceable guidance
+    without excess workflow weight; returns claims, cited evidence, proposed
+    edits, and omissions.
+scope: >-
+  Assess adding the supplied living test inventory proposal to
+  skills/tdd/SKILL.md; identify useful additions, unexpected implications,
+  and the smallest accurate edit. Agents are advisory only.
+deadline: Current task review; each agent limited to 5 turns.
+retry_fallback: >-
+  If a role does not return, mark its contribution blocked and use local
+  evidence; do not interpret silence as approval.
+return_schema:
+  - status: passed|failed|blocked
+  - claims/results
+  - evidence: path/section and concise support
+  - uncertainty
+  - implication/next action
+  - changed_paths
+  - recommended_skill_edits
+  - unexpected_items
+dispatches:
+  - board_id: tdd-living-inventory
+    board_version: 1
+    agent_name: tdd-practice
+    speciality: TDD workflow
+    scope: Same board scope above
+    question: >-
+      Where should inventory capture/update occur in the existing
+      red-green-review/coverage process, and what traceability
+      statuses/evidence are useful?
+    authority: propose-only
+    read_paths: [skills/tdd/SKILL.md]
+    write_paths: []
+    handle: d7e19e07-b73b-420
+    status: dispatched
+    deadline: Current task review; max 5 turns
+    retry_fallback: Mark blocked; use local evidence if no contribution arrives
+    return_schema: Same board-level return_schema
+  - board_id: tdd-living-inventory
+    board_version: 1
+    agent_name: skill-editor
+    speciality: Skill maintainability
+    scope: Same board scope above
+    question: >-
+      What is the smallest concise and enforceable addition, including risks
+      of over-ceremony, scope decisions, and documentation-specific testing?
+    authority: propose-only
+    read_paths: [skills/tdd/SKILL.md]
+    write_paths: []
+    handle: 21fe8678-203f-45a
+    status: dispatched
+    deadline: Current task review; max 5 turns
+    retry_fallback: Mark blocked; use local evidence if no contribution arrives
+    return_schema: Same board-level return_schema

@@ -51,11 +51,14 @@ Allowed metadata updates:
 
 - Current-account assignment for the parent and the child ticket that is about to start.
 - Status change to the project's equivalent of `In Progress` for the parent and current child.
-- Branch URL/name, PR URL, skip reason, blocker reason, or human-follow-up comment when the ticket system has a field or comment convention for that information.
+- Branch URL/name, PR URL, skip reason, blocker reason, completion documentation, or human-follow-up comment when the ticket system has a field or comment convention for that information.
+- Completion verification metadata: implementation commit hash(es), merge commit, exact verification revision, test commands and results, CI/review check or run IDs, and completion artifact URL or ID.
+- Before/after screenshot attachments or URLs for UI tickets: the before image must show the original or reference state, and the after image must show the verified implemented state.
+- Status-to-done for a child only after its PR is merged (or the project explicitly defines another completion gate), and for the parent only after every direct child is complete.
 
-Do not change parent links, child order, blocker links, labels, priority, estimates, status-to-done, or ownership by another user unless the user or project workflow explicitly instructs it.
+Do not change parent links, child order, blocker links, labels, priority, estimates, or ownership by another user unless the user or project workflow explicitly instructs it.
 
-After a subagent opens a PR, leave the child ticket in progress unless the project's workflow explicitly requires a different status. Record evidence for every metadata mutation: field changed, old value when visible, new value, command/tool used, and resulting ticket URL or response.
+After a subagent opens a PR, leave the child ticket in progress until the PR is merged. After merge, update the child with completion documentation and set it to the project's equivalent of `Done` when the completion gate is satisfied. Record evidence for every metadata mutation: field changed, old value when visible, new value, command/tool used, and resulting ticket URL or response.
 
 ## Hard Boundaries
 
@@ -191,8 +194,10 @@ Branch-name rules:
 12. Apply the ticket metadata rules for that child ticket.
 13. Spawn exactly one implementation agent using the available agent mechanism and provide the complete subagent prompt.
 14. Confirm that the delegated agent accepted the assignment and has started.
-15. Monitor the delegated agent, PR, and checks until the child ticket is complete or needs human follow-up.
-16. Continue to the next child ticket only after the current child has a branch and PR or has been skipped with a recorded reason.
+15. Monitor the delegated agent, PR, and checks until the child ticket is implementation-finished or needs human follow-up.
+16. For an implementation-finished child, apply the completion gate, publish the completion documentation and verification metadata, transition the ticket to its configured terminal status, and record the mutation evidence. Do not close it if any gate is missing.
+17. Continue to the next child ticket only after the current child has a branch and PR, or has been skipped with a recorded reason. Do not treat an open or partially closed ticket as complete.
+18. After every direct child is terminal and the parent acceptance criteria are verified, publish the aggregate parent completion documentation and verification metadata, then transition the parent to its configured terminal status.
 
 ## Execution Plan
 
@@ -343,8 +348,9 @@ This adjacent ancestry rule applies even when there is no formal blocker relatio
 Finished:
 
 - Skip implementation.
-- Record status, branch, PR, merge state, and verification evidence when available.
-- If the child ticket is complete and its PR is merged, mark it complete in the local execution plan and continue to the next uncompleted child using the correct chain branch base.
+- Record status, branch, PR, merge state, commit hashes, and verification evidence when available.
+- If the child ticket is complete and its PR is merged, apply the completion gate, publish or verify the completion documentation and verification metadata, transition it to the configured terminal status when needed, and record the mutation evidence before continuing to the next uncompleted child.
+- If it is already terminal, reuse its existing completion evidence and do not duplicate the artifact or status transition.
 
 Open PR:
 
@@ -385,6 +391,57 @@ No child tickets:
 - Stop and report that the parent has no existing child tickets.
 - Do not invent a breakdown.
 
+## Completion And Close-Out
+
+A ticket is implementation-finished when its delegated work and PR are ready. It is ticket-finished only after the project's completion gate passes. Do not close a ticket on PR creation alone.
+
+For each child, the default completion gate is:
+
+- The PR targets the integration branch and is merged, unless the project explicitly defines another terminal condition.
+- Required CI and review checks are green.
+- Each acceptance criterion has recorded evidence.
+- No unresolved blocker or follow-up prevents completion.
+- Branch, PR, commit, test, and merge evidence is available.
+- For UI tickets, before and after screenshots are attached or linked; non-UI tickets do not need screenshots.
+
+When the gate passes:
+
+1. Publish one idempotent completion comment or project-supported document on the ticket, or record close-out in dedicated completion metadata fields when supported; otherwise publish one completion comment or document when dedicated fields are unavailable.
+2. Include the ticket ID and title, outcome for each acceptance criterion, PR URL and target, branch and base, implementation commit hash(es), merge commit hash when available, exact verification commit or revision, tests with commands and results, CI/review/check run identifiers, known risks or follow-ups, timestamp, and current account.
+3. Store the same verification metadata in dedicated ticket fields when the system supports them; otherwise keep it in the completion comment/document.
+4. Transition the ticket to the project's configured terminal status (`Done`, `Completed`, or equivalent).
+5. Record the artifact URL or ID, old and new status, command/tool, and resulting ticket URL.
+
+On rerun, use the canonical idempotency key `closeout:{{ticket ID}}:{{verification revision}}` (an idempotency key based on the ticket ID and verification revision). The retry must reconcile the existing completion artifact before creating a new one. Define attachment identity by role plus checksum. Track close-out states as `not_started/artifact_published/metadata_published/status_transitioned/verified/failed`. The retry must reuse the existing completion artifact without duplicate comments, documents, or attachments and reuse the existing terminal status without duplicate transitions. The procedure must record partial publication and status failures before retrying; resume status-only only when the artifact and required metadata are confirmed published and the status transition failed. reconcile or retry artifact publication before attempting any status transition when artifact publication is unconfirmed. Before every child or parent status transition, read back and confirm the completion artifact, required metadata, canonical close-out key and state, and attachments. Only transition status from confirmed metadata_published and an eligible non-terminal status. Do not transition status when the completion artifact or required metadata is unconfirmed. A status-only retry must not transition status unless the prior status transition failed. persist the canonical close-out key, current close-out state, and attachment identity (role plus checksum) in ticket metadata or the completion artifact; read back and reconcile the persisted state after each transition before the next write; resume an interrupted transition from the last confirmed persisted state. Do not claim completion until artifact and status verification are both confirmed.
+
+For the parent, publish an aggregate completion document and transition it only after every direct child is terminal and the parent's acceptance criteria are verified. Include each child's completion artifact and verification metadata. A blocked, skipped, unclear, unmerged, or failed child keeps the parent open.
+
+If the ticket is assigned to another user, the terminal transition requires an unavailable role, the terminal status is unknown, or the ticket system cannot confirm the artifact, stop and report the conflict instead of overwriting ownership or claiming completion.
+
+### Completion Document Template
+
+```text
+Ticket: {{id}} — {{title}}
+Outcome:
+- {{acceptance criterion}} — {{verified result and evidence}}
+
+Implementation:
+- PR: {{url}}, target: {{integration branch}}, merged: {{evidence}}
+- Branch: {{source branch}}, base: {{branch base}}
+- Implementation commit(s): {{git commit hash(es)}}
+- Merge commit: {{hash or n/a}}
+- Verification revision: {{exact commit/revision tested}}
+- Tests: {{commands and results}}
+- CI/review: {{check names, run IDs, and results}}
+- Before screenshot (UI tickets): {{attachment or URL, or n/a}}
+- After screenshot (UI tickets): {{attachment or URL, or n/a}}
+- Completion artifact: {{artifact URL or ID}}
+
+Risks and follow-ups: {{none or links}}
+Completed by: {{current account}}
+Completed at: {{timestamp}}
+```
+
 ## Reference App Rules
 
 Use the reference app as the source of truth for:
@@ -410,11 +467,17 @@ Record:
 - Branch base
 - PR URL
 - PR target
-- Tests run
+- Implementation commit hash(es)
+- Merge commit hash and exact verification revision when available
+- Tests run, exact commands, and results
 - Known risks
 - Delegated agent or task identifier
-- CI/review state when available
+- CI/review state and check/run identifiers when available
 - Whether the PR diff is cumulative, clean after predecessor merge, or needs post-squash refresh
+- Acceptance-criteria evidence and completion-gate result
+- Completion artifact URL or ID, terminal status mutation, and resulting ticket URL when closed
+
+Distinguish implementation-finished from ticket-finished. A merged PR is not enough until the completion gate and ticket-system close-out both succeed. If the child is already terminal, verify its existing completion evidence and do not spawn an agent or publish a duplicate artifact.
 
 Confirm:
 
@@ -440,7 +503,7 @@ Report in these sections:
 - Processed ticket: current or last processed child ticket, state, branch name, branch base, merge base, PR target, PR URL, and whether it is cumulative.
 - Branch/PR chain: branch chain, predecessor PR state, PR URL for each child ticket, and confirmation that every PR targets the integration branch.
 - Existing work handled: reused branches, open PRs, closed PRs, failed CI, partial subagent outputs, skipped tickets, and the evidence for each decision.
-- Ticket metadata updates: assignments, status changes, branch/PR fields, comments, commands/tools used, and resulting ticket URLs or responses.
+- Ticket metadata updates: assignments, status changes, branch/PR fields, commit and verification metadata, completion artifacts, comments, commands/tools used, and resulting ticket URLs or responses.
 - Delegation: agent/task identifiers, assignment details, and delegated-agent start verification.
 - Verification/CI: validation commands and results, CI/review state, PR diff state, and post-squash refresh command/result when applicable.
 - Blocked or unclear items: blocker chain, questions left as comments, and human decisions needed.

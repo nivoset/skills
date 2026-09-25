@@ -1,0 +1,56 @@
+board_id: laya-jev-level1
+board_version: 1
+announcement: "Blackboard roster\n- LAYA-JEV-RESEARCH \u2014 model/runtime best-practices\
+  \ researcher: compare the documented Laya and Jev-compatible interfaces, deployment\
+  \ patterns, limits, and reproducibility concerns; returns source-backed claims,\
+  \ URLs, uncertainty, and recommendations.\n- LAYA-LOCAL-RUNNER \u2014 local execution\
+  \ verifier: install/run the package in an isolated environment and exercise the\
+  \ SDK and HTTP paths; returns commands, results, failures, and resource observations."
+scope: Create a level-1 local skill for working around Laya/Jev, with Laya/Jev-specific
+  data in a skill-local subfolder, and verify local Laya execution.
+authority: Agents are propose-only; board owner decides and edits the skill.
+deadline: Current task review; bounded to current session
+retry_fallback: If a role does not return, mark blocked and continue with local evidence;
+  do not treat silence as approval.
+return_schema:
+- 'status: passed|failed|blocked'
+- claims/results
+- 'evidence: path/section/URL and command result'
+- uncertainty
+- implication/next action
+- changed_paths
+dispatches:
+- board_id: laya-jev-level1
+  board_version: 1
+  agent_name: LAYA-JEV-RESEARCH
+  speciality: model/runtime best practices
+  scope: Laya/Jev local deployment and interoperability
+  question: What documented practices, compatibility rules, limits, and reproducibility
+    details belong in a level-1 skill?
+  authority: propose-only
+  read_paths:
+  - /Users/benjaminkoop/code/skills
+  - public project docs
+  write_paths: []
+  handle: sub-85f296e2
+  status: passed
+  deadline: Current task review
+  retry_fallback: Mark blocked; use local evidence
+  return_schema: Same board-level schema
+- board_id: laya-jev-level1
+  board_version: 1
+  agent_name: LAYA-LOCAL-RUNNER
+  speciality: local execution verification
+  scope: Install and exercise local SDK and HTTP server
+  question: Can the documented commands run locally, what exact calls work, and what
+    blockers/resource behavior appear?
+  authority: propose-only
+  read_paths:
+  - /Users/benjaminkoop/code/skills
+  - public project docs
+  write_paths: []
+  handle: sub-c45dab94
+  status: blocked
+  deadline: Current task review
+  retry_fallback: Mark blocked; use deterministic local checks
+  return_schema: Same board-level schema
