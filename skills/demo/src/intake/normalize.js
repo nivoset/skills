@@ -1,0 +1,1 @@
+exports.normalize=input=>{let req=input.requirements||[];return {requirements:req.map((r,i)=>({...r,id:r.id||`requirement-${i+1}`})),comparison:input.comparison||{status:'current-behavior'},source:input.source||{kind:'unknown'}}};

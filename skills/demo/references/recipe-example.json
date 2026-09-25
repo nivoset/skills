@@ -1,0 +1,150 @@
+{
+  "schemaVersion": "1",
+  "source": {
+    "kind": "diff",
+    "changeId": "example-change",
+    "citation": "README"
+  },
+  "requirements": [
+    {
+      "id": "REQ-1",
+      "description": "Compare each interaction before and after the fix",
+      "expected": "interaction completes successfully for the user",
+      "steps": [
+        {
+          "id": "step-1",
+          "action": "navigate",
+          "url": "/",
+          "expected": "home route loads and is usable"
+        },
+        {
+          "id": "step-2",
+          "action": "navigate",
+          "url": "/settings",
+          "expected": "settings route loads and is usable"
+        }
+      ]
+    }
+  ],
+  "target": {
+    "url": "http://127.0.0.1:3000",
+    "healthUrl": "http://127.0.0.1:3000"
+  },
+  "viewports": [
+    {
+      "name": "standard",
+      "width": 1440,
+      "height": 900
+    }
+  ],
+  "comparison": {
+    "status": "before-after",
+    "targets": {
+      "before": {
+        "url": "http://127.0.0.1:3000"
+      },
+      "after": {
+        "url": "http://127.0.0.1:3001"
+      }
+    },
+    "shots": [
+      {
+        "requirementId": "REQ-1",
+        "stepId": "step-1",
+        "phase": "before",
+        "route": "/",
+        "action": "navigate",
+        "focusSelector": "body",
+        "framing": "union-16:9",
+        "durationMs": 1500,
+        "annotation": "BEFORE - NOT WORKING",
+        "scroll": {
+          "x": 0,
+          "y": 0
+        },
+        "zoom": "static"
+      },
+      {
+        "requirementId": "REQ-1",
+        "stepId": "step-1",
+        "phase": "after",
+        "route": "/",
+        "action": "navigate",
+        "focusSelector": "body",
+        "framing": "union-16:9",
+        "durationMs": 1500,
+        "annotation": "AFTER - WORKING",
+        "scroll": {
+          "x": 0,
+          "y": 0
+        },
+        "zoom": "static"
+      },
+      {
+        "requirementId": "REQ-1",
+        "stepId": "step-2",
+        "phase": "before",
+        "route": "/settings",
+        "action": "navigate",
+        "focusSelector": "body",
+        "framing": "union-16:9",
+        "durationMs": 1500,
+        "annotation": "BEFORE - NOT WORKING",
+        "scroll": {
+          "x": 0,
+          "y": 0
+        },
+        "zoom": "static"
+      },
+      {
+        "requirementId": "REQ-1",
+        "stepId": "step-2",
+        "phase": "after",
+        "route": "/settings",
+        "action": "navigate",
+        "focusSelector": "body",
+        "framing": "union-16:9",
+        "durationMs": 1500,
+        "annotation": "AFTER - WORKING",
+        "scroll": {
+          "x": 0,
+          "y": 0
+        },
+        "zoom": "static"
+      }
+    ],
+    "composition": {
+      "enabled": true,
+      "output": "demo.mp4",
+      "contactSheet": "contact-sheet.jpg",
+      "padding": 32,
+      "transition": "hard-cut"
+    },
+    "viewport": "standard",
+    "browser": "chromium",
+    "theme": "default",
+    "authRole": "anonymous",
+    "locale": "en",
+    "dataFingerprint": "fixture",
+    "featureFlags": [],
+    "interactionStateFingerprint": "initial"
+  },
+  "redaction": {
+    "requiredSelectors": [],
+    "optionalSelectors": [],
+    "onFailure": "block"
+  },
+  "narration": {
+    "enabled": true
+  },
+  "outputs": {
+    "root": ".tmp/demo"
+  },
+  "timeouts": {
+    "startupMs": 30000,
+    "actionMs": 5000
+  },
+  "cleanup": {
+    "terminateOwned": true
+  }
+}

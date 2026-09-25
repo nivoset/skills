@@ -6,3 +6,11 @@ pi/
 
 # Agent and tooling temporary files
 .tmp/
+tmp/
+.feature-tdd/
+
+# Dependency and build output
+node_modules/
+target/
+.archive/
+__pycache__/

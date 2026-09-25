@@ -1,0 +1,5 @@
+{
+  "name": "demo-skill", "version": "1.0.0", "private": true, "type": "commonjs",
+  "dependencies": { "@playwright/test": "1.55.0" },
+  "scripts": { "build": "node -e \"console.log('demo runtime is source-backed')\"", "typecheck": "node --check src/index.js", "lint": "node --check src/index.js", "test": "node --test", "doctor": "node bin/demo doctor", "demo": "node bin/demo" }
+}
