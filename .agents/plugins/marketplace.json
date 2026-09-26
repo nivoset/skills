@@ -8,7 +8,7 @@
       "name": "nivoset-skills",
       "source": {
         "source": "local",
-        "path": "./plugins/nivoset-skills"
+        "path": "./.agents/plugins/plugins/nivoset-skills"
       },
       "policy": {
         "installation": "AVAILABLE",
