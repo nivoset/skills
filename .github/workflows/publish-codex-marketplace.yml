@@ -1,0 +1,45 @@
+name: Publish Codex marketplace
+
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - .agents/plugins/**
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: publish-codex-marketplace
+  cancel-in-progress: true
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out main
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Validate source skills
+        shell: pwsh
+        run: ./scripts/validate-skills.ps1
+
+      - name: Build marketplace
+        run: ./scripts/build-codex-marketplace.sh
+
+      - name: Publish generated marketplace
+        run: |
+          if git diff --quiet -- .agents/plugins; then
+            echo "Marketplace is already current."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .agents/plugins
+          git commit -m "chore(marketplace): publish Codex plugin [skip ci]"
+          git push

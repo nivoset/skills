@@ -1,0 +1,28 @@
+{
+  "name": "nivoset-skills",
+  "version": "0.1.0",
+  "description": "A collection of planning, testing, review, and delivery skills for Codex.",
+  "author": {
+    "name": "Nivoset",
+    "url": "https://github.com/nivoset"
+  },
+  "homepage": "https://github.com/nivoset/skills",
+  "repository": "https://github.com/nivoset/skills",
+  "keywords": ["skills", "planning", "testing", "review"],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Nivoset Skills",
+    "shortDescription": "Planning, testing, review, and delivery workflows.",
+    "longDescription": "A maintained collection of reusable Codex skills for planning, TDD, quality review, ticket design, demos, and software delivery.",
+    "developerName": "Nivoset",
+    "category": "Developer Tools",
+    "capabilities": ["Planning", "Testing", "Code review"],
+    "websiteURL": "https://github.com/nivoset/skills",
+    "defaultPrompt": [
+      "Plan this change against the current codebase.",
+      "Review this implementation for likely defects.",
+      "Build a behavior-driven test plan for this feature."
+    ],
+    "brandColor": "#111827"
+  }
+}

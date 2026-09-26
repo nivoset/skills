@@ -95,6 +95,33 @@ List discoverable skills without installing:
 npx skills add https://github.com/nivoset/skills --list
 ```
 
+## Installing From The Codex Plugin Marketplace
+
+Add the repository's marketplace once:
+
+```bash
+codex plugin marketplace add nivoset/skills --ref main --sparse .agents/plugins
+```
+
+Then install the bundle containing every published skill:
+
+```bash
+codex plugin add nivoset-skills@nivoset
+```
+
+When the repository changes, refresh the configured marketplace and reinstall the plugin:
+
+```bash
+codex plugin marketplace upgrade nivoset
+codex plugin add nivoset-skills@nivoset
+```
+
+Start a new Codex thread after installation or upgrade so the updated skills are loaded.
+
+The generated marketplace lives under `.agents/plugins`. A GitHub Actions workflow validates the
+source skills, rebuilds the plugin from tracked files under `skills/`, assigns a monotonically
+increasing patch version, and commits the refreshed marketplace after each update to `main`.
+
 ## Vette Skill
 
 This repository includes a `vette` skill that orchestrates whole-codebase, area-specific, and plan-first risk reviews while keeping focused review briefs nested inside the skill directory.

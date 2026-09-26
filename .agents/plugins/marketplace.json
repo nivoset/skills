@@ -1,0 +1,20 @@
+{
+  "name": "nivoset",
+  "interface": {
+    "displayName": "Nivoset"
+  },
+  "plugins": [
+    {
+      "name": "nivoset-skills",
+      "source": {
+        "source": "local",
+        "path": "./plugins/nivoset-skills"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Developer Tools"
+    }
+  ]
+}
