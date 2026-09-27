@@ -30,14 +30,14 @@ Engineering specialists may communicate directly with product specialists to ref
 
 After the user passes the technical-plan gate, turn approved product and technical inputs into a reviewable, linked document set under the workshop folder and its subfolders:
 
-- Group Markdown documents by purpose, with an index and relative links to supporting, source, and prerequisite documents. Keep each file focused on one concern, such as one decision, contract, capability, feature behavior, or process. Use separate ADRs for distinct architectural decisions.
-- Decompose outcomes into capabilities and feature-level drafts with observable acceptance behavior; use Gherkin where feature files fit the work.
-- Define OpenAPI documents for applicable HTTP contracts, plus architecture, system connections, and technical plans; use Mermaid for diagrams where it clarifies the relationships.
+- Choose any valid documentation type that makes the material clear and easy to read. Group documents by purpose, with an index and relative links to supporting, source, and prerequisite documents. Keep each file focused on one concern, such as one decision, contract, capability, feature behavior, or process. Use separate ADRs for distinct architectural decisions.
+- Decompose outcomes into capabilities and feature-level drafts with observable acceptance behavior; Gherkin is one option for specifying feature behavior.
+- Define contracts, architecture, system connections, and technical plans in suitable formats. OpenAPI can specify HTTP contracts, and Mermaid can express diagrams; use other valid formats when they communicate the material better.
 - Map prerequisites, dependencies, parallel work, join points, and a critical path. Keep documents short to medium length and below 10 rendered pages; split mixed or oversized documents along clear concern boundaries.
 - Map each accepted ask to validation evidence and identify missing contracts, scenarios, or ownership.
 - Review for gaps, ambiguity, contradictions, boundary and recovery cases, and unsupported assumptions; route findings upward.
 
-Keep the breakdown at capability and feature level unless the user explicitly requests implementation tickets. Plans may describe how behavior should be verified. Run available lint and structural checks on included Markdown, Mermaid, Gherkin, and OpenAPI artifacts; report results and any unavailable checks. This checks the planning documents and does not authorize implementation or execution of product work. The user decides whether the documentation gate is passed.
+Keep the breakdown at capability and feature level unless the user explicitly requests implementation tickets. Plans may describe how behavior should be verified. Run applicable available lint and structural checks for each artifact type; report results and any unavailable checks. This checks the planning documents and does not authorize implementation or execution of product work. The user decides whether the documentation gate is passed.
 
 ## Handoff contract
 
