@@ -1,6 +1,6 @@
 ---
 name: blackboard
-description: Use when an ambiguous initiative, product idea, epic, or cross-cutting feature needs iterative refinement through multiple specialist perspectives before a stable plan can be produced.
+description: Use when a problem is uncertain, multi-step, cross-disciplinary, or hard to frame, including exploring ideas, reproducing failures, investigating complex scenarios, or shaping work into a plan.
 ---
 
 # Blackboard
@@ -11,9 +11,9 @@ The goal is the smallest coherent, evidence-backed model of the idea that satisf
 
 ## Boundaries
 
-Use this skill for work above a well-specified implementation ticket, especially when the problem is incomplete, disputed, cross-domain, or likely to improve through back-and-forth refinement.
+Use this skill when the problem is uncertain, multi-step, disputed, cross-domain, or likely to improve through back-and-forth refinement. Valid outcomes include ideation, investigating a complicated scenario, reproducing a failure, comparing explanations, making a decision, and planning delivery. It is not limited to product strategy or ticket planning.
 
-Do not use it for ordinary implementation, a bounded code review, or a request whose behavior and approach are already settled. By default, refine the idea first. Produce capability drafts, BDD, or tickets only when the user requests them or the board is ready for that downstream artifact.
+Do not use it for ordinary implementation, a bounded code review, or a request whose behavior and approach are already settled. Match the board method to the requested outcome; capability drafts, BDD, and tickets are optional downstream artifacts, not a required finish.
 
 ## Architecture
 
@@ -43,7 +43,7 @@ Opportunistic does not mean random or hostile to structure. A top-down refinemen
 
 Specialists are knowledge sources. They have propose-only authority and communicate material claims through the board. The controller may schedule work, validate contributions, and maintain derived state; it may not settle material product, scope, compatibility, architecture, migration, or operational decisions that belong to the user or another named authority.
 
-Read [references/board-contract.md](references/board-contract.md) before creating or resuming a persisted board. It defines the artifact types, contribution schema, agenda records, version handling, and readiness checks.
+Read [references/board-contract.md](references/board-contract.md) before creating or resuming a persisted board. It defines the artifact types, contribution schema, agenda records, version handling, and readiness checks. Use [references/scenario-lab.md](references/scenario-lab.md) for ideation, failure reproduction, hypothesis testing, and complex-scenario mapping.
 
 ## Blackboard roster
 
