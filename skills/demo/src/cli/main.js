@@ -1,5 +1,4 @@
 const cp=require('node:child_process');
-const crypto=require('node:crypto');
 const fs=require('node:fs');
 const path=require('node:path');
 
@@ -10,13 +9,19 @@ const captureStatus=(events,requirements)=>{
 };
 
 function createMain(deps){
-  const {ROOT,DEMO_ROOT,VERSION,CODES,validate,canon,option,resolveRun,runId,ignored,read,review,approval,capture,manifest,recipeHash,assertRecipeMatchesApprovedReview}=deps;
+  const {DEMO_ROOT,VERSION,CODES,validate,canon,option,resolveRun,runId,ignored,read,review,capture,manifest,recipeHash}=deps;
+  const writeScript=(run,recipe)=>{
+    const file=path.join(run,'review','script.json');
+    fs.mkdirSync(path.dirname(file),{recursive:true});
+    fs.writeFileSync(file,JSON.stringify(JSON.parse(canon(recipe)),null,2)+'\n');
+    return file;
+  };
   const fail=(message,code=1)=>{console.error(`ERROR: ${message}`);process.exitCode=code};
 
   return async function main(argv=process.argv.slice(2)){
     const [command,...args]=argv;
     if(command==='--help'||!command){
-      console.log('demo validate --recipe FILE | review --recipe FILE --run-id ID | approve --run-id ID --reviewer NAME | run --recipe FILE [--run-id ID] | verify-manifest --run-id ID|--latest | doctor');
+      console.log('demo validate --recipe FILE | review --recipe FILE --run-id ID | run --recipe FILE [--run-id ID] | verify-manifest --run-id ID|--latest | doctor');
       return;
     }
     if(command==='doctor'){
@@ -66,27 +71,10 @@ function createMain(deps){
       if(!ignored(run))return fail('run root is not ignored',CODES.ARTIFACT_FAILED);
       fs.mkdirSync(run,{recursive:true});
       const featureHash=review(run,recipe);
-      const approvedRecipeHash=recipeHash(recipe,canon);
-      fs.writeFileSync(path.join(run,'review','review.json'),JSON.stringify({runId:id,featureHash,recipeHash:approvedRecipeHash,status:'pending',review:'operator-review-required'},null,2));
-      console.log(`RUN_ID=${id}\nFEATURE_HASH=${featureHash}\nRECIPE_HASH=${approvedRecipeHash}`);
-      return;
-    }
-
-    if(command==='approve'){
-      let id,reviewer;
-      try{id=option(args,'--run-id',{required:true});reviewer=option(args,'--reviewer',{required:true})}
-      catch(error){return fail(error.message,CODES.NEEDS_CLARIFICATION)}
-      let run;
-      try{run=resolveRun(id)}catch(error){return fail(error.message,CODES.NEEDS_CLARIFICATION)}
-      const metadataFile=path.join(run,'review','review.json');
-      if(!fs.existsSync(metadataFile))return fail('review not found',CODES.NEEDS_CLARIFICATION);
-      const metadata=read(metadataFile);
-      const reviewFile=fs.readFileSync(path.join(run,'review','demo.feature.review'));
-      const featureHash=crypto.createHash('sha256').update(reviewFile).digest('hex');
-      if(featureHash!==metadata.featureHash||!metadata.recipeHash||!reviewFile.includes(`canonical-recipe-sha256=${metadata.recipeHash}`))return fail('review changed or lacks recipe hash; regenerate',CODES.NEEDS_CLARIFICATION);
-      const approved={runId:id,featureHash,recipeHash:metadata.recipeHash,status:'approved',reviewer,timestamp:new Date().toISOString()};
-      fs.writeFileSync(path.join(run,'review','approval.json'),JSON.stringify(approved,null,2));
-      console.log(JSON.stringify(approved));
+      const hash=recipeHash(recipe,canon);
+      const script=writeScript(run,recipe);
+      fs.writeFileSync(path.join(run,'review','review.json'),JSON.stringify({runId:id,featureHash,recipeHash:hash,status:'informational'},null,2));
+      console.log(`RUN_ID=${id}\nFEATURE_HASH=${featureHash}\nRECIPE_HASH=${hash}\nSCRIPT=${script}`);
       return;
     }
 
@@ -123,34 +111,24 @@ function createMain(deps){
       try{run=resolveRun(id)}catch(error){return fail(error.message,CODES.NEEDS_CLARIFICATION)}
       if(!ignored(run))return fail('run root is not ignored',CODES.ARTIFACT_FAILED);
       fs.mkdirSync(run,{recursive:true});
-      const featureFile=path.join(run,'review','demo.feature.review');
-      const metadataFile=path.join(run,'review','review.json');
-      let metadata;
-      if(fs.existsSync(featureFile)&&fs.existsSync(metadataFile)){
-        const featureHash=crypto.createHash('sha256').update(fs.readFileSync(featureFile)).digest('hex');
-        metadata=read(metadataFile);
-        if(metadata.featureHash!==featureHash)return fail('review artifact changed; regenerate',CODES.NEEDS_CLARIFICATION);
-      }else{
-        const featureHash=review(run,recipe);
-        metadata={runId:id,featureHash,recipeHash:recipeHash(recipe,canon),status:'pending',review:'operator-review-required'};
-        fs.writeFileSync(metadataFile,JSON.stringify(metadata,null,2));
-      }
-      try{assertRecipeMatchesApprovedReview(recipe,metadata,approval(run),id,canon)}
-      catch(error){return fail(error.message,CODES[error.code]||CODES.NEEDS_CLARIFICATION)}
+      const script=writeScript(run,recipe);
       fs.writeFileSync(path.join(run,'recipe.frozen.json'),canon(recipe));
       fs.writeFileSync(path.join(run,'recipe.sha256'),recipeHash(recipe,canon));
+      console.log(`SCRIPT=${script}`);
       try{
         const result=await capture(recipe,run);
         const status=captureStatus(result.events,recipe.requirements);
         manifest(run,recipe,result,status);
-        console.log(`MP4=${result.artifacts?.mp4||'not-composed'}\nCONTACT_SHEET=${result.artifacts?.contactSheet||'not-composed'}\nMANIFEST=${path.join(run,'manifest.json')}\nWould you like revisions to shot selection, pacing, zoom, annotation, or framing?`);
+        console.log(`MP4=${result.artifacts?.mp4||'not-composed'}\nCONTACT_SHEET=${result.artifacts?.contactSheet||'not-composed'}\nMANIFEST=${path.join(run,'manifest.json')}`);
         process.exitCode=status==='SUCCESS'?0:CODES.ASSERTION_FAILED;
       }catch(error){
         manifest(run,recipe,null,error.code||'BLOCKED');
         console.error(error.message);
         process.exitCode=CODES[error.code]||CODES.BLOCKED;
       }
+      return;
     }
+    fail(`unknown command: ${command}`,CODES.NEEDS_CLARIFICATION);
   };
 }
 

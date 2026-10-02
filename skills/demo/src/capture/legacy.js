@@ -2,6 +2,7 @@ const cp=require('node:child_process');
 const path=require('node:path');
 const {resolveSameOriginUrl}=require('../comparison/validate');
 const {isContained}=require('../recipe/validate');
+const {fitPage}=require('./comparison');
 
 const ROOT=path.resolve(__dirname,'../..');
 
@@ -81,6 +82,8 @@ async function captureLegacy(recipe,run,viewports,options={}){
             else if(step.action==='assert-visible')await page.locator(step.selector).waitFor({state:'visible'});
             else if(step.action==='assert-text'&&!await page.locator(step.selector).getByText(String(step.text)).count())throw new Error('text not found');
             else if(step.action==='assert-url'&&page.url()!==resolvedUrl)throw new Error('URL mismatch');
+            // Measure after the real action, including content revealed by clicks.
+            await fitPage(page,{width:view.width,height:view.height});
             if(step.highlight||recipe.overlay?.highlights){
               try{
                 await page.evaluate(selector=>{

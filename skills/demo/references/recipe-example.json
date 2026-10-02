@@ -55,7 +55,7 @@
         "route": "/",
         "action": "navigate",
         "focusSelector": "body",
-        "framing": "union-16:9",
+        "framing": "full-page",
         "durationMs": 1500,
         "annotation": "BEFORE - NOT WORKING",
         "scroll": {
@@ -71,7 +71,7 @@
         "route": "/",
         "action": "navigate",
         "focusSelector": "body",
-        "framing": "union-16:9",
+        "framing": "full-page",
         "durationMs": 1500,
         "annotation": "AFTER - WORKING",
         "scroll": {
@@ -87,7 +87,7 @@
         "route": "/settings",
         "action": "navigate",
         "focusSelector": "body",
-        "framing": "union-16:9",
+        "framing": "full-page",
         "durationMs": 1500,
         "annotation": "BEFORE - NOT WORKING",
         "scroll": {
@@ -103,7 +103,7 @@
         "route": "/settings",
         "action": "navigate",
         "focusSelector": "body",
-        "framing": "union-16:9",
+        "framing": "full-page",
         "durationMs": 1500,
         "annotation": "AFTER - WORKING",
         "scroll": {

@@ -1,9 +1,0 @@
-exports.isApproved=(approval,featureHash,runId)=>!!(
-  approval&&
-  approval.status==='approved'&&
-  approval.runId===runId&&
-  approval.featureHash===featureHash&&
-  approval.recipeHash&&
-  approval.reviewer&&
-  approval.timestamp
-);
