@@ -1,6 +1,6 @@
 ---
 name: prompt-review
-description: Use when reviewing prompts, agent instructions, skills, policies, or workflow guidance for contradictions, missing conditions, hidden assumptions, or absolute language such as always, never, must, only, or cannot.
+description: Use when reviewing prompts, agent instructions, skills, policies, or workflow guidance for contradictions, missing conditions, hidden assumptions, or absolute language such as always, never, must, only, or cannot. Also use when reviewing a SKILL.md file, agent-skill package, or tool/function definition (JSON schema, MCP tool description, etc.) for model best-practice issues such as frontmatter validity, token/progressive-disclosure budget, action design, output signal, and instruction specificity.
 ---
 
 # Prompt Review
@@ -8,6 +8,8 @@ description: Use when reviewing prompts, agent instructions, skills, policies, o
 Review instruction text as a conditional policy, not as prose to polish. Find rules that are too broad for their context, conflict with other rules, or omit the conditions needed to apply them safely.
 
 ## Review contract
+
+Trigger condition: if the reviewed artifact is a SKILL.md, an agent-skill package, or a tool/function definition (JSON schema, MCP tool description, etc.), additionally apply the Model best-practice review below; otherwise skip it. That dimension's specificity/vagueness lens is orthogonal to the absolute-language/contradiction/gap lenses in this contract — report them in separate output sections and never double-count a line as both unless it is genuinely both an absolute statement and a vague/underspecified instruction.
 
 1. Read the complete prompt or instruction set before judging individual lines.
 2. Extract every normative absolute, including `always`, `never`, `must`, `only`, `cannot`, `do not`, `required`, and equivalent wording. Include the exact quote and location.
@@ -37,6 +39,23 @@ For each absolute or lifecycle rule, ask:
 
 A rule is incomplete when one of these dimensions is necessary for safe execution but absent. Do not invent the missing value; report it as a gap and offer an if-then shape with a placeholder.
 
+## Model best-practice review
+
+Trigger (see Review contract above): apply this dimension only when the reviewed artifact is itself a SKILL.md, an agent-skill package, or a tool/action definition — not a general policy prompt. Run it alongside, not instead of, the absolute-language review above: this dimension checks structure, token budget, and invocation design, not if/then conditionality.
+
+Summary checklist (full checklist, with per-item confidence ratings, in `references/model-best-practices-checklist.md`):
+- Frontmatter validity: `name` ≤64 chars, lowercase/numbers/hyphens only; `description` non-empty, ≤1024 chars, no XML tags; neither field contains the words "anthropic" or "claude".
+- Progressive disclosure budget: frontmatter ~100 tokens; body <5k tokens; bulky reference material pushed to separate bundled files, not inlined.
+- Execute vs. read-only code: skill states whether each bundled script is meant to be executed or read as reference; deterministic/repetitive logic goes in a script, not model reasoning.
+- Action/tool description depth: each tool/sub-command/delegated-agent step gets 3-4+ sentences: what/when-to-use/when-not-to-use/parameter semantics/caveats.
+- Action consolidation: related operations are one action with a mode/action parameter rather than several near-duplicate narrow actions.
+- Output signal: example outputs return only high-signal fields and stable identifiers, not bloated/opaque-ID-laden payloads.
+- Instruction specificity: guidance is explicit, not inference-reliant (distinct lens from absolute-language above).
+- Token efficiency: padding/redundant restatement/decision-irrelevant info is a defect, not a style nit.
+- Model-family fit: if the artifact explicitly targets GPT-6/Astra/Codex, also check the GPT-6-specific items in the references file (router-style root docs, narrow triggers, reduced procedural prescriptiveness) — single-source, lower confidence than the items above, and not applicable to a Claude-targeted skill.
+
+Do not flag, and do not require as a fix: description-as-sole-invocation-trigger, artifact size being "unbounded" via progressive disclosure, `user-invocable: false` hiding skills from SDK discovery, "a human could definitively determine which tool" phrasing or missing embedded examples/defaults, or enum-constrained parameters as hallucination prevention. None of these are established findings — see the references file for why.
+
 ## Output format
 
 ```md
@@ -59,6 +78,12 @@ A rule is incomplete when one of these dimensions is necessary for safe executio
 | # | Missing decision | Why it matters | Suggested condition or question |
 |---|---|---|---|
 | G1 | ... | ... | If `<condition>`, then ... |
+
+## Model best-practice findings
+<Include this section only when the Model best-practice review trigger fires (reviewed artifact is a SKILL.md, agent-skill package, or tool/function definition). Omit the whole section — not an empty table — when the trigger does not fire.>
+| # | Area | Location | Finding | Confidence | Suggested fix |
+|---|---|---|---|---|---|
+| M1 | Frontmatter / Progressive disclosure / Execute-vs-read-only / Action depth / Action consolidation / Output signal / Instruction specificity / Token efficiency | file/section | ... | high/medium/low | ... |
 
 ## Recommended rule set
 <Only include the rewritten rules after the findings; preserve unresolved items as questions.>
