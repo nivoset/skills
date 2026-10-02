@@ -5,6 +5,7 @@ pi/
 .DS_Store
 
 # Agent and tooling temporary files
+.planning/
 .tmp/
 tmp/
 .feature-tdd/
