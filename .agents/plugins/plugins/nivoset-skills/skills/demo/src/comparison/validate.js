@@ -25,8 +25,8 @@ exports.validateComparison=c=>{
   for(const [index,shot] of c.shots.entries()){
     const target=c.targets?.[shot.phase];
     const safeRoute=target?.url?resolveSameOriginRoute(target.url,shot.route):typeof shot.route==='string'&&shot.route.startsWith('/')&&!shot.route.startsWith('//')&&!shot.route.includes('\\');
-    if(!safeId(shot.requirementId)||!safeId(shot.stepId)||!['before','after'].includes(shot.phase)||!['navigate','click'].includes(shot.action||'navigate')||!safeRoute||!shot.focusSelector||shot.framing!=='union-16:9'||!Number.isInteger(shot.durationMs)||shot.durationMs<=0||!shot.annotation)return {ok:false,code:'NOT_COMPARABLE',error:`shot ${index+1} is invalid`};
-    if(shot.zoom&&!['static','push-in'].includes(shot.zoom))return {ok:false,code:'NOT_COMPARABLE',error:`shot ${index+1} has unsupported zoom`};
+    if(!safeId(shot.requirementId)||!safeId(shot.stepId)||!['before','after'].includes(shot.phase)||!['navigate','click'].includes(shot.action||'navigate')||!safeRoute||!shot.focusSelector||!['union-16:9','full-page'].includes(shot.framing)||!Number.isInteger(shot.durationMs)||shot.durationMs<=0||!shot.annotation)return {ok:false,code:'NOT_COMPARABLE',error:`shot ${index+1} is invalid`};
+    if(shot.zoom&&!['static','push-in'].includes(shot.zoom)||shot.framing==='full-page'&&shot.zoom==='push-in')return {ok:false,code:'NOT_COMPARABLE',error:`shot ${index+1} has unsupported zoom`};
   }
   if(!c.shots.some(s=>s.phase==='before')||!c.shots.some(s=>s.phase==='after'))return {ok:false,code:'NOT_COMPARABLE',error:'shots must include before and after phases'};
   if(c.composition?.transition&&c.composition.transition!=='hard-cut')return {ok:false,code:'NOT_COMPARABLE',error:'before-after transition must be hard-cut'};

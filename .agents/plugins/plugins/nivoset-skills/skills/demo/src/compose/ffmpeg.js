@@ -20,6 +20,8 @@ function validateComposition(composition){
     if(!shot.crop||!['x','y','width','height'].every(k=>Number.isInteger(shot.crop[k])&&shot.crop[k]>=0))throw new TypeError(`shots[${index}].crop must contain non-negative integers`);
     positiveInt(shot.crop.width,`shots[${index}].crop.width`);positiveInt(shot.crop.height,`shots[${index}].crop.height`);
     if(shot.labelPng)safeRelative(shot.labelPng,`shots[${index}].labelPng`);
+    if(shot.framing&&shot.framing!=='full-page'&&shot.framing!=='union-16:9')throw new TypeError(`shots[${index}].framing is unsupported`);
+    if(shot.framing==='full-page'&&shot.zoom==='push-in')throw new TypeError(`shots[${index}].zoom cannot crop full-page framing`);
     if(shot.zoom&&shot.zoom!=='static'&&shot.zoom!=='push-in')throw new TypeError(`shots[${index}].zoom is unsupported`);
   });
   return composition;
@@ -33,7 +35,7 @@ function buildFfmpegArgs(composition){
     const videoInput=inputIndex++,duration=(shot.durationMs/1000).toFixed(3);
     inputs.push('-sseof',`-${duration}`,'-i',shot.input);
     const output=shot.labelPng?`base${index}`:`v${index}`;
-    let chain=`[${videoInput}:v]crop=${shot.crop.width}:${shot.crop.height}:${shot.crop.x}:${shot.crop.y},scale=1280:720,setsar=1,fps=30,format=yuv420p,tpad=stop_mode=clone:stop_duration=0.034`;
+    let chain=`[${videoInput}:v]crop=${shot.crop.width}:${shot.crop.height}:${shot.crop.x}:${shot.crop.y},${shot.framing==='full-page'?'scale=1280:720:force_original_aspect_ratio=decrease,pad=1280:720:(ow-iw)/2:(oh-ih)/2':'scale=1280:720'},setsar=1,fps=30,format=yuv420p,tpad=stop_mode=clone:stop_duration=0.034`;
     if(shot.zoom==='push-in')chain+=`,zoompan=z='min(zoom+0.0015,1.15)':d=${Math.ceil(shot.durationMs*30/1000)}:s=1280x720:fps=30`;
     chain+=`[${output}]`;filters.push(chain);
     if(shot.labelPng){
@@ -48,7 +50,8 @@ function buildFfmpegArgs(composition){
   if(composition.contactSheet){
     const before=composition.shots[0],after=composition.shots.at(-1);
     const beforeCrop=before.crop,afterCrop=after.crop;
-    contactSheet=['-sseof','-0.100','-i',before.input,'-sseof','-0.100','-i',after.input,'-filter_complex',`[0:v]crop=${beforeCrop.width}:${beforeCrop.height}:${beforeCrop.x}:${beforeCrop.y},scale=640:360,setsar=1[before];[1:v]crop=${afterCrop.width}:${afterCrop.height}:${afterCrop.x}:${afterCrop.y},scale=640:360,setsar=1[after];[before][after]hstack=inputs=2[out]`,'-map','[out]','-frames:v','1','-y',composition.contactSheet];
+    const sheetScale=shot=>shot.framing==='full-page'?'scale=640:360:force_original_aspect_ratio=decrease,pad=640:360:(ow-iw)/2:(oh-ih)/2':'scale=640:360';
+    contactSheet=['-sseof','-0.100','-i',before.input,'-sseof','-0.100','-i',after.input,'-filter_complex',`[0:v]crop=${beforeCrop.width}:${beforeCrop.height}:${beforeCrop.x}:${beforeCrop.y},${sheetScale(before)},setsar=1[before];[1:v]crop=${afterCrop.width}:${afterCrop.height}:${afterCrop.x}:${afterCrop.y},${sheetScale(after)},setsar=1[after];[before][after]hstack=inputs=2[out]`,'-map','[out]','-frames:v','1','-y',composition.contactSheet];
   }
   return {video,contactSheet};
 }

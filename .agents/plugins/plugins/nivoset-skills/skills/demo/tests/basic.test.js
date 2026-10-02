@@ -8,7 +8,7 @@ const { unionCrop16x9 } = require('../src/capture/geometry');
 const { buildFfmpegArgs, validateComposition } = require('../src/compose/ffmpeg');
 const { captureComparison } = require('../src/capture/comparison');
 const { captureLegacy } = require('../src/capture/legacy');
-const { captureStatus } = require('../src/cli/main');
+const { createMain, captureStatus } = require('../src/cli/main');
 const recipe = require('../references/recipe-example.json');
 
 const root = path.join(__dirname, '..');
@@ -19,8 +19,8 @@ const cli = args => cp.spawnSync('node', ['bin/demo', ...args], { cwd: root, enc
 const removeRun = id => fs.rmSync(path.join(root, '.tmp', 'demo', id), { recursive: true, force: true });
 const unsafeRelativePaths = ['../out.mp4', String.raw`..\out.mp4`, String.raw`folder\out.mp4`, '//server/share/out.mp4', '/tmp/out.mp4', 'http://evil.test/out.mp4', 'bad\0name.mp4'];
 
-test('demo is user-invocable and not model-auto-invoked', () => {
-  assert.match(skill, /^disable-model-invocation:\s*true\s*$/m);
+test('demo is invocable for a direct recording journey', () => {
+  assert.match(skill, /^disable-model-invocation:\s*false\s*$/m);
   assert.match(skill, /^user-invocable:\s*true\s*$/m);
 });
 
@@ -89,38 +89,68 @@ test('review rejects a journey whose requirements are not bound to recorded shot
 });
 test('canonical serialization is deterministic', () => assert.equal(canon({ b: 1, a: 2 }), '{"a":2,"b":1}'));
 
-test('review records recipe hash without freezing capture files', () => {
-  const id = `test-gate-${Date.now()}`;
+test('optional review exposes the exact readable recipe without requiring approval', { tags: ['validation'] }, () => {
+  const id = `test-review-${Date.now()}`;
   const result = cli(['review', '--recipe', 'references/recipe-example.json', '--run-id', id]);
   const dir = path.join(root, '.tmp', 'demo', id);
-  assert.equal(result.status, 0, result.stderr);
-  assert.match(JSON.parse(fs.readFileSync(path.join(dir, 'review', 'review.json'))).recipeHash, /^[a-f0-9]{64}$/);
-  assert.equal(fs.existsSync(path.join(dir, 'recipe.frozen.json')), false);
-  assert.equal(fs.existsSync(path.join(dir, 'recipe.sha256')), false);
-  removeRun(id);
+  const script = path.join(dir, 'review', 'script.json');
+  try {
+    assert.equal(result.status, 0, result.stderr);
+    assert.ok(result.stdout.includes(`SCRIPT=${script}`), result.stdout);
+    assert.deepEqual(JSON.parse(fs.readFileSync(script, 'utf8')), recipe);
+    assert.match(fs.readFileSync(script, 'utf8'), /\n  "source":/);
+    assert.equal(fs.existsSync(path.join(dir, 'recipe.frozen.json')), false);
+    assert.doesNotMatch(result.stdout + result.stderr, /approve|permission|required/i);
+  } finally { removeRun(id); }
 });
 
-for (const [field, mutate] of [
-  ['URL', changed => { changed.comparison.targets.after.url = 'http://127.0.0.1:3999'; }],
-  ['scroll', changed => { changed.comparison.shots[0].scroll.x = 40; }],
-  ['command', changed => { changed.target = { command: ['node', 'server.js'], healthUrl: 'http://127.0.0.1:3000' }; changed.comparison.status = 'current-behavior'; }],
-]) {
-  test(`approved recipe rejects mutated ${field} before capture`, () => {
-    const id = `test-mutation-${field.toLowerCase()}-${Date.now()}`;
-    const dir = path.join(root, '.tmp', 'demo', id);
-    assert.equal(cli(['review', '--recipe', 'references/recipe-example.json', '--run-id', id]).status, 0);
-    assert.equal(cli(['approve', '--run-id', id, '--reviewer', 'test']).status, 0);
-    const changed = structuredClone(recipe);
-    mutate(changed);
-    const file = path.join(dir, 'changed.json');
-    fs.writeFileSync(file, JSON.stringify(changed));
-    const result = cli(['run', '--recipe', file, '--run-id', id]);
-    assert.equal(result.status, 33, result.stderr);
-    removeRun(id);
+test('a validated recipe records directly and exposes its exact script before capture', { tags: ['important', 'validation'] }, async () => {
+  const id = `test-direct-run-${Date.now()}`;
+  const dir = path.join(root, '.tmp', 'demo', id);
+  const output = [];
+  const originalLog = console.log;
+  const oldExitCode = process.exitCode;
+  const main = createMain({
+    CODES: { BLOCKED: 11, ARTIFACT_FAILED: 30, ASSERTION_FAILED: 22, NEEDS_CLARIFICATION: 10 },
+    validate, canon, read: file => JSON.parse(fs.readFileSync(file, 'utf8')),
+    option: (args, name, { required = false } = {}) => {
+      const index = args.indexOf(name);
+      const value = index < 0 ? undefined : args[index + 1];
+      if (value && !value.startsWith('-')) return value;
+      if (required) throw new Error(`${name} requires a non-flag value`);
+    },
+    resolveRun: value => { assert.equal(value, id); return dir; },
+    runId: () => id, ignored: () => true,
+    recipeHash: (value, serialize) => require('node:crypto').createHash('sha256').update(serialize(value)).digest('hex'),
+    capture: async (value, run) => {
+      const script = path.join(run, 'review', 'script.json');
+      assert.equal(output.at(-1), `SCRIPT=${script}`);
+      assert.deepEqual(JSON.parse(fs.readFileSync(script, 'utf8')), value);
+      assert.equal(fs.existsSync(path.join(run, 'review', 'approval.json')), false);
+      return { events: value.requirements.map(requirement => ({ requirementId: requirement.id, outcome: 'pass' })), artifacts: {} };
+    },
+    manifest: () => {},
   });
-}
+  console.log = value => output.push(value);
+  try {
+    await main(['run', '--recipe', path.join(root, 'references', 'recipe-example.json'), '--run-id', id]);
+    assert.equal(process.exitCode, 0);
+    assert.deepEqual(JSON.parse(fs.readFileSync(path.join(dir, 'recipe.frozen.json'), 'utf8')), recipe);
+    fs.writeFileSync(path.join(dir, 'review', 'review.json'), JSON.stringify({ recipeHash: 'older-preview' }));
+    const changed = structuredClone(recipe);
+    changed.comparison.targets.after.url = 'http://127.0.0.1:3999';
+    assert.equal(validate(changed).ok, true);
+    const changedFile = path.join(dir, 'changed.json');
+    fs.writeFileSync(changedFile, JSON.stringify(changed));
+    await main(['run', '--recipe', changedFile, '--run-id', id]);
+    assert.equal(process.exitCode, 0);
+    assert.deepEqual(JSON.parse(fs.readFileSync(path.join(dir, 'review', 'script.json'), 'utf8')), changed);
+    assert.deepEqual(JSON.parse(fs.readFileSync(path.join(dir, 'recipe.frozen.json'), 'utf8')), changed);
+    assert.doesNotMatch(output.join('\n'), /approve|permission|required/i);
+  } finally { console.log = originalLog; process.exitCode = oldExitCode; removeRun(id); }
+});
 
-test('review artifact exposes command argv and canonical URL for approval', () => {
+test('review artifact exposes command argv and canonical URL for optional review', () => {
   const changed = structuredClone(recipe);
   changed.comparison.status = 'current-behavior';
   changed.target = {
@@ -153,30 +183,23 @@ test('command review exposes the real execution directory and rejects invalid cw
   changed.target.cwd = path.join(root, 'package.json');
   assert.equal(validate(changed).ok, false);
 });
-test('mutating command cwd after approval exits 33', () => {
-  const id = `test-mutation-cwd-${Date.now()}`;
+test('optional review reports the command execution directory without changing validation', { tags: ['validation'] }, () => {
+  const id = `test-review-cwd-${Date.now()}`;
   const dir = path.join(root, '.tmp', 'demo', id);
   const changed = structuredClone(recipe);
   changed.comparison.status = 'current-behavior';
-  changed.target = {
-    command: ['/usr/bin/true'],
-    cwd: root,
-    healthUrl: 'http://127.0.0.1:3000/health',
-  };
+  changed.target = { command: ['/usr/bin/true'], cwd: root, healthUrl: 'http://127.0.0.1:3000/health' };
   const file = path.join(root, '.tmp', `${id}.json`);
   fs.mkdirSync(path.dirname(file), { recursive: true });
   fs.writeFileSync(file, JSON.stringify(changed));
-  assert.equal(cli(['review', '--recipe', file, '--run-id', id]).status, 0);
-  const reviewText = fs.readFileSync(path.join(dir, 'review', 'demo.feature.review'), 'utf8');
-  assert.match(reviewText, new RegExp(`cwd=${root.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`));
-  assert.equal(cli(['approve', '--run-id', id, '--reviewer', 'test']).status, 0);
-  changed.target.cwd = path.join(root, 'tests');
-  fs.writeFileSync(file, JSON.stringify(changed));
-  assert.equal(cli(['run', '--recipe', file, '--run-id', id]).status, 33);
-  fs.rmSync(file, { force: true });
-  removeRun(id);
+  try {
+    assert.equal(cli(['review', '--recipe', file, '--run-id', id]).status, 0);
+    const reviewText = fs.readFileSync(path.join(dir, 'review', 'demo.feature.review'), 'utf8');
+    assert.ok(reviewText.includes(`cwd=${root}`));
+    assert.deepEqual(JSON.parse(fs.readFileSync(path.join(dir, 'review', 'script.json'), 'utf8')), changed);
+  } finally { fs.rmSync(file, { force: true }); removeRun(id); }
 });
-test('review artifact exposes both command target URLs for approval', () => {
+test('review artifact exposes both command target URLs for optional review', () => {
   const changed = structuredClone(recipe);
   changed.comparison.status = 'current-behavior';
   changed.target = {
@@ -188,9 +211,9 @@ test('review artifact exposes both command target URLs for approval', () => {
   assert.match(output, /url=http:\/\/127\.0\.0\.1:3000\/app/);
   assert.match(output, /healthUrl=http:\/\/127\.0\.0\.1:3000\/health/);
 });
-test('review exposes shot storyboard details required for approval', () => {
+test('review exposes shot storyboard details required for optional review', () => {
   const output = gherkin(recipe);
-  for (const value of ['requirementId=REQ-1', 'stepId=step-1', 'phase=before', 'phase=after', 'route=/', 'focus=body', 'framing=union-16:9', 'durationMs=1500', 'annotation=BEFORE']) {
+  for (const value of ['requirementId=REQ-1', 'stepId=step-1', 'phase=before', 'phase=after', 'route=/', 'focus=body', `framing=${recipe.comparison.shots[0].framing}`, 'durationMs=1500', 'annotation=BEFORE']) {
     assert.match(output, new RegExp(value.replace('/', '\\/')));
   }
 });
@@ -276,9 +299,8 @@ test('viewport and requirement identifiers reject path traversal characters', ()
     assert.equal(validate(changed).ok, false);
   }
 });
-test('CLI rejects missing, flag-shaped, and traversal values', () => {
-  assert.equal(cli(['approve', '--run-id', 'missing']).status, 10);
-  assert.equal(cli(['approve', '--run-id', 'missing', '--reviewer', '--recipe']).status, 10);
+test('CLI rejects missing, flag-shaped, and traversal values', { tags: ['validation'] }, () => {
+  assert.equal(cli(['approve', '--run-id', 'missing', '--reviewer', 'someone']).status, 10);
   assert.equal(cli(['review', '--recipe', '--run-id', 'safe']).status, 10);
   assert.equal(cli(['review', '--recipe', 'references/recipe-example.json', '--run-id', '../escape']).status, 10);
   const malformedRun = cli(['run', '--recipe', 'references/recipe-example.json', '--run-id', '--reviewer']);
@@ -411,7 +433,7 @@ test('recording closes each shot context before saving video', async () => {
   await captureComparison(changed, dir, { playwright: { chromium: { launch: async () => browser } } });
   assert.equal(contexts.filter(item => item.options.recordVideo).length, recipe.comparison.shots.length);
   assert.equal(actions.filter(item => item === 'save').length, recipe.comparison.shots.length);
-  assert.equal(actions.filter(item => Array.isArray(item) && item[0] === 'clock').length, recipe.comparison.shots.length * 2);
+  assert.equal(actions.filter(item => Array.isArray(item) && item[0] === 'clock').length, recipe.comparison.shots.length);
   assert.deepEqual(
     actions.filter(item => Array.isArray(item) && item[0] === 'fastForward').map(item => item[1]),
     recipe.comparison.shots.map(shot => shot.durationMs),
@@ -612,36 +634,16 @@ test('Prime recording waits for visible focus before reading its bounding box', 
   const bounds = source.indexOf('bounds = focus.bounding_box()');
   assert.ok(visible >= 0 && visible < bounds);
 });
-test('comparison runtimes advance an installed clock instead of waiting in real time', () => {
-  const primeSource = fs.readFileSync(primeReference, 'utf8');
+test('recorded comparisons hold for the configured wall-clock duration', () => {
   const nodeSource = fs.readFileSync(comparisonSource, 'utf8');
-  assert.match(primeSource, /page\.clock\.fast_forward\(duration_ms\)/);
-  assert.match(nodeSource, /page\.clock\.fastForward\(shot\.durationMs\)/);
-  assert.doesNotMatch(`${primeSource}\n${nodeSource}`, /waitForTimeout|wait_for_timeout/);
+  assert.match(nodeSource, /setTimeout\(resolve,shot\.durationMs\)/);
 });
 
-test('mutating viewport after approval exits 33', () => {
-  const id = `test-mutation-viewport-${Date.now()}`;
-  const dir = path.join(root, '.tmp', 'demo', id);
-  assert.equal(cli(['review', '--recipe', 'references/recipe-example.json', '--run-id', id]).status, 0);
-  assert.equal(cli(['approve', '--run-id', id, '--reviewer', 'test']).status, 0);
-  const changed = structuredClone(recipe);
-  changed.viewports[0].width = 1280;
-  const file = path.join(dir, 'changed.json');
-  fs.writeFileSync(file, JSON.stringify(changed));
-  assert.equal(cli(['run', '--recipe', file, '--run-id', id]).status, 33);
-  removeRun(id);
-});
-
-test('mutating composition after approval exits 33', () => {
-  const id = `test-mutation-composition-${Date.now()}`;
-  const dir = path.join(root, '.tmp', 'demo', id);
-  assert.equal(cli(['review', '--recipe', 'references/recipe-example.json', '--run-id', id]).status, 0);
-  assert.equal(cli(['approve', '--run-id', id, '--reviewer', 'test']).status, 0);
-  const changed = structuredClone(recipe);
-  changed.comparison.composition.padding = 64;
-  const file = path.join(dir, 'changed.json');
-  fs.writeFileSync(file, JSON.stringify(changed));
-  assert.equal(cli(['run', '--recipe', file, '--run-id', id]).status, 33);
-  removeRun(id);
+test('recipe edits remain subject to viewport and target URL validation', { tags: ['validation'] }, () => {
+  const invalidViewport = structuredClone(recipe);
+  invalidViewport.viewports[0].width = -1;
+  assert.equal(validate(invalidViewport).ok, false);
+  const invalidUrl = structuredClone(recipe);
+  invalidUrl.comparison.targets.after.url = 'javascript:alert(1)';
+  assert.equal(validate(invalidUrl).ok, false);
 });

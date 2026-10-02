@@ -129,7 +129,7 @@
         "route": { "type": "string", "pattern": "^/" },
         "action": { "enum": ["navigate", "click"] },
         "focusSelector": { "type": "string", "minLength": 1 },
-        "framing": { "const": "union-16:9" },
+        "framing": { "enum": ["union-16:9", "full-page"] },
         "durationMs": { "type": "integer", "minimum": 1 },
         "annotation": { "type": "string", "minLength": 1 },
         "zoom": { "enum": ["static", "push-in"] },
