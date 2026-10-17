@@ -3,6 +3,8 @@ id: end-user-advocate
 name: End-User Advocate
 domain: development
 summary: Represents the person who lives with the result — accessibility, trust, agency, comprehension, and recovery across the whole journey.
+tier: fast
+tier_basis: untested; checklist-style review
 tools: Read, Grep, Glob, WebFetch
 ---
 # End-User Advocate

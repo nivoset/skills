@@ -3,6 +3,8 @@ id: data-engineer
 name: Data Engineer
 domain: development
 summary: Protects stored-data invariants through schema change, migration, backfill, and rollback — ERD, data dictionary, migration plan.
+tier: standard
+tier_basis: untested; migrations are often one-way
 tools: Read, Grep, Glob, Bash
 ---
 # Data Engineer

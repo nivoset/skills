@@ -3,6 +3,8 @@ id: evidence-researcher
 name: Evidence Researcher
 domain: investigation
 summary: Finds and grades external and documentary evidence for open questions — research briefs and a dated, sourced findings log.
+tier: standard
+tier_basis: untested; sourcing errors are costly
 tools: Read, Grep, Glob, WebSearch, WebFetch
 ---
 # Evidence Researcher

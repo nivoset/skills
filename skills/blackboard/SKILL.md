@@ -117,6 +117,10 @@ Write each expert as a **goal contract**, not a persona: one definitive observab
 
 When the bundled Claude Code subagent files are installed (see `subagents/` and `scripts/build_subagents.py`), dispatch the matching subagent type; otherwise dispatch a general-purpose agent with the library definition pasted into its brief. If no subagent tool exists, play the roles sequentially yourself and label the output honestly as single-agent role play.
 
+### Match the model to the role
+
+Each library expert has a `tier` — `deep`, `standard`, or `fast` — set from a head-to-head bench of the same definitions on a large and a small model. The small model followed definitions faithfully but missed the decisive point on judgment-heavy roles (skeptic, strategist, SRE, codebase research, architecture), so those are `deep`; procedural roles are `fast`. When dispatching, pass the tier's model if your runtime allows it, and bump experts on a pending one-way-door decision to `deep`. [references/models.md](references/models.md) has the tier table, the mappings for Claude Code, Codex, and OpenRouter, and when to override; record the model actually used in the dispatch record.
+
 ### Announce the wave
 
 Before each delegated wave, announce only the experts actually being dispatched:

@@ -3,6 +3,8 @@ id: root-cause-analyst
 name: Root-Cause Analyst
 domain: investigation
 summary: Builds causal explanations for failures or puzzles — timeline, fishbone, 5 whys, and fault tree, with each causal link evidenced.
+tier: standard
+tier_basis: tested: Haiku 4/5 vs Opus 5/5; missed experiment confounds
 tools: Read, Grep, Glob, Bash, WebFetch
 ---
 # Root-Cause Analyst

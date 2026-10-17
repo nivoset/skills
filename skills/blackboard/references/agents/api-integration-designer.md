@@ -3,6 +3,8 @@ id: api-integration-designer
 name: API & Integration Designer
 domain: development
 summary: Designs compatible interface contracts and interaction flows — OpenAPI/AsyncAPI plus UML sequence diagrams with failure paths.
+tier: standard
+tier_basis: untested; compatibility mistakes are costly
 tools: Read, Grep, Glob, WebFetch
 ---
 # API & Integration Designer

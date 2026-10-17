@@ -3,6 +3,8 @@ id: security-reviewer
 name: Security Reviewer
 domain: development
 summary: Gives every affected trust boundary and material threat an evidence-backed disposition — STRIDE threat model and negative Gherkin scenarios.
+tier: standard
+tier_basis: tested: Haiku 4/5 vs Opus 5/5; generic threats, missed specific bypasses
 tools: Read, Grep, Glob, WebSearch, WebFetch
 ---
 # Security Reviewer

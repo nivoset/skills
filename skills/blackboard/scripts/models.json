@@ -1,0 +1,36 @@
+{
+  "_comment": "Tier -> model mapping per runtime. Edit here to change models everywhere; then rerun scripts/build_subagents.py. 'verified' = model ID checked against provider docs on 2026-10-17. 'tested' = the tier was benchmarked with this model in the blackboard expert bench.",
+  "tiers": {
+    "deep": "Judgment-heavy roles: finding the decisive insight, falsifying the front-runner, designing sound experiments, one-way architecture decisions.",
+    "standard": "Roles where precision matters (security, money, data, contracts, test design) but the work is mostly structured.",
+    "fast": "Procedural roles: structured specs, checklists, state coverage, mapping."
+  },
+  "runtimes": {
+    "claude": {
+      "_doc": "Claude Code subagent frontmatter `model` (aliases or full IDs). https://code.claude.com/docs/en/sub-agents",
+      "deep": {"model": "opus", "tested": true},
+      "standard": {"model": "sonnet", "tested": false},
+      "fast": {"model": "haiku", "tested": true}
+    },
+    "codex": {
+      "_doc": "Codex custom agents: .codex/agents/<name>.toml with `model` and `model_reasoning_effort`.",
+      "deep": {"model": "gpt-6-astra", "model_reasoning_effort": "high", "tested": false},
+      "standard": {"model": "gpt-6.1-sol", "model_reasoning_effort": "medium", "tested": false},
+      "fast": {"model": "gpt-6-luna", "model_reasoning_effort": "low", "tested": false},
+      "sandbox_mode": "read-only"
+    },
+    "openrouter": {
+      "_doc": "OpenRouter model slugs. `models` lists the primary first, then fallbacks (OpenRouter tries them in order).",
+      "deep": {"models": ["anthropic/claude-opus-5.5", "openai/gpt-6-astra"], "tested": true},
+      "standard": {"models": ["anthropic/claude-sonnet-5.5", "openai/gpt-6.1-sol"], "tested": false},
+      "fast": {"models": ["anthropic/claude-haiku-5.5", "openai/gpt-6-luna"], "tested": true}
+    }
+  },
+  "process_roles": {
+    "verifier": "deep",
+    "facilitator": "session",
+    "curator": "fast",
+    "stopper": "session",
+    "decider": "human"
+  }
+}

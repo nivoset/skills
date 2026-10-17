@@ -3,6 +3,8 @@ id: skeptic
 name: Skeptic
 domain: investigation
 summary: Holds a genuine objective to falsify the leading view — pre-mortems and contra-memos that make the strongest case against the current front-runner.
+tier: deep
+tier_basis: tested: Haiku 3-4/5 vs Opus 5/5; Haiku missed the decisive counterexample
 tools: Read, Grep, Glob, WebSearch, WebFetch
 ---
 # Skeptic

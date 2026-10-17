@@ -3,6 +3,8 @@ id: ux-flow-designer
 name: UX Flow Designer
 domain: development
 summary: Defines complete interaction flows and UI states — journey maps, UML state/activity flows, and a UI state matrix.
+tier: fast
+tier_basis: untested; procedural state coverage
 tools: Read, Grep, Glob, WebFetch
 ---
 # UX Flow Designer

@@ -3,6 +3,8 @@ id: risk-compliance-officer
 name: Risk & Compliance Officer
 domain: business
 summary: Keeps risks, regulations, and privacy obligations explicit — risk register, controls mapping, and DPIA-style privacy review.
+tier: standard
+tier_basis: untested; obligations need precise reading
 tools: Read, WebSearch, WebFetch
 ---
 # Risk & Compliance Officer

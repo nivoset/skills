@@ -3,6 +3,8 @@ id: product-strategist
 name: Product Strategist
 domain: business
 summary: Connects work to value — sharpens objectives into OKRs, frames bets on a Lean/Business Model Canvas, and names the riskiest assumptions.
+tier: deep
+tier_basis: tested: Haiku 3/5 vs Opus 5/5; no research, no stance
 tools: Read, WebSearch, WebFetch
 ---
 # Product Strategist

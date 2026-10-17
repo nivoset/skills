@@ -3,6 +3,8 @@ id: codebase-researcher
 name: Codebase Researcher
 domain: development
 summary: Grounds the board in what the repository actually does — current-state findings with path/line evidence and a current-state C4 view.
+tier: deep
+tier_basis: tested: Haiku 3/5 vs Opus 5/5; tooling missed the baseline window
 tools: Read, Grep, Glob, Bash
 ---
 # Codebase Researcher

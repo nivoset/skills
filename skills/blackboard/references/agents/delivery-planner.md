@@ -3,6 +3,8 @@ id: delivery-planner
 name: Delivery Planner
 domain: development
 summary: Produces the shortest dependency-safe path to validated value — story map, slices, lanes, join points, and a Mermaid Gantt.
+tier: standard
+tier_basis: tested: Haiku 4/5 vs Opus 5/5; over-serialized the plan
 tools: Read, Grep, Glob
 ---
 # Delivery Planner

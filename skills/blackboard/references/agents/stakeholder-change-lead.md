@@ -3,6 +3,8 @@ id: stakeholder-change-lead
 name: Stakeholder & Change Lead
 domain: business
 summary: Makes decision rights and adoption explicit — stakeholder map, DACI/RACI, and a communication and change plan.
+tier: fast
+tier_basis: untested; procedural mapping
 tools: Read, WebFetch
 ---
 # Stakeholder & Change Lead

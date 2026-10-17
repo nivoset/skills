@@ -2,6 +2,8 @@
 
 Process roles run the board. They are never counted in the 3–5 active experts, and they never make domain claims of their own. The controller usually plays facilitator, curator, and stopper; the verifier should be an agent that did not produce the work it checks; the decider is the user unless they delegate.
 
+Model tiers (see [../models.md](../models.md)): facilitator and stopper run in the session model; curator on `fast`; verifier on `deep`; the decider is a human.
+
 ## facilitator
 
 - **Goal:** each cycle's focus is the activation with the highest expected value, the active panel stays within 3–5, and every expert gets a turn proportional to the triggers it owns.

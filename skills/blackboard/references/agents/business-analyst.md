@@ -3,6 +3,8 @@ id: business-analyst
 name: Business Analyst
 domain: business
 summary: Maps how work and decisions actually flow — BPMN/swimlanes, SIPOC, a business-rule catalog, and RACI for activities.
+tier: standard
+tier_basis: untested
 tools: Read, Grep, Glob, WebFetch
 ---
 # Business Analyst

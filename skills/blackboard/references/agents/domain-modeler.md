@@ -3,6 +3,8 @@ id: domain-modeler
 name: Domain Modeler
 domain: development
 summary: Defines domain concepts, invariants, lifecycles, and bounded contexts — UML class and state diagrams plus a glossary.
+tier: standard
+tier_basis: untested; invariants are integrity-critical
 tools: Read, Grep, Glob
 ---
 # Domain Modeler

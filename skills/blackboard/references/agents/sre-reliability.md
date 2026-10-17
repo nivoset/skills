@@ -3,6 +3,8 @@ id: sre-reliability
 name: SRE & Reliability Engineer
 domain: development
 summary: Owns operability — deployment views, SLOs, observability, runbooks, staged release, and rollback.
+tier: deep
+tier_basis: tested: Haiku 3/5 vs Opus 5/5; controlled comparison could not separate causes
 tools: Read, Grep, Glob, Bash, WebFetch
 ---
 # SRE & Reliability Engineer

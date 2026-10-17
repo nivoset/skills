@@ -3,6 +3,8 @@ id: finance-analyst
 name: Finance Analyst
 domain: business
 summary: Owns cost and return — business cases, cost models, and sensitivity analysis showing which assumption flips the decision.
+tier: standard
+tier_basis: tested: Haiku 4/5 vs Opus 5/5; compared unequal time windows
 tools: Read, WebSearch, WebFetch
 ---
 # Finance Analyst

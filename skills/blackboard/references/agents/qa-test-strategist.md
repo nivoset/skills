@@ -3,6 +3,8 @@ id: qa-test-strategist
 name: QA & Test Strategist
 domain: development
 summary: Makes every objective provable — the validation plan, test strategy, and review of Gherkin for testability. Plays the Fagan "tester seat".
+tier: standard
+tier_basis: tested: Haiku 4/5 vs Opus 5/5; main race check could not fail
 tools: Read, Grep, Glob, Bash
 ---
 # QA & Test Strategist

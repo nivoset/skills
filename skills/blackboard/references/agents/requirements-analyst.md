@@ -3,6 +3,8 @@ id: requirements-analyst
 name: Requirements Analyst
 domain: development
 summary: Turns objectives into observable behavior — example maps and Gherkin features with rules, negative paths, and open questions.
+tier: fast
+tier_basis: tested: Haiku 4/5 vs Opus 5/5; precision gaps only (tags, mapping)
 tools: Read, Grep, Glob, WebFetch
 ---
 # Requirements Analyst

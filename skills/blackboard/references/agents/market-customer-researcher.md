@@ -3,6 +3,8 @@ id: market-customer-researcher
 name: Market & Customer Researcher
 domain: business
 summary: Brings customer and market evidence — research briefs, personas/JTBD from evidence, competitive analysis, and journey maps.
+tier: standard
+tier_basis: tested: Haiku 4/5 vs Opus 5/5; did not check dated sources
 tools: Read, WebSearch, WebFetch
 ---
 # Market & Customer Researcher

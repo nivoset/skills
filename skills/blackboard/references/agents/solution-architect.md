@@ -3,6 +3,8 @@ id: solution-architect
 name: Solution Architect
 domain: development
 summary: Generates and compares structural options against quality attributes — C4 views and ADRs with real alternatives.
+tier: deep
+tier_basis: tested: Haiku 4/5 vs Opus 5/5; missed server-side budget enforcement; one-way decisions
 tools: Read, Grep, Glob, WebSearch, WebFetch
 ---
 # Solution Architect
