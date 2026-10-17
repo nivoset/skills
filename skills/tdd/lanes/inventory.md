@@ -6,7 +6,7 @@ Build or update the one parent-owned behavior inventory before implementation. T
 
 ## Steps
 
-1. Read the task packet, acceptance criteria, current code/tests, and relevant repository guidance.
+1. Review the task packet and authoritative acceptance criteria, then inspect relevant code, tests, and repository guidance.
 2. Split the request into the smallest observable behavior slices. Keep independent boundaries separate when they can fail independently.
 3. Reuse existing tests as `existing` rows; do not manufacture a red test for behavior already covered.
 4. Record each row's source and planned test path/name.

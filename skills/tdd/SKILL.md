@@ -62,7 +62,7 @@ prior_evidence: concise results from the previous lane
 stop_conditions: [conditions that require blocked/parent decision]
 ```
 
-The agent reads this file only as needed plus the selected `lanes/<lane>.md`. Do not send the entire ticket, repository history, or prior lane transcripts when the task packet contains the required facts.
+Use the task packet and selected `lanes/<lane>.md`. Add only context needed to resolve gaps in the packet; omit unrelated ticket history and prior transcripts.
 
 ## Ownership and isolation
 

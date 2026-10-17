@@ -21,6 +21,7 @@ Follow the caller contract when supplied; Product Intake owns the full shared pa
 
 - **Identity:** supplied packet/revision/attempt/role identifiers, or `unknown`.
 - **Investigation:** status, reason and each required-check disposition.
+- **Source versions (required):** map every cited artifact to its supplied artifact version, or `unknown` when absent; use the same value in each finding's source-version slot. If a log supplies only the command target/tested revision, keep its artifact-version slots `unknown` and retain the tested revision separately in evidence/context.
 - **Findings:** stable finding ID, claim, source/version/locator/context, support disposition, separate interpretation, material impact and nonbinding recommendation. Retain supplied IDs across rechecks; label new IDs **new**. Use `[]` if none.
 - **Unresolved:** uncertainty, missing evidence/unmet required check, owner as supplied or `unknown`, concrete parent-routing action and re-entry condition.
 - **Verification:** actual assessment and executed checks/results, separately from supplied logs; state `no executed checks` where applicable. Include unavailable evidence and unexamined scope.
@@ -38,4 +39,4 @@ Plan readiness is separate. A completed excerpt-only audit is not blocked solely
 
 ## Example
 
-Excerpt-only audit, P4/revision 4/attempt E1, role evidence: **new `evidence-import-01`** — “revision 4 import passed” is **unverified**. Supplied `import.log`, revision 2, line 8 records success; interpretation: historical result does not verify revision 4. Impact: current-pass claim lacks proof. Recommendation: parent requests revision-4 result. Owner: `unknown`; re-entry: version-matched result supplied. Investigation: `passed`; excerpt comparison complete, no required execution assigned, no executed checks; current outcome uncertain; `changed_paths: []`.
+Excerpt-only audit, P4/revision 4/attempt E1, role evidence: **new `evidence-import-01`** — “revision 4 import passed” is **unverified**. Source versions: `import.log: unknown`; finding source: `import.log`, version `unknown`, line 8. Supplied evidence/context: `check-import` exited 0 on revision 2; interpretation: historical result does not verify revision 4. Impact: current-pass claim lacks proof. Recommendation: parent requests revision-4 result. Owner: `unknown`; re-entry: version-matched result supplied. Investigation: `passed`; excerpt comparison complete, no required execution assigned, no executed checks; current outcome uncertain; `changed_paths: []`.

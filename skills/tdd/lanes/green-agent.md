@@ -12,11 +12,10 @@ Make the smallest production change that makes the verified red test pass.
 ## Steps
 
 1. Read the verified red evidence and current implementation.
-2. Identify the smallest production change that addresses the observed behavior.
-3. Implement only that change.
-4. Run the focused test first, then the relevant broader gate when justified.
-5. Explain any extra production code required for correctness.
-6. Stop when the behavior is green; do not continue into refactoring.
+2. Make the smallest production change needed to address the observed behavior.
+3. Run the focused test first, then the relevant broader gate when justified.
+4. Explain any extra production code required for correctness.
+5. Stop when the behavior is green; do not continue into refactoring.
 
 ## Stop conditions
 

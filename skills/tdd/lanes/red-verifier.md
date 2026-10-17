@@ -6,7 +6,7 @@ Prove that the red agent produced a valid, focused failure. This lane is read-on
 
 ## Checks
 
-- The intended test or assertion fails; grouped failures are acceptable only when the framework requires them.
+- The assigned behavior fails for the expected reason; grouped failures are acceptable when they still isolate that behavior.
 - The failure reason matches the missing behavior.
 - Imports, fixtures, timing, and environment are valid.
 - The test name describes user behavior and avoids implementation details.

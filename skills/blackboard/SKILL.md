@@ -47,34 +47,9 @@ Read [references/board-contract.md](references/board-contract.md) before creatin
 
 ## Blackboard roster
 
-Roles are dynamic. Select them from the current board state, then reconsider the roster after every material board change. Do not treat the initial roster as the team for the whole run.
+Select specialists from current evidence and board needs; reconsider the roster after every material change. Delegate only to resolve a specific uncertainty or produce a needed artifact. Specialists propose; the controller validates and schedules but does not make decisions reserved for the user or another authority.
 
-Before each delegated wave, announce only the roles that will actually be dispatched:
-
-```text
-Blackboard roster — cycle <cycle-id>, board v<version>
-- <stable-name> — <speciality>: goal <definitive observable outcome>; triggered by <artifact IDs>; investigates <question>; returns <artifact types and evidence>.
-```
-
-Record the announcement and dispatch in `.tmp/planning/blackboard/<board-id>/dispatch.yaml`. Treat `.tmp/planning/` as the generic root for disposable planning state and verify `.tmp/` is gitignored before writing. Each dispatch includes the board version, triggering artifact IDs, bounded scope, question, authority, readable paths, prohibited mutations, handle, deadline, retry or fallback, and return contract. Use `planned` until a real handle exists and `dispatched` only afterward.
-
-A role definition includes:
-
-- one definitive goal stated as the observable outcome the role must produce within its bounded scope;
-- an observable trigger condition;
-- required inputs and evidence scope;
-- the artifact types it may propose;
-- completion and blocking conditions;
-- expected cost or deadline and a fallback;
-- `propose-only` authority unless the user explicitly grants more.
-
-A speciality describes what the role knows; its goal defines what must become true because it was activated. Do not use activity goals such as “review security” or “analyze the design.” State a testable outcome such as “identify every affected trust boundary and give each material risk an evidence-backed disposition.” A contribution cannot be `passed` unless its goal is satisfied or every unmet part is returned as `blocked` with a re-entry condition.
-
-Examples of triggers include a disputed factual claim, missing user behavior, an untested assumption, conflicting constraints, a newly discovered dependency, a changed member of a related-case family, a shared invariant, a safety boundary, or two live approaches that need comparison. These are examples, not a permanent roster.
-
-For suggested starter rosters and domain overlays, see the [examples index](examples/README.md). Delivery planning builds the validation plan and path to satisfy every ask; product strategy planning sets product and user stance, covers security domains, and frames tradeoffs. Domain overlays add specialists only when their board-observable triggers apply. Treat every example as a starting point; re-select roles from board state every cycle.
-
-For user-facing work, treat end-user advocacy as distinct from interface design. UI/UX examines interaction structure; the advocate examines accessibility, trust, agency, confusing failure states, and recovery across every affected domain.
+For persisted boards, use the role and dispatch contracts in [references/board-contract.md](references/board-contract.md). Starter rosters and domain overlays are examples, not a fixed team; select only roles whose triggers apply. For user-facing work, distinguish interface design from end-user advocacy, which covers accessibility, trust, agency, failure states, and recovery.
 
 ## Opportunistic control loop
 
@@ -106,22 +81,9 @@ Do not let an easy leaf displace a more important unresolved premise merely beca
 
 ## Implication sweeps and balanced coverage
 
-Treat a material change as a possible member of a larger case family, not as an isolated item. Run an implication sweep to discover sibling cases, shared invariants, consumers, dependents, lifecycle states, and counterexamples that are supported by the repository, domain model, accepted behavior, or user intent. Examples include other supported languages after a locale-setting change, other roles after an authorization change, or other state transitions after changing one transition. Examples guide discovery; they are not a universal checklist.
+Treat material changes as possible members of a related case family. Check for affected siblings, shared invariants, consumers, dependencies, lifecycle states, and counterexamples using evidence from the repository, accepted behavior, or user intent. Consider known family members under the same relevant dimensions, but do not expand every family into a full cross-product; use shared evidence only when the common mechanism and boundaries are demonstrated.
 
-For every discovered case, record the triggering artifact, the concrete relationship, the authoritative source that establishes the family or invariant, and one disposition: `required`, `covered`, `research`, `deferred`, `not-applicable`, or `duplicate`. Use typed relationships such as `same-family-as`, `shares-invariant-with`, `depends-on`, `can-regress`, and `counterexample-to`. A plausible relationship without sufficient evidence is `research`, not an implied fact.
-
-Balanced coverage means that every known family member is considered under the same relevant review dimensions and evidence standard. It does not mean spending equal effort on every member or expanding every family into a full cross-product. Shared evidence may cover an equivalence class when the common mechanism and boundaries are demonstrated. Sample representatives only when the sampling rule, equivalence evidence, and excluded boundary cases are recorded. Any exception between comparable members must cite evidence or an authorized product decision.
-
-Control scope explicitly:
-
-- `required` cases affect accepted outcomes, correctness, safety, authorization, compatibility, a shared invariant, or the critical verification path; they remain current and blocking until covered or removed from scope by the proper authority.
-- `covered` cases cite current behavioral, repository, test, or decision evidence.
-- `research` cases name the uncertainty, bounded investigation, owner, and answerability or exit condition.
-- `deferred` cases are useful but not required for the current outcome and carry the normal owner, authority, expiry, rationale, and re-entry data.
-- `not-applicable` cases cite why the apparently related member or review dimension does not apply.
-- `duplicate` cases point to the canonical case and inherit no stronger disposition than it has.
-
-Group duplicates and rank cases by acceptance relevance before activating work. Product-impacting scope expansion requires user authority. Do not hide required work as deferred, let a parking-lot list grow without ownership, or continue implication research after its bounded exit condition. Re-run the sweep whenever a refinement changes the family definition, shared mechanism, invariant, or affected boundaries.
+Keep required correctness, safety, authorization, compatibility, and critical-path cases blocking until covered or explicitly removed by the proper authority. Record uncertain, deferred, duplicate, or not-applicable cases with evidence and an owner or rationale appropriate to the disposition. Product-impacting scope expansion requires user authority. Re-run the sweep when the family definition, shared mechanism, invariant, or affected boundary changes. For persisted boards, use the case and disposition schema in [references/board-contract.md](references/board-contract.md).
 
 ## Back-and-forth refinement
 
@@ -171,36 +133,12 @@ Blackboard state under `.tmp/planning/` is working state, not a repository deliv
 
 ## Readiness
 
-`parent-ready` means the central outcome, non-goals, evaluation criteria, constraints, main user behaviors, live hypotheses, blocking questions, and material related-case families are explicit enough to begin downstream behavior discovery. It does not mean the idea is finished.
+`parent-ready` means the outcome, constraints, key behaviors, hypotheses, blocking questions, and related-case families are clear enough for downstream discovery; it does not mean the idea is finished. `final-ready` means the requested artifact is complete, material claims have evidence or authorized decisions, required implications are covered, and no blocking conflict or newly triggered review remains. Silence or budget exhaustion is not approval.
 
-`final-ready` means the requested artifact has been produced; all material claims trace to current evidence or authorized decisions; every material implication sweep is balanced and closed; no blocking conflict, unknown, stale island, unresolved `required` or `research` case, or newly triggered required review remains; and a completeness cycle found no material omission. Silence and budget exhaustion are not approval.
+`blocked` identifies the affected artifact or island, owner, evidence, and re-entry condition; continue independent work where safe. A deferral records its owner, authority, rationale, expiry, and re-entry condition. Required correctness, safety, or authorization work remains blocking until resolved or removed by the proper authority.
 
-`blocked` identifies the affected artifact or island, owner, evidence, and re-entry condition. Continue other useful islands unless the blocker invalidates the parent outcome or a shared invariant.
-
-A deferral names its owner, authority, affected IDs, rationale, expiry, and re-entry condition. Required correctness, safety, or authorization work cannot be hidden by deferral; it remains blocking until resolved or explicitly removed from scope by the proper authority.
-
-Before declaring readiness, ask all three:
-
-- Can any currently triggered specialist materially change the conclusion?
-- Did the latest changes create a specialist or review need that was not present in the initial roster?
-- Does any material change lack an implication sweep whose known family members and relevant dimensions are accounted for without unexplained exceptions?
-
-If any answer is yes, continue the loop.
-
-For the final completeness cycle, evaluate all current trigger rules against the full candidate artifact, not merely the last delta. Include a missing-role scan for domains exposed after the initial roster and rerun implication sweeps against the final family definitions, invariants, and affected boundaries. Silence, an empty dispatch queue, or completion by the initially selected roles does not count as a clean cycle.
+Before readiness, check the full candidate artifact for new specialist triggers, unresolved material questions, and incomplete implication sweeps—not only changes since the last cycle. For persisted boards, use the readiness checklist in [references/board-contract.md](references/board-contract.md).
 
 ## Completion output
 
-Return a concise projection of the board rather than a transcript:
-
-- refined outcome, non-goals, and evaluation criteria;
-- current model of the idea and its observable behaviors;
-- accepted, contested, rejected, and deferred hypotheses with rationale;
-- evidence, decisions, risks, dependencies, and unresolved questions;
-- material related-case families, coverage balance, and any evidence-backed exceptions;
-- important back-and-forth revisions and why the idea changed;
-- capabilities, BDD, tickets, dependency lanes, and join points only when requested;
-- control summary: cycles run, strategy shifts, blocked islands, and why processing stopped;
-- verdict: `parent-ready`, `final-ready`, or `blocked`.
-
-Do not claim that agents, commands, tests, or external research ran unless they actually did. Do not convert an unresolved material choice into a recommendation merely to make the board look complete.
+Return a concise projection, not a transcript: the requested outcome and behaviors; important hypotheses and their status; material evidence, decisions, risks, dependencies, coverage gaps, and unresolved questions; why processing stopped; and the verdict (`parent-ready`, `final-ready`, or `blocked`). Include capabilities, BDD, tickets, or dependency lanes only when requested. Do not claim work that did not run or turn an unresolved material choice into a recommendation.
