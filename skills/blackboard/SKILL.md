@@ -1,215 +1,294 @@
 ---
 name: blackboard
-description: Use when an ambiguous initiative, product idea, epic, or cross-cutting feature needs iterative refinement through multiple specialist perspectives before a stable plan can be produced.
+description: Use for any problem, topic, initiative, decision, or investigation that benefits from several specialist perspectives working over a shared board — discovery and research ("figure out why X", "explore options for Y"), decisions and tradeoffs ("should we A or B"), product or business planning, and implementation planning for features, architecture, migrations, or process changes. Produces goal-based objectives, a staffed panel of expert agents (from a standard dev/business library with BDD/Gherkin, UML, C4, ADR, and other documentation duties), recorded decisions and sidebars, and a detailed step-by-step plan for investigating or implementing. Use it whenever the user asks to plan, scope, explore, de-risk, or break down something ambiguous or cross-cutting, wants expert agents or a "blackboard" / "war room" / design-review style session, or wants a plan backed by documentation, even if they never say "blackboard".
 ---
 
 # Blackboard
 
-Refine an idea through an opportunistic blackboard process. Treat planning as an evolving conversation among specialists, not a fixed sequence of reviews. A contribution can expose a new opportunity, move attention to another level, revive an earlier question, or change which specialist should act next.
+Work a problem through an opportunistic blackboard: a small rotating panel of specialist agents contributes typed, attributed entries to a shared board, a controller decides who acts next, and the board itself becomes the record. The output is a goal-based plan — step by step — for investigating, deciding, or implementing, plus the documentation each step needs.
 
-The goal is the smallest coherent, evidence-backed model of the idea that satisfies the agreed evaluation criteria. Consensus, activity, and ticket volume are not completion signals.
+The goal is the smallest coherent, evidence-backed model of the problem that satisfies agreed objectives. Consensus, activity, agent count, and ticket volume are not completion signals.
 
-## Boundaries
+The design draws on 1970s blackboard systems (Hearsay-II, BB1, GBB), 2025 LLM blackboard research (LbMAS, volunteer-based blackboards, Terrarium), human design-review practice (ATAM, Fagan, NASA/Apollo boards, DACI/RAPID), and design-rationale methods (IBIS/QOC, ADR/MADR). Read [references/research-basis.md](references/research-basis.md) when you need the reasoning or sources behind a rule, or when the user asks why the skill works this way.
 
-Use this skill for work above a well-specified implementation ticket, especially when the problem is incomplete, disputed, cross-domain, or likely to improve through back-and-forth refinement.
+## When to use
 
-Do not use it for ordinary implementation, a bounded code review, or a request whose behavior and approach are already settled. By default, refine the idea first. Produce capability drafts, BDD, or tickets only when the user requests them or the board is ready for that downstream artifact.
+Use it for anything above a well-specified task: incomplete, disputed, cross-domain, or likely to improve through back-and-forth. It works for software and non-software topics alike — a feature, an outage investigation, a pricing change, a vendor choice, a research question, a migration, a hiring process, a game mechanic.
+
+Skip it for an ordinary implementation ticket, a bounded code review, or a question with one obvious answer.
+
+### Scale the ceremony to the stakes
+
+The board's logic (objectives, staffed panel, typed entries, decision records, harvested sidebars, step plan) always applies. Its **storage** does not have to. Pick a weight at the start and record it:
+
+- **Light** — one person deciding, a conversational topic, no repository, or a single session. Keep the board as sections of one working markdown file (or just in context). No YAML contract files, no per-event files. Spend the effort on the deliverables the user will read.
+- **Full** — real subagents are dispatched, work spans sessions or people, the board must survive handoff, or the user asks for it. Use the file layout in the board contract.
+
+Light is the default unless a full-weight condition holds. In tests, a full YAML board on a solo business decision roughly doubled cost without improving the answer.
+
+## Modes
+
+Choose a mode at the start and record it on the control board. Modes chain: investigation often feeds a decision, and a decision feeds implementation. Switch mode when the board shows the current one is finished or wrong, and record why.
+
+| Mode | Use when | Central question | Primary output |
+| --- | --- | --- | --- |
+| `investigate` | The problem, cause, landscape, or facts are unknown. | What is true, and what don't we know yet? | Findings with evidence, answered and open questions, investigation plan. |
+| `decide` | Options exist (or can be generated) and must be weighed. | Which option best meets the objectives, and what are we giving up? | Option analysis, decision records, dissent, follow-on plan. |
+| `implement` | The outcome is roughly agreed; the path is not. | How do we deliver and prove each objective is met? | Validation plan, sequenced step-by-step implementation plan, specs. |
 
 ## Architecture
 
 Maintain two linked boards:
 
-- **Domain board** — the problem and emerging solution: goals, non-goals, observations, evidence, constraints, behaviors, hypotheses, alternatives, risks, dependencies, and partial plans.
-- **Control board** — the reasoning process: current focus, triggered specialist opportunities, agenda, active investigations, resource bounds, strategy, stalls, and reasons for selecting the next action.
+- **Domain board** — the problem and emerging solution: objectives, non-goals, observations, evidence, constraints, behaviors, hypotheses, options, risks, dependencies, decisions, documentation artifacts, and partial plans.
+- **Control board** — the reasoning process: mode, current focus, roster, agenda of triggered activations, sidebars, parking lot, resource bounds, strategy, stalls, and why each next action was chosen.
 
 Preserve five functional planes across those boards:
 
-- **knowledge** — observations, evidence, and computations relevant to the idea;
-- **plan abstractions** — candidate patterns, strategies, and desirable properties that could shape a solution;
-- **emerging plan** — the partial solution decisions currently being developed;
-- **executive** — priorities, focus, eligible specialist activations, and scheduling decisions;
-- **meta-plan** — problem framing, reasoning method, policies, and evaluation criteria.
+- **knowledge** — observations, evidence, and computations;
+- **plan abstractions** — candidate patterns, strategies, options, and desirable properties;
+- **emerging plan** — the partial solution and plan currently being developed;
+- **executive** — priorities, focus, eligible activations, and scheduling;
+- **meta-plan** — framing, mode, reasoning method, policies, and evaluation criteria.
 
-The first three belong to the domain board; the last two belong to the control board. Organize domain artifacts across useful levels of abstraction rather than forcing a top-down hierarchy. At minimum distinguish:
+The first three belong to the domain board, the last two to the control board. Organize domain artifacts across levels of abstraction. Generic levels that fit most topics:
 
 - **outcomes** — what must become true and for whom;
-- **designs** — candidate ways to understand or structure the idea;
-- **behaviors** — observable flows, boundaries, failures, and recovery;
-- **delivery** — capabilities, slices, dependencies, and validation.
+- **options** — candidate ways to understand, structure, or solve the problem;
+- **behaviors** — observable flows, mechanisms, boundaries, failures, and recovery;
+- **delivery** — steps, slices, dependencies, owners, and validation.
 
-Work may move in either direction. A delivery constraint can invalidate a model; a behavior can expose a missing outcome; evidence can revive a rejected alternative. Record these moves instead of smoothing them into a linear story.
+Work moves in both directions. A delivery constraint can invalidate an option; a behavior can expose a missing outcome; evidence can revive a rejected alternative. Record these moves instead of smoothing them into a linear story. While requirements are vague, work level by level; once facts settle, let attention jump to the most promising island. (Hearsay-II found opportunistic jumping halved work at well-defined levels but was harmful at noisy ones.)
 
-Opportunistic does not mean random or hostile to structure. A top-down refinement pass is valid when the meta-plan selects it and it continues to produce useful deltas; it is one available strategy rather than the hard-coded workflow.
+Specialists are knowledge sources with **propose-only** authority. They never call each other; they communicate through the board. The controller schedules work, validates contributions, and maintains derived state. It may not settle material product, scope, architecture, financial, or operational decisions that belong to the user or another named authority.
 
-Specialists are knowledge sources. They have propose-only authority and communicate material claims through the board. The controller may schedule work, validate contributions, and maintain derived state; it may not settle material product, scope, compatibility, architecture, migration, or operational decisions that belong to the user or another named authority.
+Read [references/board-contract.md](references/board-contract.md) before creating or resuming a persisted board. It defines artifact types, the objective tree, the contribution schema, agenda records, sidebars, decision records, the parking lot, and readiness checks.
 
-Read [references/board-contract.md](references/board-contract.md) before creating or resuming a persisted board. It defines the artifact types, contribution schema, agenda records, version handling, and readiness checks.
+## Step 1 — Frame goal-based objectives
 
-## Blackboard roster
+Before staffing anything, turn the request into an **objective tree**. Experts are chosen to serve objectives, so a vague objective produces a vague roster.
 
-Roles are dynamic. Select them from the current board state, then reconsider the roster after every material board change. Do not treat the initial roster as the team for the whole run.
+1. **Mission** — one sentence: what must be true when this work is done, and for whom.
+2. **Objectives** — 2–6 outcome statements, each with an observable success measure, the evidence that would prove it, a priority, and the authority who accepts it. Write outcomes ("on-call can identify the failing region within 5 minutes"), not activities ("look at monitoring").
+3. **Key questions or asks** under each objective — the specific unknowns (`investigate`), choices (`decide`), or deliverables (`implement`) that must be resolved to meet it.
+4. **Non-goals and constraints** — what is explicitly out, plus budget, deadline, policy, and technical limits.
+5. **Evaluation criteria** — how options or plans will be compared (cost, risk, time, reversibility, user impact, …). These become the tradeoff axes that drive staffing.
 
-Before each delegated wave, announce only the roles that will actually be dispatched:
+If the request is too thin to write measurable objectives, search available evidence first (code, docs, prior decisions, the existing board). Ask the user only for what evidence cannot supply, and propose draft objectives for them to correct rather than asking open-ended questions. Classify each decision the work will produce as **one-way door** (costly to reverse — more experts, a contra-memo step, explicit user sign-off) or **two-way door** (cheap to reverse — move fast, fewer experts).
+
+## Step 2 — Staff the board
+
+### Process roles are not experts
+
+Keep process roles separate from domain experts and outside the expert count. In the LbMAS ablation, removing the controller nearly quadrupled token use with no accuracy gain; MAST found weak verification and missed completion among the top multi-agent failure causes.
+
+| Process role | Responsibility | Usually played by |
+| --- | --- | --- |
+| `facilitator` | Runs the control loop: selects who acts, enforces turn equality, prevents runaway debate. | The controller (you). |
+| `curator` | Keeps the board clean: dedupes, summarizes, prunes what agents *see* (never what is *stored*), writes cycle notes. | The controller, or a cheap subagent on large boards. |
+| `verifier` | Checks evidence, traceability, and whether contributions actually met their goals. | A subagent that did not write the work under review. |
+| `decider` | Holds decision rights for material choices. Exactly one per decision. | The user, unless they delegate a class of decisions. |
+| `stopper` | Applies readiness, budget, stall, and round-cap rules; decides when the board is done. | The controller. |
+
+Definitions are in [references/agents/process-roles.md](references/agents/process-roles.md).
+
+### How many experts
+
+- **Active panel: 3–5 experts per wave, default 4.** Use 1 for a trivial question, 2–4 for an A-vs-B tradeoff. Group-size evidence (about 4 voices per conversation, satisfaction peaking at 4–5, costs rising faster than people expect), review practice (ATAM 3–5 evaluators, Fagan 3–7, Apollo's 5-member board), and multi-agent results (Anthropic's 3–5 parallel subagents; AgentVerse getting *worse* on math with more reviewers) all land in this band.
+- **Standing roster: any size.** Keep the wider roster on the control board and rotate members in by topic, level, island, or canvas tab. Scale by adding islands (parallel rooms with their own small panel), not by enlarging one room. Apollo ran subsystem reviews first, then an integrated review, then a five-member change board.
+- **Widen only when it pays.** Add experts when the top options are rated about equally (the Hearsay-II rule), when an objective or tradeoff axis has no owner, or when a one-way-door decision is pending. More voting samples help on answer-checking tasks; more *distinct experts* do not automatically help deliberation.
+- **Every extra expert costs integration.** n experts produce n(n−1)/2 critique pairs (5 → 10, 7 → 21). Multi-agent runs cost roughly 15× the tokens of chat.
+
+### Which experts
+
+Pick experts by the **structure of the problem**, not by job titles:
+
+1. **Coverage matrix.** Rows are board levels and level transitions (outcomes → options → behaviors → delivery). Columns are objectives and evaluation criteria (tradeoff axes). Each transition needs at least one generator and one verifier; each tradeoff axis needs one owner. An empty cell is a silent failure — a missing expert never announces itself — so an empty cell triggers recruitment.
+2. **Documentation duties.** Each output document (Gherkin features, C4 diagrams, ADRs, a risk register, …) needs a responsible expert. The library lists which agent owns which artifact.
+3. **Unique knowledge.** Prefer the expert who knows something no one else on the panel knows. Groups tend to discuss shared information and miss unique facts, so ask each expert for what only its perspective reveals before convergence.
+4. **Authentic dissent.** Seat at least one expert whose objective *genuinely conflicts* with the emerging consensus (the cost owner against the reliability owner, the operator against the builder). An assigned devil's advocate is far weaker than a real conflicting goal. Before a one-way-door decision, run a contra-memo: the dissenting expert writes the full case for the leading alternative.
+5. **Downstream verifier.** Always include someone who must live with or check the result (tester, operator, support, finance, end user) — the Fagan "tester seat".
+
+Write each expert as a **goal contract**, not a persona: one definitive observable goal, trigger, inputs, owned tradeoff axis, artifact types and documents it produces, completion and blocking conditions, bound, and fallback. Persona titles barely move accuracy; specific objectives, output formats, and boundaries do. "Identify every affected trust boundary and give each material risk an evidence-backed disposition" is a goal; "review security" is not.
+
+### Start from the standard library
+
+[references/agents/README.md](references/agents/README.md) catalogs ready-made experts for software development (requirements/BDD, domain modeling/UML, architecture/C4+ADR, API contracts, data, security, testing, reliability, UX, delivery) and business work (business analysis, process, finance, market and customer research, risk and compliance, stakeholders and change, strategy), plus investigation roles (evidence researcher, root-cause analyst, skeptic). Each definition names its documentation duties and standards. Load only the definitions you will dispatch. Adapt or create roles freely — record `specializes: <library-id>` when you narrow one, and register new roles with the event that justified them.
+
+When the bundled Claude Code subagent files are installed (see `subagents/` and `scripts/build_subagents.py`), dispatch the matching subagent type; otherwise dispatch a general-purpose agent with the library definition pasted into its brief. If no subagent tool exists, play the roles sequentially yourself and label the output honestly as single-agent role play.
+
+### Announce the wave
+
+Before each delegated wave, announce only the experts actually being dispatched:
 
 ```text
-Blackboard roster — cycle <cycle-id>, board v<version>
-- <stable-name> — <speciality>: goal <definitive observable outcome>; triggered by <artifact IDs>; investigates <question>; returns <artifact types and evidence>.
+Blackboard roster — cycle <cycle-id>, board v<version>, mode <mode>
+- <stable-name> — <speciality>: goal <observable outcome>; owns <axis/doc>; triggered by <artifact IDs>; investigates <question>; returns <artifact types and documents>.
+Bench: <roster members not dispatched this wave and why>
 ```
 
-Record the announcement and dispatch in `.tmp/planning/blackboard/<board-id>/dispatch.yaml`. Treat `.tmp/planning/` as the generic root for disposable planning state and verify `.tmp/` is gitignored before writing. Each dispatch includes the board version, triggering artifact IDs, bounded scope, question, authority, readable paths, prohibited mutations, handle, deadline, retry or fallback, and return contract. Use `planned` until a real handle exists and `dispatched` only afterward.
+Record the announcement and dispatch in `.tmp/planning/blackboard/<board-id>/dispatch.yaml` (verify `.tmp/` is gitignored first). Each dispatch includes the board version, triggering artifact IDs, bounded scope, question, authority, readable paths, prohibited mutations, deadline, fallback, and return contract. Use `planned` until a real handle exists and `dispatched` afterward.
 
-A role definition includes:
+## Step 3 — Run the opportunistic control loop
 
-- one definitive goal stated as the observable outcome the role must produce within its bounded scope;
-- an observable trigger condition;
-- required inputs and evidence scope;
-- the artifact types it may propose;
-- completion and blocking conditions;
-- expected cost or deadline and a fallback;
-- `propose-only` authority unless the user explicitly grants more.
+Run cycles until a stop condition is met. Do not pre-commit to a phase pipeline or a fixed roster.
 
-A speciality describes what the role knows; its goal defines what must become true because it was activated. Do not use activity goals such as “review security” or “analyze the design.” State a testable outcome such as “identify every affected trust boundary and give each material risk an evidence-backed disposition.” A contribution cannot be `passed` unless its goal is satisfied or every unmet part is returned as `blocked` with a re-entry condition.
-
-Examples of triggers include a disputed factual claim, missing user behavior, an untested assumption, conflicting constraints, a newly discovered dependency, a changed member of a related-case family, a shared invariant, a safety boundary, or two live approaches that need comparison. These are examples, not a permanent roster.
-
-For suggested starter rosters and domain overlays, see the [examples index](examples/README.md). Delivery planning builds the validation plan and path to satisfy every ask; product strategy planning sets product and user stance, covers security domains, and frames tradeoffs. Domain overlays add specialists only when their board-observable triggers apply. Treat every example as a starting point; re-select roles from board state every cycle.
-
-For user-facing work, treat end-user advocacy as distinct from interface design. UI/UX examines interaction structure; the advocate examines accessibility, trust, agency, confusing failure states, and recovery across every affected domain.
-
-### Pi subagent profiles
-
-When using Pi with `pi-subagents`, treat discovered `blackboard-*` agents as execution profiles for matching role definitions, not as the board's role registry. First derive the active role and its trigger from the current board; then dispatch only the discovered profile that fits that activation. The profile name does not replace the stable `role_id`, goal, trigger, authority, or return contract in `roles.yaml` and `control.yaml`.
-
-Map activations by expertise: repository or source investigation to `blackboard-researcher`; interaction and visual choices to `blackboard-designer`; user accessibility, clarity, trust, and recovery to `blackboard-qa`; implementation correctness, reliability, and maintenance to `blackboard-engineer`; API, contract, dependency, or system-boundary questions to `blackboard-architect`; synthesis of validated contributions to `blackboard-synthesizer`. A user-facing design need constrained by an API contract may trigger `blackboard-architect`, not an invented generic role or an automatic designer-engineer pairing. These profiles form a capability pool, not a required team.
-
-`blackboard-controller` is an orchestration profile, not a specialist; use it only when delegating control of the blackboard itself. Before relying on any profile, confirm it is available in runtime discovery. If absent, do not claim it ran or emulate its execution; use an authorized local alternative or record the activation as blocked with its re-entry condition. Persisted-board roles remain registered in `roles.yaml`, with eligible activations and selection decisions in `control.yaml`; do not invent board frontmatter metadata for profiles or active roles.
-
-
-## Opportunistic control loop
-
-Run cycles until a stop condition is met. Do not pre-commit to a phase pipeline or a fixed number of roles.
-
-1. **Observe the delta.** Compare the current board with the prior version. Identify additions, revisions, contradictions, newly answerable questions, reopened items, and stale evidence.
-2. **Generate opportunities.** Evaluate every registered or newly useful specialist trigger against that delta. When the delta changes a behavior, rule, setting, variant, boundary, or shared mechanism, trigger an implication sweep unless current evidence proves that no related case exists. Create a knowledge-source activation record for each plausible next contribution; do not dispatch it yet.
-3. **Choose focus.** Select the activation most likely to reduce a material uncertainty, resolve a critical conflict, test a central hypothesis, or unblock downstream work. A small set may run in parallel only when scopes do not overlap or share an unresolved decision.
-4. **Record control.** Write the selected focus, alternatives considered, evidence-backed priority signals, resource bound, and expected board change to the control board. Scores are signals, never decision authority or truth.
-5. **Dispatch.** Announce the wave, then give each role the same current board version plus its trigger IDs, bounded question, evidence requirements, and contribution schema.
-6. **Validate.** Reject or retry malformed contributions without filling gaps by inference. Check evidence, scope, authority, changed paths, and base version before merging.
-7. **Apply as events.** Append valid contributions, preserve provenance and competing hypotheses, derive a new snapshot, and increment the board version. Never use last-writer-wins.
-8. **React.** Let the new artifacts trigger the next cycle. A challenge should normally return to the original proposal for a response; that response may refine, split, defend, or retract it. Material disagreement opens a disagreement room rather than being averaged away.
-9. **Reassess strategy.** If progress stalls, change the control approach: move up or down an abstraction level, switch between evidence-first and hypothesis-first work, invoke an adversarial role, split an island, or ask the user for the missing authority. Record why the strategy changed and whether it helped.
-10. **Check stopping conditions.** Continue while a useful, authorized activation can materially improve the board. Stop only under the readiness, blocked, budget, or exhaustion rules below.
+1. **Observe the delta.** Compare the board with the prior version: additions, revisions, contradictions, newly answerable questions, reopened items, stale evidence, empty coverage cells.
+2. **Generate opportunities.** Evaluate every roster trigger against the delta. When the delta changes a behavior, rule, setting, variant, boundary, or shared mechanism, trigger an implication sweep. Create an activation record for each plausible contribution; do not dispatch yet.
+3. **Select, don't round-robin.** Ask candidates for a cheap **response frame** — one line on what they would add and which artifacts it would change — or post an unaddressed request and let relevant experts volunteer. Select the activations most likely to reduce a material uncertainty, resolve a critical conflict, test a central hypothesis, or unblock downstream work. Keep the wave at 3–5 experts. (Selector-driven boards cut tokens about 3.7× at similar accuracy; volunteer boards beat assigned sub-agents by 14–57%.)
+4. **Record control.** Write the focus, alternatives considered, priority signals, bound, and expected delta to the control board.
+5. **Fan out independently.** Dispatch with the same board version, trigger IDs, bounded question, evidence requirements, and contribution schema. On a fresh question, experts assess *without seeing each other's drafts* first — like Amazon's silent memo reading or 1-2-4-All — to avoid anchoring.
+6. **Validate.** Reject or retry malformed contributions without filling gaps by inference. Check evidence, scope, authority, changed paths, documentation standards, and base version.
+7. **Apply as events.** Append valid contributions, preserve provenance and competing hypotheses, derive a new snapshot, increment the version. Never last-writer-wins.
+8. **Converge centrally.** Synthesis happens in one place with full context (the facilitator, then the decider), not in open-ended agent debate. Debate adds little beyond independent assessment plus aggregation, and uncoordinated agents amplify each other's errors. Target critique at specific disagreements; open a sidebar when it needs more than one exchange.
+9. **React and re-staff.** Let new artifacts trigger the next cycle. Update the contribution ledger (which experts' entries survived, changed the board, or were noise), recruit for empty coverage cells and unanswered questions, and merge or bench experts whose contributions duplicate others or never change the board.
+10. **Reassess strategy.** If progress stalls, change approach: move up or down a level, switch evidence-first and hypothesis-first, bring in the dissenter, split an island, or ask the user for missing authority. Record why.
+11. **Check stopping conditions** (readiness, blocked, budget, round cap, exhaustion below).
 
 ### Priority order
 
-Prefer the next activation using this order, adjusted by current evidence:
-
-1. correctness, safety, authorization, or irreversible-risk blocker;
-2. contradiction affecting the central outcome or critical path;
+1. correctness, safety, authorization, legal, or irreversible-risk blocker;
+2. contradiction affecting the central objective or critical path;
 3. question with high expected information gain;
 4. work that unblocks several other artifacts;
 5. cheap, reversible exploration that discriminates between live hypotheses;
-6. completeness or polish.
+6. completeness, documentation polish.
 
-Do not let an easy leaf displace a more important unresolved premise merely because it is easier to finish.
+Do not let an easy leaf displace an unresolved premise because it is easier to finish.
 
 ## Implication sweeps and balanced coverage
 
-Treat a material change as a possible member of a larger case family, not as an isolated item. Run an implication sweep to discover sibling cases, shared invariants, consumers, dependents, lifecycle states, and counterexamples that are supported by the repository, domain model, accepted behavior, or user intent. Examples include other supported languages after a locale-setting change, other roles after an authorization change, or other state transitions after changing one transition. Examples guide discovery; they are not a universal checklist.
+Treat a material change as a possible member of a larger case family: sibling cases, shared invariants, consumers, dependents, lifecycle states, and counterexamples supported by evidence. Examples: other supported languages after a locale change, other roles after a permission change, other regions after a pricing change, other states after a transition change.
 
-For every discovered case, record the triggering artifact, the concrete relationship, the authoritative source that establishes the family or invariant, and one disposition: `required`, `covered`, `research`, `deferred`, `not-applicable`, or `duplicate`. Use typed relationships such as `same-family-as`, `shares-invariant-with`, `depends-on`, `can-regress`, and `counterexample-to`. A plausible relationship without sufficient evidence is `research`, not an implied fact.
-
-Balanced coverage means that every known family member is considered under the same relevant review dimensions and evidence standard. It does not mean spending equal effort on every member or expanding every family into a full cross-product. Shared evidence may cover an equivalence class when the common mechanism and boundaries are demonstrated. Sample representatives only when the sampling rule, equivalence evidence, and excluded boundary cases are recorded. Any exception between comparable members must cite evidence or an authorized product decision.
-
-Control scope explicitly:
-
-- `required` cases affect accepted outcomes, correctness, safety, authorization, compatibility, a shared invariant, or the critical verification path; they remain current and blocking until covered or removed from scope by the proper authority.
-- `covered` cases cite current behavioral, repository, test, or decision evidence.
-- `research` cases name the uncertainty, bounded investigation, owner, and answerability or exit condition.
-- `deferred` cases are useful but not required for the current outcome and carry the normal owner, authority, expiry, rationale, and re-entry data.
-- `not-applicable` cases cite why the apparently related member or review dimension does not apply.
-- `duplicate` cases point to the canonical case and inherit no stronger disposition than it has.
-
-Group duplicates and rank cases by acceptance relevance before activating work. Product-impacting scope expansion requires user authority. Do not hide required work as deferred, let a parking-lot list grow without ownership, or continue implication research after its bounded exit condition. Re-run the sweep whenever a refinement changes the family definition, shared mechanism, invariant, or affected boundaries.
+For each discovered case, record the trigger, relationship, authoritative source, and one disposition: `required`, `covered`, `research`, `deferred`, `not-applicable`, or `duplicate`. A plausible relationship without evidence is `research`, not a fact. Balanced coverage means every known member is considered under the same relevant dimensions and evidence standard. It does not mean equal effort or a blind cross-product. Shared evidence may cover an equivalence class when the common mechanism is demonstrated. Product-impacting scope expansion requires user authority. Full rules are in the board contract.
 
 ## Back-and-forth refinement
 
-Contributions use explicit operations: `propose`, `support`, `challenge`, `refine`, `split`, `connect`, `answer`, or `retract`. Every operation targets stable artifact IDs and creates a new event. Revision preserves the earlier version and uses typed relationships such as `supports`, `challenges`, `responds-to`, `refines`, `depends-on`, `blocks`, `answers`, `derived-from`, `supersedes`, `duplicates`, `same-family-as`, `shares-invariant-with`, `can-regress`, or `counterexample-to`.
+Contributions use explicit operations: `propose`, `support`, `challenge`, `refine`, `split`, `connect`, `answer`, or `retract`, each targeting stable artifact IDs and creating a new event. Revisions preserve earlier versions through typed relations (`supports`, `challenges`, `responds-to`, `refines`, `depends-on`, `blocks`, `answers`, `derived-from`, `supersedes`, `duplicates`, `same-family-as`, `shares-invariant-with`, `can-regress`, `counterexample-to`).
 
-For a material challenge:
+For a material challenge: preserve proposal and challenge as distinct artifacts; ask whether evidence can decide it; give the proposer a chance to respond to the strongest form of the challenge; synthesize only if the synthesis preserves the real tradeoff; escalate value judgments to the decider once evidence questions are exhausted. Rejection is memory, not deletion: keep the rejected option, rationale, authority, and reopening conditions.
 
-1. preserve the proposal and challenge as distinct artifacts;
-2. ask whether new evidence can decide the issue;
-3. give the proposer or an equivalent role a chance to respond to the strongest version of the challenge;
-4. use a synthesis role only when it can preserve the actual tradeoff and provenance;
-5. escalate value judgments or authority decisions to the user after answerable evidence questions are exhausted.
+## Sidebars and the parking lot
 
-Rejection is memory, not deletion. Retain the rejected option, evidence, rationale, authority, and conditions that would justify reopening it.
+Side conversations are where useful divergence happens and where decisions get lost. Every mature practice (Open Space harvests, 1-2-4-All, Rust's "summarize offline discussion back onto the RFC") converges on one rule: **a sidebar is fine; an unharvested sidebar is a failure.**
+
+Open a **sidebar** on the control board when:
+
+- two supported artifacts conflict on facts, required behavior, authorization, or safety (a **disagreement room**);
+- a narrow question needs a few experts and several exchanges (a **working sidebar**);
+- an expert needs verification of its own claim (a **verification sidebar**).
+
+Each sidebar records a parent anchor (artifact, decision, step, or canvas node), a purpose question, participants (usually 2–3), the base board version, a bound, and status `open`, `converged`, `parked`, or `abandoned`. It **cannot close without a harvest** posted to the main board: summary, decision candidates, new issues, action items, and preserved dissent, linked to the full transcript. Close disagreements by evidence or by the named authority — never by majority vote, confidence averaging, or last-writer-wins. Sidebars scope context; they are not a privacy boundary, so never brief an expert with secrets on the assumption a sidebar contains them.
+
+Keep a **parking lot** for out-of-scope or premature items: origin artifact, raiser, why parked, and at review time one disposition — `delete`, `defer` (owner, expiry, re-entry condition), or `delegate` (owner). Review it before every readiness check; an ownerless parking lot is hidden scope.
+
+## Documentation
+
+Let the board be the minutes. Agents remove the capture cost that killed earlier design-rationale tools, so every entry is typed, attributed, timestamped, and linked as it is written. The remaining cost is human reading time, so curate summaries on top.
+
+- **Live deliberation** uses IBIS/QOC structure: questions, options, criteria, arguments, assessments.
+- **Decisions** become decision records: MADR fields plus a one-sentence **Y-statement** ("In the context of …, facing …, we decided for … and neglected …, to achieve …, accepting that …"), a one-way/two-way door flag, each participating expert's stance (`agree`, `disagree-and-commit`, `block` with reason), a confirmation check, and a pinned board version. Records are numbered, never deleted, and reversed only by a superseding record. Software architecture decisions also become ADRs.
+- **Domain documents** are produced by the expert who owns them, to the standard in [references/documentation/](references/documentation/README.md): Gherkin/BDD features, UML (class, sequence, state, activity, use-case), C4 (context, container, component, deployment), ADRs, ERDs, OpenAPI/AsyncAPI contracts, threat models, BPMN process maps, risk registers, business cases, and others. Prefer Mermaid for diagrams unless the user's repo uses another notation. Every document traces to the objectives and decisions it serves.
+- **Traceability** is bidirectional: objective ↔ question/ask ↔ decision ↔ document ↔ plan step ↔ validation check ↔ origin sidebar ↔ superseded record.
+
+Write documents only when they serve an objective, a decision, or a plan step. A board that produces six diagrams nobody needs is noise.
 
 ## User participation
 
-Treat a user correction, new constraint, answer, or reframing as an authoritative board event for their intent and decisions within scope, not as a reason to discard the earlier board. Mark affected artifacts contested, superseded, stale, or reopened; preserve the cause; then regenerate the agenda. A user decision does not rewrite contrary observed evidence; it records the chosen tradeoff with that evidence still visible.
+Treat a user correction, constraint, answer, or reframing as an authoritative board event, not a reason to discard the board. Mark affected artifacts contested, superseded, stale, or reopened; preserve the cause; regenerate the agenda. A user decision does not rewrite contrary evidence; it records the chosen tradeoff with that evidence visible.
 
-Ask the user only after available evidence and specialist work cannot resolve a material issue. Show the live alternatives, strongest supported tradeoff, affected artifact IDs, and why the choice requires their authority. After the answer, update only the affected artifacts and resume the opportunistic loop. Do not restart the entire plan or treat an earlier readiness verdict as permanent.
+Ask the user only after evidence and specialist work cannot resolve a material issue. Show the live alternatives, strongest supported tradeoff, affected IDs, and why it needs their authority. After the answer, update only the affected artifacts and resume. Generated experts are contributors with a voice and no vote; the user is the decider unless they delegate.
 
 ## Parallel islands
 
-Partition independent questions into bounded islands with their own scope, local focus, version base, and exit condition. Record shared invariants and explicit join points. An island-level blocker blocks only that island unless evidence shows it invalidates a shared invariant or the parent outcome.
-
-Before merging an island, check its base version and shared invariants. Rebase or re-review stale work; do not silently apply it to a changed parent board. Run an integration review at each join point.
+Partition independent questions into islands with their own scope, small panel, version base, and exit condition. Record shared invariants and join points. An island blocker blocks only that island unless it invalidates a shared invariant or the parent objective. Before merging, check the base version and shared invariants, rebase or re-review stale work, and run an integration review at each join.
 
 ## Evidence and uncertainty
 
-Separate observations, interpretations, and recommendations. Every material claim cites an evidence artifact or is marked `unverified`. External evidence records source, retrieval time, relevant version, and local verification status. Repository evidence uses stable paths plus symbols, lines, tests, commands, or commit identifiers as available.
+Separate observations, interpretations, and recommendations. Every material claim cites evidence or is marked `unverified`. External evidence records source, retrieval time, version, and local verification status. Repository evidence uses stable paths plus symbols, lines, tests, commands, or commits.
 
-Confidence and difficulty are diagnostic signals only. A material change to either must cite the board events that caused it. Increasing difficulty or falling confidence usually means new discovery and re-planning, not failure or automatic rollback.
+Confidence ratings are signals, not truth. Single-expert confidence is unreliable (Hearsay-II's ratings put the correct word only around 4.5th of 20), so prefer corroboration from independent experts or evidence. Treat accepted decision records as constraints until superseded; drafts are hypotheses; rejected and superseded records remain evidence.
 
-Before asking the user, search current code, tests, schemas, feature files, decisions, research, and existing board artifacts. Bound the search. When no available source can answer safely, create a `human-required` question with an owner, affected IDs, why evidence is insufficient, and the exact re-entry condition.
-
-Treat accepted decision records as constraints unless a newer authorized decision supersedes them. Draft decisions are hypotheses to challenge; rejected and superseded decisions remain historical evidence. If a decision conflicts with current code, tests, or a newer authority, preserve the precedence conflict and trigger investigation rather than choosing whichever source is most convenient.
+Before asking the user, search code, tests, schemas, feature files, decisions, research, and the board. Bound the search. When nothing can answer safely, create a `human-required` question with owner, affected IDs, why evidence is insufficient, and the re-entry condition.
 
 ## Stall, budget, and recovery
 
-Treat repeated activations with no meaningful board delta, duplicate findings, circular challenges, or unchanged confidence as a stall. Record the stall and try one materially different control strategy. Do not spend the remaining budget paraphrasing the same position.
+Repeated activations with no meaningful delta, duplicate findings, circular challenges, or unchanged confidence are a stall. Record it and try one materially different strategy; don't spend budget paraphrasing.
 
-Every run has a bounded cycle, time, or cost budget. Reaching the bound never implies readiness. Persist the current snapshot, active agenda, blocked islands, and a precise resume trigger. Late contributions remain events but cannot replace current state without freshness validation.
+Every run has a bounded cycle, time, or cost budget. Default round cap: 4 waves on a single question before the stopper forces a strategy change or a user question. Reaching a bound never implies readiness: persist the snapshot, agenda, open sidebars, parked items, blocked islands, and a precise resume trigger.
 
-On resume, verify authoritative sources, board version, open disagreements, decisions, and shared invariants before dispatching new work.
-
-Blackboard state under `.tmp/planning/` is working state, not a repository deliverable. Never commit it. If the user requests a durable plan, project only the finalized, approved result into a user-approved repository location and record that promotion in the temporary board. If the temporary board has been cleaned, reconstruct it from authoritative inputs and report the lost continuity rather than pretending the prior state still exists.
+Blackboard state under `.tmp/planning/` is working state, never committed. Promote only finalized, approved projections (plans, specs, decision records, diagrams) to a user-approved location and record the promotion. On resume, verify sources, board version, open sidebars, decisions, and shared invariants before dispatching.
 
 ## Readiness
 
-`parent-ready` means the central outcome, non-goals, evaluation criteria, constraints, main user behaviors, live hypotheses, blocking questions, and material related-case families are explicit enough to begin downstream behavior discovery. It does not mean the idea is finished.
+`parent-ready`: mission, objectives with success measures, non-goals, evaluation criteria, constraints, main behaviors or findings, live hypotheses, blocking questions, and material case families are explicit enough to begin the next mode or downstream work.
 
-`final-ready` means the requested artifact has been produced; all material claims trace to current evidence or authorized decisions; every material implication sweep is balanced and closed; no blocking conflict, unknown, stale island, unresolved `required` or `research` case, or newly triggered required review remains; and a completeness cycle found no material omission. Silence and budget exhaustion are not approval.
+`final-ready`: the requested plan and documents exist; all material claims trace to evidence or authorized decisions; every objective has a met success measure or a planned validation; material implication sweeps are balanced and closed; no blocking conflict, open disagreement sidebar, ownerless parking-lot item, stale island, or unresolved `required`/`research` case remains; and a completeness cycle found no material omission. Silence and budget exhaustion are not approval.
 
-`blocked` identifies the affected artifact or island, owner, evidence, and re-entry condition. Continue other useful islands unless the blocker invalidates the parent outcome or a shared invariant.
+`blocked`: names the affected artifact or island, owner, evidence, and re-entry condition. Continue other islands unless the blocker invalidates the parent.
 
-A deferral names its owner, authority, affected IDs, rationale, expiry, and re-entry condition. Required correctness, safety, or authorization work cannot be hidden by deferral; it remains blocking until resolved or explicitly removed from scope by the proper authority.
+Before declaring readiness, ask:
 
-Before declaring readiness, ask all three:
+- Can any triggered expert, or any empty cell in the coverage matrix, materially change the conclusion?
+- Did recent changes create an expert need that the initial roster lacked?
+- Does any material change lack a balanced implication sweep?
+- Is any sidebar unharvested, or any parked item without a disposition?
 
-- Can any currently triggered specialist materially change the conclusion?
-- Did the latest changes create a specialist or review need that was not present in the initial roster?
-- Does any material change lack an implication sweep whose known family members and relevant dimensions are accounted for without unexplained exceptions?
+If any answer is yes, continue. The final completeness cycle evaluates all triggers and the coverage matrix against the full candidate output, not just the last delta.
 
-If any answer is yes, continue the loop.
+## Step 4 — Produce the step-by-step plan
 
-For the final completeness cycle, evaluate all current trigger rules against the full candidate artifact, not merely the last delta. Include a missing-role scan for domains exposed after the initial roster and rerun implication sweeps against the final family definitions, invariants, and affected boundaries. Silence, an empty dispatch queue, or completion by the initially selected roles does not count as a clean cycle.
+Every run ends in a plan the user can execute, shaped by mode. Read [references/planning-outputs.md](references/planning-outputs.md) for the templates. Every step has:
+
+- **ID and objective link** — which objective and question/ask it advances;
+- **owner** — library role or human, plus the decider for any decision it produces;
+- **inputs** — evidence, documents, access, and prior steps it needs;
+- **actions** — concrete, ordered actions specific enough that someone else could start;
+- **outputs** — board artifacts and documents produced, named by standard (e.g. `features/checkout-refund.feature`, ADR-0007, C4 container view);
+- **exit criterion** — the observable condition that ends the step, including what result would change the plan (for investigations, the finding that would kill or redirect a hypothesis);
+- **verification** — how someone checks the output (test, review, metric, source);
+- **dependencies, effort, and risk** — what it waits on, a comparative size, and what could go wrong.
+
+These fields apply to **every** step you present as part of the plan, including follow-on steps after a decision and steps inside post-decision playbooks. If a later step can't be specified yet, keep it out of the numbered plan and list it under "Sketched next steps" with the trigger that will make it plannable — don't present half-specified steps as plan steps.
+
+Investigation plans order steps by information gain per cost and include decision points ("if X, go to step 5; else step 7"). Decision plans end in a decision record and its follow-on implementation or validation steps. Implementation plans reach a first end-to-end validated slice before breadth work, and map every step back to an objective — work with no objective is scope creep, and an objective with no check is unverified.
 
 ## Completion output
 
-Return a concise projection of the board rather than a transcript:
+Return a concise projection of the board, not a transcript. Everything below belongs in what the user reads (the reply or the delivered documents), not only in board working files — a panel or decision that exists only in `control.yaml` is invisible to them:
 
-- refined outcome, non-goals, and evaluation criteria;
-- current model of the idea and its observable behaviors;
-- accepted, contested, rejected, and deferred hypotheses with rationale;
-- evidence, decisions, risks, dependencies, and unresolved questions;
-- material related-case families, coverage balance, and any evidence-backed exceptions;
-- important back-and-forth revisions and why the idea changed;
-- capabilities, BDD, tickets, dependency lanes, and join points only when requested;
-- control summary: cycles run, strategy shifts, blocked islands, and why processing stopped;
+- mode(s), mission, objective tree with success measures, non-goals, and evaluation criteria;
+- roster used: experts per wave, who was benched or added and why, and the coverage matrix with any intentionally empty cells;
+- current model of the problem: findings, behaviors, or options;
+- decisions as Y-statements with stances and dissent; accepted, contested, rejected, and deferred hypotheses;
+- documentation produced (with paths) and what each serves;
+- sidebar harvests and parking-lot dispositions;
+- evidence, risks, dependencies, and open questions;
+- the step-by-step plan;
+- control summary: cycles run, strategy shifts, stalls, blocked islands, why processing stopped, and the contribution ledger (whose entries survived into decisions);
 - verdict: `parent-ready`, `final-ready`, or `blocked`.
 
-Do not claim that agents, commands, tests, or external research ran unless they actually did. Do not convert an unresolved material choice into a recommendation merely to make the board look complete.
+### Required closing block
+
+End the reply to the user with this block, filled from the board. It is the part most often lost when work stays in working files, so write it even when the same content appears in a delivered document:
+
+```markdown
+## Board summary
+- **Mode / weight:** <mode(s)> · <light|full> · <single-agent role play | N subagents dispatched>
+- **Mission:** <one sentence>
+- **Objectives:** <id — outcome — success measure> (one line each)
+- **Panel:** wave 1: <3–5 experts> · later waves: <changes> · bench: <role — why not active>
+- **Decisions:** <id — Y-statement — status — stances (agree / disagree-and-commit / block)>
+- **Open sidebars / parking lot:** <id — disposition>
+- **Plan check:** <N> steps, all with objective link, owner, exit criterion, verification: yes | no (<which are missing>)
+- **Unverified claims:** <list, or "none">
+- **Verdict:** parent-ready | final-ready | blocked — <why>
+```
+
+Before sending, actually perform the plan check: walk every numbered step and confirm all four fields are present. Fix a missing field rather than reporting it, unless it genuinely can't be known yet; then move the step to "Sketched next steps".
+
+### Evidence integrity
+
+Every number or fact attributed to a source must come from a source you actually read in this run. If a page failed to load, say so and do not cite it for that figure; label remembered figures as `unverified (recalled)`. Never attach a citation to a figure the cited page did not contain.
+
+Do not claim that agents, commands, tests, or research ran unless they did. Do not convert an unresolved material choice into a recommendation to make the board look complete.

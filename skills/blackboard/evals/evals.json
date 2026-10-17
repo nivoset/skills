@@ -1,0 +1,62 @@
+{
+  "skill_name": "blackboard",
+  "evals": [
+    {
+      "id": 1,
+      "name": "dev-spend-cap-feature",
+      "prompt": "Use a blackboard session to plan a feature for my Next.js + Vercel ai-sdk planning app: each board gets an AI spend cap that the user sets (stored in localStorage), with a warning at 80% and a hard stop at 100% that blocks new expert-agent calls until the user raises the cap. Multiple tabs can be open on the same board. I want the expert agents you'd use, the gherkin, a C4 container view, any ADRs, and a step-by-step implementation plan.",
+      "expected_output": "Objective tree; 3-5 active experts chosen via coverage reasoning with bench; Gherkin features with negative/edge cases (multi-tab, race, cap raised); C4 container view; ADR(s) with Y-statement and stances; implementation plan with steps having objective link, owner, exit criterion, verification; walking skeleton first.",
+      "files": [],
+      "assertions": [
+        "Objective tree: objectives each with an observable/measurable success measure appear in the reply or a delivered document (not only in board working files)",
+        "Panel size: the reply or a delivered document names a specific set of 3-5 active domain experts for a wave (process roles excluded) and explains the bench or exclusions",
+        "Plan steps complete: every presented plan step (including follow-on and playbook steps) has an objective link, an owner, a checkable exit criterion, and a verification method",
+        "Decision record: at least one decision is written out with a complete Y-statement (context, facing, decided for, neglected, to achieve, accepting) and records expert stances or dissent",
+        "Honesty: does not present role-play as independent agents, does not mark decisions/ADRs accepted on the user's behalf, and labels assumptions and unverified claims",
+        "Closing block: the reply ends with a board summary covering mode, objectives, panel, decisions, plan check, unverified claims, and verdict",
+        "Gherkin quality: a .feature file with at least one Rule: block, a multi-tab scenario, and exactly one When per scenario (script-checked)",
+        "Hard stop: the admission rule guarantees settled plus in-flight spend never exceeds 100% of the cap, or the plan explicitly flags any overshoot as a choice for the user",
+        "C4 container view: diagram renders without error and shows containers with technology and labeled, directional relationships",
+        "ADR: at least one ADR file with two or more genuine considered options and a confirmation/check section",
+        "Walking skeleton: the implementation plan reaches a first end-to-end validated slice before breadth work"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "business-launch-decision",
+      "prompt": "I'm a solo dev making a non-combat RTS. I'm trying to decide between launching on Steam Early Access in about 3 months or holding for a polished 1.0 in about 9 months. Run a blackboard on this and give me a plan to make the decision and what to do after.",
+      "expected_output": "Mode investigate->decide; objectives with measurable success; business/investigation experts (product strategist, market researcher, finance, skeptic) not dev roles by default; investigation steps ordered by information gain with redirect conditions; options incl. hybrid; decision record with Y-statement, door classification, stances/contra-memo; follow-on plan.",
+      "files": [],
+      "assertions": [
+        "Objective tree: objectives each with an observable/measurable success measure appear in the reply or a delivered document (not only in board working files)",
+        "Panel size: the reply or a delivered document names a specific set of 3-5 active domain experts for a wave (process roles excluded) and explains the bench or exclusions",
+        "Plan steps complete: every presented plan step (including follow-on and playbook steps) has an objective link, an owner, a checkable exit criterion, and a verification method",
+        "Decision record: at least one decision is written out with a complete Y-statement (context, facing, decided for, neglected, to achieve, accepting) and records expert stances or dissent",
+        "Honesty: does not present role-play as independent agents, does not mark decisions/ADRs accepted on the user's behalf, and labels assumptions and unverified claims",
+        "Closing block: the reply ends with a board summary covering mode, objectives, panel, decisions, plan check, unverified claims, and verdict",
+        "Door classification: the launch decision (or its parts) is explicitly labeled one-way or two-way door",
+        "Dissent: a pre-mortem or contra-memo for the runner-up option is included",
+        "Evidence integrity: every figure attributed to a named source or URL is consistent with that source (spot-check with web fetch), or is labeled unverified; no citation is attached to an unreadable source",
+        "User inputs: gate thresholds are presented as proposals for the user to set, and the user-owned inputs that block the decision are listed"
+      ]
+    },
+    {
+      "id": 3,
+      "name": "ci-slowdown-investigation",
+      "prompt": "blackboard this: our CI pipeline (GitHub Actions, monorepo, ~40 packages, pnpm + turborepo) went from ~12 min to ~41 min over the past month and nobody knows why. I don't have the repo handy right now, I just want a solid investigation plan we can run tomorrow morning with whoever's around.",
+      "expected_output": "Investigate mode; hypotheses table with competing causes; investigation steps ordered by info gain per cost with exit/redirect criteria and verification; roles like root-cause-analyst, codebase-researcher, sre, skeptic; honest about no repo access (evidence unverified); decision points; documentation e.g. timeline/fishbone; no fabricated findings.",
+      "files": [],
+      "assertions": [
+        "Objective tree: objectives each with an observable/measurable success measure appear in the reply or a delivered document (not only in board working files)",
+        "Panel size: the reply or a delivered document names a specific set of 3-5 active domain experts for a wave (process roles excluded) and explains the bench or exclusions",
+        "Plan steps complete: every presented plan step (including follow-on and playbook steps) has an objective link, an owner, a checkable exit criterion, and a verification method",
+        "Decision record: at least one decision is written out with a complete Y-statement (context, facing, decided for, neglected, to achieve, accepting) and records expert stances or dissent",
+        "Honesty: does not present role-play as independent agents, does not mark decisions/ADRs accepted on the user's behalf, and labels assumptions and unverified claims",
+        "Closing block: the reply ends with a board summary covering mode, objectives, panel, decisions, plan check, unverified claims, and verdict",
+        "Ordering: investigation steps are ordered cheap/high-information first with explicit exit and redirect criteria",
+        "Morning-ready: steps are mapped onto real people or headcount scenarios (not only role names) so whoever shows up can run them",
+        "Discriminating experiment: the plan includes re-running a pre-slowdown commit against current head under the same conditions to separate repo-side from environment causes"
+      ]
+    }
+  ]
+}
