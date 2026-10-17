@@ -76,6 +76,15 @@ For suggested starter rosters and domain overlays, see the [examples index](exam
 
 For user-facing work, treat end-user advocacy as distinct from interface design. UI/UX examines interaction structure; the advocate examines accessibility, trust, agency, confusing failure states, and recovery across every affected domain.
 
+### Pi subagent profiles
+
+When using Pi with `pi-subagents`, treat discovered `blackboard-*` agents as execution profiles for matching role definitions, not as the board's role registry. First derive the active role and its trigger from the current board; then dispatch only the discovered profile that fits that activation. The profile name does not replace the stable `role_id`, goal, trigger, authority, or return contract in `roles.yaml` and `control.yaml`.
+
+Map activations by expertise: repository or source investigation to `blackboard-researcher`; interaction and visual choices to `blackboard-designer`; user accessibility, clarity, trust, and recovery to `blackboard-qa`; implementation correctness, reliability, and maintenance to `blackboard-engineer`; API, contract, dependency, or system-boundary questions to `blackboard-architect`; synthesis of validated contributions to `blackboard-synthesizer`. A user-facing design need constrained by an API contract may trigger `blackboard-architect`, not an invented generic role or an automatic designer-engineer pairing. These profiles form a capability pool, not a required team.
+
+`blackboard-controller` is an orchestration profile, not a specialist; use it only when delegating control of the blackboard itself. Before relying on any profile, confirm it is available in runtime discovery. If absent, do not claim it ran or emulate its execution; use an authorized local alternative or record the activation as blocked with its re-entry condition. Persisted-board roles remain registered in `roles.yaml`, with eligible activations and selection decisions in `control.yaml`; do not invent board frontmatter metadata for profiles or active roles.
+
+
 ## Opportunistic control loop
 
 Run cycles until a stop condition is met. Do not pre-commit to a phase pipeline or a fixed number of roles.
