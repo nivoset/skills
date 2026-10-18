@@ -1,11 +1,12 @@
 ---
 name: judge-prompt
 description: >
-  Judge prompts, system instructions, agent definitions, tool instructions, and
-  prompt-based workflows for fitness to their intended task. Build and dispatch
-  Blackboard-style reviewers dynamically from the artifact's goals, domain,
-  runtime, actions, outputs, and newly discovered risks; use when a prompt needs
-  an evidence-backed ready, revise, or blocked judgment.
+  Assess, test, or judge an existing prompt, system instruction, agent or skill
+  definition, tool instruction, or prompt-based workflow against its intended
+  behavior. Use when the user asks whether it is clear, safe, reliable,
+  runtime-compatible, or ready to use, including when adaptive Blackboard-style
+  reviewers are useful. Do not trigger for prompt drafting or rewriting without
+  evaluation, or for general discussion of prompt best practices.
 ---
 
 # Judge Prompt
