@@ -1,0 +1,8 @@
+interface:
+  display_name: "Judge Prompt"
+  short_description: "Judge an existing prompt with adaptive reviewers"
+policy:
+  products:
+    - CHAT
+    - CODEX
+  allow_implicit_invocation: true
