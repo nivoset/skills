@@ -68,15 +68,17 @@ Treat the following as candidate lenses, not a permanent panel. Create only role
 
 Create a new, narrowly scoped role whenever a material finding exposes expertise or a question that no current role covers. Give each role a stable ID, speciality, observable trigger, definitive goal, bounded question, required inputs and evidence, allowed proposed artifacts, completion and blocking conditions, finite cost/time/attempt bound, fallback, and propose-only authority. A role's goal must describe the result it produces, not the activity it performs.
 
+Register the role before dispatch. On a persisted Blackboard, add its definition to `roles.yaml` and its trigger-specific activation to `control.yaml`; for a conversational review, keep an equivalent role card and activation record in context. Keep reusable role identity separate from the per-cycle activation. Select an available execution profile only after runtime discovery, and preserve the role's own goal, trigger, and return contract when mapping it to a profile.
+
 ### 4. Dispatch and evolve the Blackboard roster
 
 Before dispatch, discover the actual subagent or delegation capability available in the current runtime. Do not claim an agent ran unless it was actually dispatched and returned.
 
 For each wave:
 
-1. Announce only roles selected for dispatch, with their goal, trigger, question, and return artifacts.
-2. Give each reviewer the same current artifact snapshot and review context, plus its bounded assignment. Keep assignments independent where possible.
-3. Ask reviewers to return exact prompt excerpts and locations, evidence, interpretation, impact, uncertainty, and a proposed finding or question. Do not ask them to rewrite the whole artifact.
+1. Announce only roles selected for dispatch, with their goal, trigger, question, and return artifacts. Record each activation as eligible, selected, dispatched, completed, blocked, expired, superseded, or rejected as applicable.
+2. Give each reviewer the same current artifact snapshot and review context, plus its role card and bounded assignment. Keep assignments independent where possible.
+3. Dispatch one role-specific reviewer for each selected activation through an actually available subagent or delegation tool. Ask the reviewer to return exact prompt excerpts and locations, evidence, interpretation, impact, uncertainty, and a proposed finding or question. Do not ask them to rewrite the whole artifact.
 4. Validate each contribution for scope, evidence, current version, authority, and completion goal before using it.
 5. Preserve distinct proposals and challenges as separate board events. Route a material challenge to the proposal owner or an equivalent reviewer for a response when that can add information.
 6. Re-evaluate role triggers after every material finding. Add and dispatch a new role when the new question can change the judgment; close or defer roles whose triggers no longer apply.
@@ -96,15 +98,15 @@ Prefer evaluation over prompt-style preferences. When the task and expected beha
 - run cases only when the runtime, tools, data, and authorization are available;
 - otherwise return proposed cases and mark execution as not run.
 
-Do not use one successful example as proof of reliability. Keep model comparisons on the same test inputs and criteria. Do not expose hidden reasoning as an evaluation artifact; request concise rationale and evidence instead.
+Require behavioral cases when the prompt is recurring or reused, supports consequential decisions, has complex machine-readable output, or claims reliability across edge cases. For a low-risk one-off text task with clear criteria, state why additional runtime testing is not needed; a representative sample response can help expose usability issues but does not prove reliability. If required evaluation cannot run, record the missing capability or inputs and mark coverage incomplete. Do not use one successful example as proof of reliability. Keep model comparisons on the same test inputs and criteria. Do not expose hidden reasoning as an evaluation artifact; request concise rationale and evidence instead.
 
 ### 6. Produce the judgment
 
 Use the strongest supported finding to determine the verdict; do not average away blockers or rely on a numeric aggregate score.
 
-- **ready** — no unresolved material issue is likely to prevent the intended behavior; applicable reviewer goals are satisfied; required evaluation evidence passes or is explicitly not applicable.
-- **revise** — one or more specific, fixable prompt issues remain, but the review can still identify a clear path to correction.
-- **blocked** — intent, authority, evidence, runtime access, or a required decision is missing such that a sound judgment cannot be made. Name the owner and re-entry condition.
+- **ready** — no unresolved material issue is likely to prevent the intended behavior; applicable reviewer goals are satisfied; required evaluation evidence passes or is explicitly not needed with a reason.
+- **revise** — one or more specific, fixable prompt issues remain, and the review can identify a clear path to correction. A substantiated blocker to prompt readiness can still produce a `revise` verdict when its correction is clear, even if other nonessential review coverage is incomplete; report the coverage gap.
+- **blocked** — intent, authority, evidence, required reviewer coverage, runtime access, or a required decision is missing such that a sound verdict cannot be made. Name the owner and re-entry condition.
 
 Classify findings as **blocker**, **major**, **minor**, or **polish**. Include exact location, evidence, likely consequence, confidence, and the smallest useful change. Keep reviewer disagreement visible and distinguish factual conflicts from choices that need user authority.
 
