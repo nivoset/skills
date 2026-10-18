@@ -2,6 +2,10 @@
 
 Use this contract when the board needs structured working state across multiple cycles, delegated waves, or handoffs within the active workspace. The board is temporary and may disappear when `.tmp/` is cleaned. For a small conversational refinement, keep the same logical records in context without creating empty files.
 
+## Contents
+
+Design intent · Files · Board snapshot (domain artifact, typed relation) · Implication sweep and case-family records · Knowledge-source definitions · Activation record · Contribution return contract · Applying contributions · Back-and-forth thread · Objective tree · Roster, coverage matrix, and contribution ledger · Decision records · Sidebars · Parking lot · Plan steps · Sensitive evidence and retention · Islands and joins · Control signals and learning · Cycle note · Readiness validation
+
 ## Design intent
 
 The domain board stores the evolving problem and partial solutions. The control board stores opportunities to reason about that state and the decision about which opportunity receives attention next. Specialists do not form a fixed pipeline. A board event may trigger a specialist that was irrelevant one cycle earlier.
@@ -20,8 +24,14 @@ The controller is the only board writer. Specialists receive a versioned snapsho
         ├── dispatch.yaml
         ├── events/
         │   └── <applied-version>-<event-id>.yaml
-        ├── disagreements/
-        │   └── <room-id>.yaml
+        ├── objectives.yaml
+        ├── decisions/
+        │   └── <decision-id>.yaml
+        ├── sidebars/
+        │   └── <sidebar-id>.yaml
+        ├── parking-lot.yaml
+        ├── documents/
+        │   └── <projected drafts: .feature, .md, .mmd>
         └── iterations/
             └── <cycle-id>.md
 ```
@@ -30,10 +40,14 @@ The controller is the only board writer. Specialists receive a versioned snapsho
 
 - `board.yaml` is the materialized current domain-board snapshot.
 - `roles.yaml` contains reusable and dynamically introduced knowledge-source definitions.
-- `control.yaml` contains the current agenda, focus, strategy, signals, and run budget.
+- `control.yaml` contains the mode, roster and coverage matrix, contribution ledger, current agenda, focus, strategy, signals, and run budget.
 - `dispatch.yaml` records planned and actual delegated work.
 - `events/` is immutable history and the source for reconstructing why the snapshot changed.
-- `disagreements/` preserves material evidence or decision conflicts through resolution.
+- `objectives.yaml` holds the mission, objective tree, non-goals, and evaluation criteria.
+- `decisions/` holds decision records (MADR fields plus Y-statement and stances).
+- `sidebars/` preserves disagreement rooms and working or verification sidebars through harvest.
+- `parking-lot.yaml` holds parked items and their dispositions.
+- `documents/` holds draft domain documents (Gherkin, diagrams, ADR drafts) until promoted.
 - `iterations/` contains concise human-readable deltas, not hidden reasoning transcripts.
 
 Do not create placeholder files. Create each artifact when its first real record exists.
@@ -84,7 +98,7 @@ Every entry in `artifacts` is typed and located on both a functional plane and a
   last_event_id: event-014
 ```
 
-Useful `type` values include `goal`, `non-goal`, `constraint`, `observation`, `evidence`, `question`, `hypothesis`, `alternative`, `behavior`, `risk`, `dependency`, `decision`, `finding`, `capability`, `slice`, and `evaluation-criterion`. Extend the vocabulary only when the new type changes validation, authority, or routing.
+Useful `type` values include `objective`, `option`, `document`, `plan-step`, `goal`, `non-goal`, `constraint`, `observation`, `evidence`, `question`, `hypothesis`, `alternative`, `behavior`, `risk`, `dependency`, `decision`, `finding`, `capability`, `slice`, and `evaluation-criterion`. Extend the vocabulary only when the new type changes validation, authority, or routing.
 
 Domain artifacts use the `knowledge`, `plan-abstractions`, or `emerging-plan` plane. Their abstraction level is `outcomes`, `designs`, `behaviors`, or `delivery`. This permits movement both across levels and between evidence, candidate structure, and the partial plan. Executive and meta-plan records live in `control.yaml` rather than being disguised as domain conclusions.
 
@@ -351,7 +365,7 @@ hypothesis A
 
 The controller should schedule a response when the challenge is material and the original rationale can still add information. It should not force a reply when decisive evidence already falsifies the proposal or the proposal owner is unavailable and an equivalent role can assess it.
 
-Open a disagreement room when independently supported artifacts conflict on facts, required behavior, authorization, or safety. A room records:
+Open a disagreement room (a sidebar of kind `disagreement`, see Sidebars below) when independently supported artifacts conflict on facts, required behavior, authorization, or safety. A room records:
 
 - room ID and affected artifact IDs;
 - strongest supported form of each position;
@@ -362,6 +376,155 @@ Open a disagreement room when independently supported artifacts conflict on fact
 - resolution, rationale, evidence, and any preserved dissent.
 
 Do not close a disagreement through majority vote, confidence averaging, or last-writer-wins. Evidence may settle factual disagreements. The named authority settles value or tradeoff decisions after the evidence is visible.
+
+## Objective tree
+
+`objectives.yaml` is written in Step 1, before staffing, and revised through normal events.
+
+```yaml
+mode: decide            # investigate | decide | implement; history kept in control.yaml
+mission: <what must be true when done, and for whom>
+objectives:
+  - id: obj-detect-region-failure
+    statement: On-call can identify the failing region within 5 minutes of an alert
+    success_measure: median time-to-identify < 5 min across the last 10 incidents or a game-day drill
+    evidence_required: [incident timeline, drill result]
+    priority: 1
+    authority: <named person or role who accepts this objective as met>
+    door: two-way        # one-way | two-way for the decisions this objective will force
+    questions:           # investigate: unknowns; decide: choices; implement: asks
+      - id: q-region-signal
+        statement: Which existing signal distinguishes regional from global failure?
+        state: open      # open | answered | parked | obsolete
+non_goals: []
+constraints: []
+evaluation_criteria:     # these are the tradeoff axes; each needs an owner in the coverage matrix
+  - id: crit-cost
+    statement: monthly run cost
+    direction: minimize
+```
+
+An objective is valid only when it states an outcome with an observable success measure and an accepting authority. Activity objectives ("analyze the logs") are rewritten or rejected.
+
+## Roster, coverage matrix, and contribution ledger
+
+`control.yaml` keeps:
+
+```yaml
+roster:
+  active: [requirements-analyst, solution-architect, security-reviewer, sre-reliability]
+  bench:
+    - role_id: finance-analyst
+      reason: no cost criterion triggered yet
+  max_active_per_wave: 4        # 3-5; record any override and why
+coverage_matrix:
+  rows: [outcomes->options, options->behaviors, behaviors->delivery]
+  columns: [obj-detect-region-failure, crit-cost, crit-risk]
+  cells:
+    - row: options->behaviors
+      column: crit-cost
+      generator: solution-architect
+      verifier: null             # empty cell -> recruitment trigger unless justified
+      justification_if_empty: null
+documents_owned:
+  - document: C4 container view
+    owner: solution-architect
+    serves: [obj-detect-region-failure]
+contribution_ledger:
+  - role_id: security-reviewer
+    activations: 3
+    entries_proposed: 7
+    entries_surviving_into_decisions: 4
+    no_delta_activations: 0
+    duplicates_of: []
+```
+
+An empty matrix cell is a recruitment trigger unless the controller records why it is not applicable. A role whose ledger shows repeated no-delta activations or entries that duplicate another role is a merge-or-bench candidate; record the decision and evidence. The ledger is how the board measures its own staffing; it never grants a role authority.
+
+## Decision records
+
+Every material decision gets a record in `decisions/`, numbered monotonically:
+
+```yaml
+decision_id: dec-0007
+title: Use per-region health probes for regional failure detection
+status: accepted          # proposed | accepted | rejected | superseded | deprecated
+supersedes: null
+superseded_by: null
+door: two-way
+decider: <user or delegated authority>
+consulted: [solution-architect, sre-reliability, finance-analyst]
+informed: [support-lead]
+objective_ids: [obj-detect-region-failure]
+context: <forces and constraints, citing artifact IDs>
+decision_drivers: [crit-cost, crit-time-to-detect]
+considered_options:
+  - option_id: opt-probes
+    pros: []
+    cons: []
+  - option_id: opt-log-anomaly
+    pros: []
+    cons: []
+decision: We will ...
+y_statement: >-
+  In the context of <use case>, facing <concern>, we decided for <option>
+  and neglected <other options>, to achieve <quality>, accepting that <downside>.
+consequences: []
+confirmation: <how compliance will be checked: test, review, metric>
+stances:
+  - role_id: finance-analyst
+    stance: disagree-and-commit   # agree | disagree-and-commit | block
+    reason: probe cost scales with regions; accepted for now
+board_version: 23                 # pinned snapshot the decision referenced
+origin_sidebar: sb-004
+evidence_ids: []
+```
+
+A `block` stance prevents acceptance until the decider resolves it explicitly. One-way-door decisions require a contra-memo artifact from the strongest dissenter and explicit decider acceptance. Reverse a decision only by a new superseding record.
+
+## Sidebars
+
+```yaml
+sidebar_id: sb-004
+kind: disagreement        # disagreement | working | verification
+anchor_ids: [hypothesis-log-anomaly, decision-candidate-probes]
+purpose_question: Can log anomaly detection meet the 5-minute objective without new infra?
+participants: [sre-reliability, data-analyst]     # usually 2-3
+base_version: 19
+bound: 2 exchanges or 30 minutes
+status: converged         # open | converged | parked | abandoned
+transcript_ref: sidebars/sb-004.transcript.md
+harvest:
+  summary: <what was learned>
+  decision_candidates: [dec-0007]
+  new_artifacts: []
+  new_questions: []
+  action_items: [{item: run probe cost estimate, owner: finance-analyst}]
+  preserved_dissent: []
+  posted_event_id: event-031
+```
+
+A sidebar cannot move to `converged`, `parked`, or `abandoned` without a harvest posted to the main board as an event. `abandoned` still harvests what was learned and why it stopped. Information in a sidebar is scoped context, not protected data.
+
+## Parking lot
+
+```yaml
+- item_id: park-012
+  statement: Consider multi-cloud failover
+  origin_artifact_id: q-region-signal
+  raised_by: solution-architect
+  parked_because: outside non-goal "no new cloud providers this quarter"
+  disposition: defer       # delete | defer | delegate | pending
+  owner: <role or person>
+  expires_at: <date or cycle>
+  reentry_condition: <when it comes back>
+```
+
+Review every `pending` item before each readiness check. An item cannot stay `pending` through `final-ready`.
+
+## Plan steps
+
+The final plan is projected from `plan-step` artifacts. Each records `id`, `objective_ids`, `question_ids`, `owner`, `decider`, `inputs`, `actions`, `outputs` (artifact IDs and document paths), `exit_criterion`, `redirect_if`, `verification`, `depends_on`, `effort` (Fibonacci signal), and `risks`. See `references/planning-outputs.md`.
 
 ## Sensitive evidence and retention
 
@@ -415,7 +578,8 @@ After an activation completes, record whether it produced the expected delta, a 
 - dispatches and contribution statuses;
 - applied event IDs;
 - implication sweeps opened, updated, or closed, including coverage balance changes;
-- newly opened, changed, or closed disagreements;
+- sidebars opened, harvested, or abandoned, and parking-lot changes;
+- roster changes (recruited, benched, merged) and the reason;
 - strategy shift or stall result;
 - remaining agenda and next resume trigger.
 

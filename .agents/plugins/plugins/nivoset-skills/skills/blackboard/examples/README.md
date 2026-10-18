@@ -1,5 +1,7 @@
 # Blackboard starter rosters
 
+The general-purpose expert catalog — development, business, and investigation roles with their documentation duties — is in [../references/agents/README.md](../references/agents/README.md). The files here are finer-grained overlays for specific planning stages and domains; each overlay role specializes a library role (record `specializes: <library-id>`). Keep the active panel at 3–5 per wave even when an overlay lists more roles: the rest sit on the bench until their trigger fires.
+
 These examples suggest knowledge sources for common blackboard runs. They are starting points, not fixed teams: select only roles whose triggers are true, and reassess the roster after every material board change. All roles are `propose-only`. Every registered actor must copy a definitive goal from the example or refine it for the bounded assignment. The goal states the observable result the actor must produce and is the standard for `passed`; speciality and activity alone are insufficient.
 
 ## Planning stages
