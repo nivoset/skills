@@ -1,6 +1,6 @@
 ---
 name: planning-orchestrator
-description: Orchestrate codebase research, decision clarification, and ticket decomposition into independently testable leaf tickets with plain-English acceptance tests.
+description: Use when planning a feature, refactor, migration, integration, large repair, or codebase-researched breakdown into developer-consumable tickets.
 ---
 
 # Planning Orchestrator
@@ -17,6 +17,15 @@ This skill is the main planning entrypoint. It owns repository mapping, research
 - Use when the user wants the work split into developer-consumable tickets.
 - Use when the user wants codebase research before questions or estimates.
 - Do not use when the user only wants implementation, code review, or a risk review.
+
+## Related skill boundaries
+
+- Use `planning-questions` first when the request prescribes an implementation instead of a need, touches architecture or a shared contract, crosses a trust/auth boundary, or the requester wants options and a challenge — it resolves the decision, then hands off here.
+- Use `planning-decomposer` directly only when research and decisions are already settled.
+- Use `ticket-building-system` when the user wants a single ticket draft or tracker metadata without planning a breakdown.
+- Use `questline` for grooming an existing tracker tree rather than planning from a desired outcome.
+- Use `objective-check` for readiness validation and `tdd` when implementation starts.
+- Use `bdd` only when acceptance tests or scenarios need behavior wording help.
 
 ## Scope Inputs
 
