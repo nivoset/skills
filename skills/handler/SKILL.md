@@ -1,48 +1,26 @@
 ---
 name: handler
-description: Use when taking a bug or feature ticket through delegated investigation, behavior testing, implementation, browser evidence, and pull-request validation.
+description: Use when delivering a supplied bug or feature ticket through an existing branch, delegated research, implementation, and pull-request validation.
 ---
 
 # Handler
 
-Coordinate ticket delivery from verified failure to reviewed, tested pull request. The orchestrator owns sequencing and decisions; specialists own isolated evidence or implementation lanes. Do not treat urgency, plausible intent, or a green partial check as authorization to guess behavior or claim completion.
+Coordinate delivery of a supplied ticket on its verified existing branch where possible. The orchestrator owns scope, branch/worktree safety, phase state, integration, publication, and final claims.
 
-## Start and scope
+**Required reference:** Read [references/workflow.md](references/workflow.md) before acting. Apply `worktree`, `cmux`, `fish-cli`, `linear-cli` (or the supplied tracker), `nlm-skill`, `fix-merge-conflicts`, `tdd`, and `babysitting-pull-requests`; apply test-naming and change-aware test classification guidance when changing tests. Prefer CI for scenario reproduction and capture; when unsuitable, use task-local Docker, then `pnpm start`, then documented `dev`, with unused-port and safe-target checks.
 
-1. Confirm the ticket identifier, canonical ticket, current repository/worktree, branch, repository instructions, acceptance criteria, and existing changes. Inspect the current cmux session and reuse a matching ticket workspace; open the canonical ticket in a `<TICKET> ticket` browser subtab once its URL is known. Preserve pre-existing work. Do not take ownership of another agent’s files or ticket.
-2. Inspect relevant code, tests, product rules, PR template, naming rules, CI checks, and project browser setup. Build a behavior matrix: each affected user-observable behavior, inputs/boundaries, routes/consumers, fallback and recovery paths, expected result, evidence source, and planned test.
-3. If acceptance or authoritative behavior is ambiguous, stop before implementation and ask a narrow question. Existing tests/code may provide evidence, not permission to invent a product rule. Record assumptions only when a human explicitly authorizes them.
-4. Check out the task branch and establish a clean, isolated worktree. Record baseline HEAD and status. Avoid concurrent writes to the same files.
-5. Keep planning notes, scratch files, temporary scripts, logs, browser traces, and generated artifacts out of commits and pushes. Store temporary work outside the repository or in ignored paths; store required review evidence in an agreed artifact location. Before staging, inspect the full diff and staged file list. Stage only the intended implementation, tests, and explicitly requested durable documentation. Never use blanket staging (`git add .` / `git add -A`) when temporary or unrelated files may exist. If any planning or temporary file was staged, unstage it before commit; do not commit or push it.
+**Keep the delivery in `/goal` mode:** Start `/goal` with the supplied ticket and the completion target `ready-for-human`. Do not end the goal at branch selection, push, PR creation, or CI submission. Keep it active through relevant service lifecycle/up/down validation, exact-SHA checks, accessible scenario proof, review resolution, and PR-ready notification. For PR monitoring, also use `babysitting-pull-requests`; its watch limits and stop conditions apply. A blocker or expired watch window is not goal completion: report the last observed state and awaited input, without claiming success.
 
-## Delegated lanes
+## Phase gates
 
-The main agent is an orchestrator. Delegate each substantive phase to a uniquely named specialist whose name includes the ticket ID and role. Every handoff states objective, exact behavior row, allowed/forbidden paths, relevant skill, exact verification command, prior evidence, stop conditions, and required return fields. Require status, claims, evidence (path/symbol/command/result), uncertainty, changed files, blockers, and next action. Specialists propose evidence; parent controls scope and integrates only after review.
+1. **Research:** resolve ticket, active PR/branch, worktree ownership, behavior inventory, and independent NotebookLM/source evidence. Missing docs alone do not block clear behavior; ambiguity does.
+2. **Conflicts:** plan branch/file and service-contract conflicts with evidence, owners, and validation before changes; then repair with exclusive writer ownership and hand off the integrated SHA. Clean/up-to-date is `not-needed`; conflict repair never pushes.
+3. **Delivery:** reread at integrated SHA, establish focused red→green evidence under TDD lane ownership, and, when relevant, validate task-local services and documented up/down requests. Prefer CI for scenario reproduction/capture; if unsuitable, use task-local Docker, then `pnpm start`, then documented `dev`, after verifying local ports are unused and the target is safe. Local demonstrations are valid scenario evidence, not CI checks. Review and push/update the selected branch; create or update its PR as specified in the workflow. Preserve existing fixes.
+4. **CI:** run required checks in CI against exact SHAs; use scenario proof from CI when available or the safe local fallback order above. Pending, failed, missing, inaccessible, skipped-required, or stale-SHA checks are not pass.
+5. **Ready for human:** only after required checks, proof, review findings, and behavior inventory pass; mark PR ready and notify. Never approve, merge, or move ticket state automatically.
 
-1. **Failure test (red):** a test specialist creates the smallest user-behavior test for the reported defect, preferably reusable unchanged for after-fix validation. Use the repository’s naming and test conventions. Parent verifies the test fails for the claimed defect, and that it fails for the intended reason rather than setup, selector, timing, or environment noise. Do not implement until this is established.
-2. **Before evidence:** independently delegate a browser specialist to capture the unfixed scenario and record video using the project-supported browser setup. Local scenario capture is allowed only against a task-local service after verifying the selected port is unused and the service uses that port; never run E2E locally or send traffic to shared, staging, or production services. E2E execution and its capture remain CI-only. Preserve the exact command, browser/runtime version, URL or fixture, ticket/commit, artifact path, and result. If reproducible capture is impossible, report the blocker; do not claim visual verification.
-3. **Plan and edge cases:** delegate a test/behavior reviewer to validate the matrix, failure test and implementation plan, including boundary, negative, duplicate, stale, recovery, and authorization cases that apply. Parent reconciles evidence and resolves scope questions before implementation.
-4. **Implementation:** use the `tdd` skill and its lane contracts. Assign the green implementer only production paths; tests remain owned by the red lane. Verify each inventory row through red, red-verifier, green, reviewer, and close as applicable. Do not weaken or delete a valid failing test to get green.
-5. **After evidence:** capture the same scenario against the fixed candidate and record the after video, following the same local-port and CI-only E2E boundaries. Confirm the scenario matches and compare artifacts. If a different scenario is required, explain why and retain evidence for both behaviors. Do not claim success from a stale capture or a different commit.
+Keep one resumable cmux workspace per ticket, publish phase/blocker/source/service state, and keep planning/proof scratch under ignored `.tmp/<TICKET>/`. Keep local evidence visible in the same-pane `<TICKET> proof` subtab. Preserve unrelated dirty work; never reset, clean, stash, force-checkout, or stage it. A blocker must state what failed or is prohibited, why it prevents the next gate, observed evidence, owner, and exact next action. Stop only dependent work; continue independent permitted work. A documentation/source gap does not block clear behavior.
 
-No two active delegates may write the same path. Parent owns integration, scope changes, ticket/PR actions, and final claims. Stop on ambiguous behavior, invalid red, unavailable verification commands after project retry, unrelated dirty changes, or required paths outside the lane.
+## Handoff
 
-## Pull request and checks
-
-1. Inspect repository contribution instructions, strict branch/commit/test naming rules, PR template, target branch, and required checks. Do not guess conventions; cite the source used. Use neutral wording in new external-facing artifacts where project policy requires it.
-2. Once the fix and focused review are ready, push the selected feature branch and create or update a **draft** PR; pushing and PR creation are allowed delivery actions. Open the PR in a `<TICKET> PR #<number>` browser subtab in the ticket workspace as soon as its URL exists. Include the ticket link, concise behavior summary, test evidence, and accessible before/after videos (attach or link artifacts with permissions verified). Follow every required PR-template field. Do not mark ready yet.
-3. Run required static, unit, and applicable integration/e2e checks on the pushed candidate. If a check is deferred, failed, unavailable, or inconclusive, keep the PR draft and report it; never represent a partial suite as all checks passing. Confirm checks apply to the exact current commit and rerun/invalidate after relevant changes.
-4. Mark the PR ready only after required checks pass, code review findings are resolved, both videos are posted and accessible, the PR template and naming rules are satisfied, and ticket acceptance is verified. Parent records check names, commit SHA, commands/results, and unresolved risks.
-5. Never approve or merge. Do not claim the ticket is complete before the defined PR/ticket completion state is observed.
-
-## Required handoff
-
-Return: ticket and branch; behavior matrix; delegation roster and lane results; reproduced failure and exact red evidence; before/after video paths and accessibility; changed files; plan/review and edge-case outcomes; PR URL/state and template compliance; candidate SHA; checks with exact commands/results; blockers, assumptions, and unresolved risks; next action. Label overall state `blocked`, `draft-review`, `ready-for-human`, or `complete` and explain the gate met.
-
-## Stop conditions
-
-- Acceptance is ambiguous: ask; do not infer and implement under pressure.
-- Browser setup/capture fails: report blocker; do not omit the before/after evidence silently.
-- Red test does not fail for the ticket defect: fix test setup or return to scope discovery.
-- Required checks or review are outstanding: keep PR draft.
-- Pre-existing changes overlap: stop and coordinate ownership; never overwrite or stage them.
+Return selected branch/base/worktree, ticket and PR state, behavior/source evidence, lane results, exact baseline/candidate SHAs, checks and proof links, workspace state, blockers, risks, and next action. Include the per-gate evidence table defined in the workflow. Do not claim an unobserved gate.
