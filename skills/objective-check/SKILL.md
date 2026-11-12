@@ -1,6 +1,6 @@
 ---
 name: objective-check
-description: Use when validating that an Epic, Feature, parent ticket, or ticket subtree is coherent, dependency-safe, testable, and ready before implementation or TDD orchestration.
+description: Use when auditing an Epic, Feature, parent ticket, or ticket subtree for objective coverage, dependency safety, acceptance criteria, test evidence, and readiness before implementation or TDD.
 ---
 
 # Objective Check
